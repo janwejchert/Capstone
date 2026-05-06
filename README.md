@@ -13,11 +13,19 @@ The working agreement and the phased implementation plan are in
 
 ```
 pip install -r requirements.txt
+pip install -e .
 jupyter notebook notebooks/
 ```
 
-Open the phase you want to run. Each notebook starts with a parameters cell
-you can edit to explore variations.
+The second command installs the local `reflexive_market` package so the
+notebooks can import it. Open the phase you want to run. Each notebook starts
+with a parameters cell you can edit to explore variations.
+
+To run the tests:
+
+```
+pytest -q
+```
 
 ## Layout
 
