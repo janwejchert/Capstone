@@ -134,8 +134,20 @@ Every notebook follows the same skeleton.
    knob the notebook uses, with a short comment for each. This is the only
    place numeric values should appear. Changing a parameter and re-running
    should be enough to see a different variation.
-3. **Imports cell**: numpy, matplotlib, and the local package only. No pandas,
-   scipy, statsmodels, or sklearn unless a phase clearly justifies it.
+3. **Imports cell**: starts with two lines that add `../src` to `sys.path`
+   so the local package imports work even when the kernel does not have
+   `reflexive_market` installed. Then numpy, matplotlib, and the local
+   package only. No pandas, scipy, statsmodels, or sklearn unless a phase
+   clearly justifies it.
+
+   ```
+   import sys
+   sys.path.append("../src")
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from reflexive_market import simulate
+   ```
 4. **Setup cell**: build a `numpy.random.default_rng(seed)` and any derived
    constants.
 5. **Run cell**: call `simulate.run(...)` once. Keep this short.
