@@ -1,0 +1,108 @@
+"""Phase 4 invariants for forecast-based trading and stochastic adoption."""
+
+import numpy as np
+
+from reflexive_market import adoption, simulate, traders
+from reflexive_market.metrics import lag1_autocorr
+
+
+def test_advanced_order_clips_to_position_cap():
+    assert traders.advanced_order(0.05, risk_scale=0.001, q_cap=2.0) == 2.0
+    assert traders.advanced_order(-0.05, risk_scale=0.001, q_cap=2.0) == -2.0
+
+
+def test_advanced_order_returns_zero_for_nan_forecast():
+    assert traders.advanced_order(float("nan"), risk_scale=0.001, q_cap=2.0) == 0.0
+
+
+def test_advanced_order_passes_through_within_cap():
+    out = traders.advanced_order(0.001, risk_scale=0.001, q_cap=2.0)
+    assert abs(out - 1.0) < 1e-12
+
+
+def test_stochastic_diffusion_with_zero_pi_and_delta_is_no_op():
+    rng = np.random.default_rng(0)
+    state = np.array([0, 1, 0, 1, 0])
+    out = adoption.stochastic_diffusion_step(state, pi=0.0, delta=0.0, rng=rng)
+    np.testing.assert_array_equal(out, state)
+
+
+def test_stochastic_diffusion_pushes_population_to_full_adoption():
+    rng = np.random.default_rng(1)
+    state = np.zeros(500, dtype=int)
+    for _ in range(2000):
+        state = adoption.stochastic_diffusion_step(state, pi=0.01, delta=0.0, rng=rng)
+    assert state.mean() > 0.95
+
+
+def test_stochastic_diffusion_reaches_steady_state_with_exit():
+    rng = np.random.default_rng(2)
+    state = np.zeros(2000, dtype=int)
+    for _ in range(3000):
+        state = adoption.stochastic_diffusion_step(
+            state, pi=0.02, delta=0.02, rng=rng
+        )
+    assert abs(state.mean() - 0.5) < 0.05
+
+
+def test_simulate_run_default_kwargs_match_phase1_behaviour():
+    a = simulate.run(
+        T=200, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(11),
+    )
+    b = simulate.run(
+        T=200, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(11),
+    )
+    np.testing.assert_array_equal(a["returns"], b["returns"])
+    assert np.all(np.isnan(a["forecasts"]))
+    assert np.all(a["adoption_share"] == 0.0)
+
+
+def test_simulate_run_with_zero_adoption_and_forecast_matches_baseline():
+    """Turning the forecast on but keeping zero adoption must not change the
+    realised path, since adopters do not exist to act on the forecast."""
+    base = simulate.run(
+        T=600, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(7),
+    )
+    fc = simulate.run(
+        T=600, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(7),
+        forecast_window=100, forecast_p=1, risk_scale=0.001, q_cap=2.0,
+        adoption_pi=0.0, adoption_delta=0.0, initial_adoption_share=0.0,
+    )
+    np.testing.assert_array_equal(base["returns"], fc["returns"])
+    assert np.all(np.isnan(fc["forecasts"][:100]))
+    assert np.all(np.isfinite(fc["forecasts"][100:]))
+
+
+def test_adoption_share_rises_under_positive_pi():
+    out = simulate.run(
+        T=2000, N=200, mu=0.05, phi=0.20, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(17),
+        forecast_window=100, forecast_p=1, risk_scale=0.001, q_cap=1.0,
+        adoption_pi=0.005, adoption_delta=0.0,
+    )
+    assert out["adoption_share"][0] < 0.05
+    assert out["adoption_share"][-1] > 0.95
+
+
+def test_high_adoption_changes_lag1_autocorr_relative_to_baseline():
+    """Sanity check the central mechanism: a long run with full adoption
+    has a different empirical lag-1 autocorrelation than the same run with
+    zero adoption. The direction depends on parameters; this test only
+    asserts a non-trivial change."""
+    common = dict(
+        T=4000, N=200, mu=0.05, phi=0.25, sigma_news=0.01, sigma_q=1.0,
+        forecast_window=250, forecast_p=1, risk_scale=0.001, q_cap=1.0,
+    )
+    base = simulate.run(rng=np.random.default_rng(31), **common)
+    full = simulate.run(
+        rng=np.random.default_rng(31),
+        initial_adoption_share=1.0,
+        **common,
+    )
+    rho_base = lag1_autocorr(base["returns"])
+    rho_full = lag1_autocorr(full["returns"])
+    assert abs(rho_base - rho_full) > 0.02

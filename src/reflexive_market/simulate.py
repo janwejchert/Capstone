@@ -8,55 +8,123 @@ proposal:
     3. The market maker absorbs aggregate demand and moves the quote.
     4. The exogenous news shock and residual AR term realise.
 
-Phase 1 adds the loop with null traders only. Later phases add the forecast,
-adoption, and switching steps.
+Phase 1 added the loop with null traders only. Phase 4 extends the same
+function with the rolling AR forecast, the BH98 advanced order with cap, and
+stochastic adoption diffusion. The defaults reduce the function back to the
+phase 1-3 baseline.
 """
 
 import numpy as np
 
+from . import adoption as adoption_mod
+from . import forecast as forecast_mod
 from . import market, traders
 
 
-def run(T, N, mu, phi, sigma_news, sigma_q, rng):
-    """Run the baseline market for T periods with all traders using the null rule.
+def run(
+    T,
+    N,
+    mu,
+    phi,
+    sigma_news,
+    sigma_q,
+    rng,
+    forecast_window=None,
+    forecast_p=1,
+    risk_scale=None,
+    q_cap=None,
+    adoption_pi=0.0,
+    adoption_delta=0.0,
+    initial_adoption_share=0.0,
+):
+    """Run the market for T periods.
+
+    With the phase 1-3 defaults (no forecast_window, zero adoption) every
+    trader uses the random null rule and the loop is the original baseline
+    simulator. Pass a forecast_window plus adoption parameters to run the
+    phase 4 setup with reflexive adoption.
 
     Parameters
     ----------
-    T : int
-        Number of periods to simulate.
-    N : int
-        Number of traders.
-    mu : float
-        Market-maker price-impact coefficient (equation 5).
-    phi : float
-        Reduced-form residual AR(1) coefficient in the return law (equation 6).
-    sigma_news : float
-        Standard deviation of the exogenous news shock.
-    sigma_q : float
-        Standard deviation of individual null orders (equation 8).
-    rng : numpy.random.Generator
-        Source of randomness.
+    T, N, mu, phi, sigma_news, sigma_q, rng :
+        Phase 1 parameters. See equations (5), (6), (8).
+    forecast_window : int or None
+        Rolling AR window length. None disables forecasting; adopters then
+        always trade the null rule.
+    forecast_p : int
+        AR order. Defaults to 1, matching equations (9), (10).
+    risk_scale : float or None
+        Combined ``a * sigma^2`` denominator from equation (3). Required when
+        forecast_window is set.
+    q_cap : float or None
+        Per-trader position cap from equation (3). Required when
+        forecast_window is set.
+    adoption_pi, adoption_delta : float
+        Per-period transition probabilities for equations (11), (12).
+    initial_adoption_share : float
+        Fraction of agents who already use the advanced rule at t = 0.
 
     Returns
     -------
-    dict
-        prices : ndarray of shape (T + 1,), log prices with p_0 = 0.
-        returns : ndarray of shape (T,), one-period returns.
-        demand : ndarray of shape (T,), aggregate demand each period.
+    dict with keys
+        prices, returns, demand : as in the phase 1 baseline.
+        forecasts : ndarray of shape (T,), one-period-ahead AR forecast each
+            period (NaN before the warm-up).
+        adoption_share : ndarray of shape (T,), share of adopters at the end
+            of each period after the diffusion step.
     """
     prices = np.zeros(T + 1)
     returns = np.zeros(T)
     demand = np.zeros(T)
+    forecasts = np.full(T, np.nan)
+    adoption_share = np.zeros(T)
+
+    forecasting_on = forecast_window is not None
+    if forecasting_on and (risk_scale is None or q_cap is None):
+        raise ValueError(
+            "risk_scale and q_cap are required when forecast_window is set"
+        )
+
+    adoption = np.zeros(N, dtype=int)
+    if initial_adoption_share > 0.0:
+        n_initial = int(round(initial_adoption_share * N))
+        if n_initial > 0:
+            initial_idx = rng.choice(N, size=n_initial, replace=False)
+            adoption[initial_idx] = 1
 
     r_prev = 0.0
     for t in range(T):
-        orders = traders.null_orders(N, sigma_q, rng)
+        if forecasting_on and t >= forecast_window:
+            history = returns[t - forecast_window : t]
+            fitted = forecast_mod.fit_ar(history, p=forecast_p)
+            forecasts[t] = forecast_mod.forecast_next(history, fitted)
+
+        null = traders.null_orders(N, sigma_q, rng)
+        if forecasting_on:
+            q_adv = traders.advanced_order(forecasts[t], risk_scale, q_cap)
+            orders = (1 - adoption) * null + adoption * q_adv
+        else:
+            orders = null
+
         D_t = market.aggregate_demand(orders)
         epsilon = rng.standard_normal()
         r_new = market.next_return(r_prev, D_t, mu, phi, sigma_news, epsilon)
+
         prices[t + 1] = prices[t] + r_new
         returns[t] = r_new
         demand[t] = D_t
         r_prev = r_new
 
-    return {"prices": prices, "returns": returns, "demand": demand}
+        if adoption_pi > 0.0 or adoption_delta > 0.0:
+            adoption = adoption_mod.stochastic_diffusion_step(
+                adoption, adoption_pi, adoption_delta, rng
+            )
+        adoption_share[t] = adoption.mean()
+
+    return {
+        "prices": prices,
+        "returns": returns,
+        "demand": demand,
+        "forecasts": forecasts,
+        "adoption_share": adoption_share,
+    }
