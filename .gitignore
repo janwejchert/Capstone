@@ -18,6 +18,7 @@ env/
 .DS_Store
 Thumbs.db
 
-# Results that are too large to track
+# Results: track small phase summaries, ignore everything else
 results/data/*.npz
 !results/data/.gitkeep
+!results/data/phase_*.npz

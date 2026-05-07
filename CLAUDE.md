@@ -134,15 +134,15 @@ Every notebook follows the same skeleton.
    knob the notebook uses, with a short comment for each. This is the only
    place numeric values should appear. Changing a parameter and re-running
    should be enough to see a different variation.
-3. **Imports cell**: starts with two lines that add `../src` to `sys.path`
-   so the local package imports work even when the kernel does not have
-   `reflexive_market` installed. Then numpy, matplotlib, and the local
+3. **Imports cell**: starts with two lines that prepend `../src` to `sys.path`
+   so the local checkout imports win even if an older `reflexive_market` is
+   already installed in the kernel. Then numpy, matplotlib, and the local
    package only. No pandas, scipy, statsmodels, or sklearn unless a phase
    clearly justifies it.
 
    ```
    import sys
-   sys.path.append("../src")
+   sys.path.insert(0, "../src")
 
    import numpy as np
    import matplotlib.pyplot as plt
