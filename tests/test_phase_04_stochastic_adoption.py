@@ -88,6 +88,28 @@ def test_adoption_share_rises_under_positive_pi():
     assert out["adoption_share"][-1] > 0.95
 
 
+def test_adoption_args_do_not_advance_market_rng():
+    """No-op adoption settings, including pi=0 with delta>0 and zero initial
+    adopters, must not change the exogenous market path. Otherwise across-
+    regime comparisons would be confounded by different shock streams."""
+    common = dict(
+        T=400, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+    )
+    base = simulate.run(rng=np.random.default_rng(123), **common)
+    no_op = simulate.run(
+        rng=np.random.default_rng(123),
+        adoption_pi=0.0, adoption_delta=0.0, initial_adoption_share=0.0,
+        **common,
+    )
+    delta_only = simulate.run(
+        rng=np.random.default_rng(123),
+        adoption_pi=0.0, adoption_delta=0.05, initial_adoption_share=0.0,
+        **common,
+    )
+    np.testing.assert_array_equal(base["returns"], no_op["returns"])
+    np.testing.assert_array_equal(base["returns"], delta_only["returns"])
+
+
 def test_high_adoption_changes_lag1_autocorr_relative_to_baseline():
     """Sanity check the central mechanism: a long run with full adoption
     has a different empirical lag-1 autocorrelation than the same run with

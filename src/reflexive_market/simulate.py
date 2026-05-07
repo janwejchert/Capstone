@@ -73,6 +73,13 @@ def run(
         adoption_share : ndarray of shape (T,), share of adopters at the end
             of each period after the diffusion step.
     """
+    # Spawn an independent rng for adoption draws so adoption parameters
+    # cannot advance the market shock stream. With this split, no-op
+    # adoption settings (pi = delta = 0, no initial adopters) leave the
+    # realised market path identical to a call without any adoption args,
+    # and across-regime comparisons stay paired on the same shocks.
+    adoption_rng = np.random.default_rng(rng.integers(0, 2**63 - 1))
+
     prices = np.zeros(T + 1)
     returns = np.zeros(T)
     demand = np.zeros(T)
@@ -89,7 +96,7 @@ def run(
     if initial_adoption_share > 0.0:
         n_initial = int(round(initial_adoption_share * N))
         if n_initial > 0:
-            initial_idx = rng.choice(N, size=n_initial, replace=False)
+            initial_idx = adoption_rng.choice(N, size=n_initial, replace=False)
             adoption[initial_idx] = 1
 
     r_prev = 0.0
@@ -117,7 +124,7 @@ def run(
 
         if adoption_pi > 0.0 or adoption_delta > 0.0:
             adoption = adoption_mod.stochastic_diffusion_step(
-                adoption, adoption_pi, adoption_delta, rng
+                adoption, adoption_pi, adoption_delta, adoption_rng
             )
         adoption_share[t] = adoption.mean()
 
