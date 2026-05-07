@@ -1,13 +1,13 @@
 # Notebooks
 
 One notebook per phase. Run them in order. See `../CLAUDE.md` for what each
-phase delivers and the order of construction. Only phase 1 is implemented so
-far. Phases 2-7 are planned and listed for reference.
+phase delivers and the order of construction. Phases 1 and 2 are implemented
+so far. Phases 3-7 are planned and listed for reference.
 
 | Phase | Status  | File                                       | Goal                                            |
 |-------|---------|--------------------------------------------|-------------------------------------------------|
 | 1     | done    | `phase_01_baseline_market.ipynb`           | Baseline market with null traders only          |
-| 2     | planned | `phase_02_benchmark_validation.ipynb`      | Stable descriptive stats across seeds           |
+| 2     | done    | `phase_02_benchmark_validation.ipynb`      | Stable descriptive stats across seeds           |
 | 3     | planned | `phase_03_ar_forecast.ipynb`               | Rolling AR forecast, no adoption                |
 | 4     | planned | `phase_04_stochastic_adoption.ipynb`       | Forecast-based trading and stochastic adoption  |
 | 5     | planned | `phase_05_performance_adoption.ipynb`      | Risk-adjusted performance-based adoption        |
