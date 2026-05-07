@@ -88,6 +88,36 @@ def test_adoption_share_rises_under_positive_pi():
     assert out["adoption_share"][-1] > 0.95
 
 
+def test_adoption_start_t_holds_indicators_then_releases():
+    """With initial adoption at zero, no transitions can fire until
+    ``adoption_start_t``. After that index the share rises as usual."""
+    out = simulate.run(
+        T=600, N=128, mu=0.05, phi=0.10,
+        sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(0),
+        adoption_pi=0.05, adoption_delta=0.0,
+        adoption_start_t=200,
+    )
+    np.testing.assert_array_equal(out["adoption_share"][:200], 0.0)
+    assert out["adoption_share"][-1] > 0.5
+
+
+def test_adoption_start_t_does_not_change_market_path():
+    """Delaying transitions must leave the realised return path identical
+    when no adopters can act on the forecast yet."""
+    common = dict(
+        T=400, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+    )
+    base = simulate.run(rng=np.random.default_rng(13), **common)
+    delayed = simulate.run(
+        rng=np.random.default_rng(13),
+        adoption_pi=0.1, adoption_delta=0.0,
+        adoption_start_t=300,
+        **common,
+    )
+    np.testing.assert_array_equal(base["returns"], delayed["returns"])
+
+
 def test_adoption_args_do_not_advance_market_rng():
     """No-op adoption settings, including pi=0 with delta>0 and zero initial
     adopters, must not change the exogenous market path. Otherwise across-

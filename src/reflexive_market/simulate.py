@@ -36,6 +36,7 @@ def run(
     adoption_pi=0.0,
     adoption_delta=0.0,
     initial_adoption_share=0.0,
+    adoption_start_t=0,
 ):
     """Run the market for T periods.
 
@@ -63,6 +64,12 @@ def run(
         Per-period transition probabilities for equations (11), (12).
     initial_adoption_share : float
         Fraction of agents who already use the advanced rule at t = 0.
+    adoption_start_t : int
+        Index at which stochastic transitions begin. Before this index the
+        adoption indicators stay at their initial values, even when
+        ``adoption_pi`` or ``adoption_delta`` is non-zero. Lets phase 4
+        align the diffusion onset with metric warm-up so a regime's
+        low-adoption span has metric observations to compare with.
 
     Returns
     -------
@@ -122,7 +129,7 @@ def run(
         demand[t] = D_t
         r_prev = r_new
 
-        if adoption_pi > 0.0 or adoption_delta > 0.0:
+        if t >= adoption_start_t and (adoption_pi > 0.0 or adoption_delta > 0.0):
             adoption = adoption_mod.stochastic_diffusion_step(
                 adoption, adoption_pi, adoption_delta, adoption_rng
             )
