@@ -1,8 +1,8 @@
 # Notebooks
 
 One notebook per phase. Run them in order. See `../CLAUDE.md` for what each
-phase delivers and the order of construction. Phases 1-6 are implemented
-so far. Phase 7 is planned and listed for reference.
+phase delivers and the order of construction. All seven phases are
+implemented.
 
 | Phase | Status  | File                                       | Goal                                            |
 |-------|---------|--------------------------------------------|-------------------------------------------------|
@@ -12,7 +12,7 @@ so far. Phase 7 is planned and listed for reference.
 | 4     | done    | `phase_04_stochastic_adoption.ipynb`       | Forecast-based trading and stochastic adoption  |
 | 5     | done    | `phase_05_performance_adoption.ipynb`      | Risk-adjusted performance-based adoption        |
 | 6     | done    | `phase_06_experiments_threshold.ipynb`     | Sweep parameters, locate the critical share A*  |
-| 7     | planned | `phase_07_evaluation_extensions.ipynb`     | Summary plus one extension                      |
+| 7     | done    | `phase_07_evaluation_extensions.ipynb`     | Summary plus transaction-cost extension         |
 
 Every notebook starts with a parameters cell. Edit those values to explore
 variations. Do not hard-code numbers later in the notebook.
