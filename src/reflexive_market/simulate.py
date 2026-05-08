@@ -10,8 +10,9 @@ proposal:
 
 Phase 1 added the loop with null traders only. Phase 4 extends the same
 function with the rolling AR forecast, the BH98 advanced order with cap, and
-stochastic adoption diffusion. The defaults reduce the function back to the
-phase 1-3 baseline.
+stochastic adoption diffusion. Phase 5 adds the certainty-equivalent
+performance-based switching rule. The defaults reduce the function back to
+the phase 1-3 baseline.
 """
 
 import numpy as np
@@ -37,13 +38,18 @@ def run(
     adoption_delta=0.0,
     initial_adoption_share=0.0,
     adoption_start_t=0,
+    switching_window=None,
+    switching_a=0.0,
+    switching_alpha=0.0,
+    switching_beta=0.0,
 ):
     """Run the market for T periods.
 
     With the phase 1-3 defaults (no forecast_window, zero adoption) every
     trader uses the random null rule and the loop is the original baseline
     simulator. Pass a forecast_window plus adoption parameters to run the
-    phase 4 setup with reflexive adoption.
+    phase 4 stochastic setup, or a forecast_window plus switching parameters
+    for the phase 5 certainty-equivalent setup.
 
     Parameters
     ----------
@@ -65,11 +71,20 @@ def run(
     initial_adoption_share : float
         Fraction of agents who already use the advanced rule at t = 0.
     adoption_start_t : int
-        Index at which stochastic transitions begin. Before this index the
-        adoption indicators stay at their initial values, even when
-        ``adoption_pi`` or ``adoption_delta`` is non-zero. Lets phase 4
-        align the diffusion onset with metric warm-up so a regime's
-        low-adoption span has metric observations to compare with.
+        Index at which adoption transitions begin. Before this index the
+        adoption indicators stay at their initial values. Lets phase 4 and 5
+        align the adoption onset with metric warm-up.
+    switching_window : int or None
+        Rolling window length for certainty-equivalent computation
+        (equation 13). When set, equations (13)-(15) replace the stochastic
+        diffusion. Cannot be combined with non-zero adoption_pi or
+        adoption_delta.
+    switching_a : float
+        Risk-aversion coefficient ``a`` in CE = mean - (a/2) * var (eq 13).
+    switching_alpha : float
+        Baseline adoption term in equation (15).
+    switching_beta : float
+        Sensitivity to recent performance in equation (15).
 
     Returns
     -------
@@ -78,8 +93,20 @@ def run(
         forecasts : ndarray of shape (T,), one-period-ahead AR forecast each
             period (NaN before the warm-up).
         adoption_share : ndarray of shape (T,), share of adopters at the end
-            of each period after the diffusion step.
+            of each period after the diffusion or switching step.
+        null_profit, advanced_profit : ndarray of shape (T,), per-period
+            realised profit of a representative trader following each rule
+            (eq 7). Used by the phase 5 CE computation.
+        switching_score : ndarray of shape (T,), score S_t from eq 14 each
+            period switching is performed; NaN otherwise.
     """
+    using_switching = switching_window is not None
+    using_stochastic = adoption_pi > 0.0 or adoption_delta > 0.0
+    if using_switching and using_stochastic:
+        raise ValueError(
+            "stochastic diffusion and CE-based switching cannot both be active"
+        )
+
     # Spawn an independent rng for adoption draws so adoption parameters
     # cannot advance the market shock stream. With this split, no-op
     # adoption settings (pi = delta = 0, no initial adopters) leave the
@@ -92,6 +119,9 @@ def run(
     demand = np.zeros(T)
     forecasts = np.full(T, np.nan)
     adoption_share = np.zeros(T)
+    null_profit = np.zeros(T)
+    advanced_profit = np.zeros(T)
+    switching_score = np.full(T, np.nan)
 
     forecasting_on = forecast_window is not None
     if forecasting_on and (risk_scale is None or q_cap is None):
@@ -118,6 +148,7 @@ def run(
             q_adv = traders.advanced_order(forecasts[t], risk_scale, q_cap)
             orders = (1 - adoption) * null + adoption * q_adv
         else:
+            q_adv = 0.0
             orders = null
 
         D_t = market.aggregate_demand(orders)
@@ -129,9 +160,32 @@ def run(
         demand[t] = D_t
         r_prev = r_new
 
-        if t >= adoption_start_t and (adoption_pi > 0.0 or adoption_delta > 0.0):
+        # Per-period realised profit of a representative trader following
+        # each rule (equation 7). The null rule's representative profit is
+        # the population-average null-trader profit; the advanced rule's
+        # representative profit is q_adv times the realised return, common
+        # across all adopters since the forecast is public.
+        null_profit[t] = float(null.mean()) * r_new
+        advanced_profit[t] = q_adv * r_new
+
+        if t < adoption_start_t:
+            adoption_share[t] = adoption.mean()
+            continue
+
+        if using_stochastic:
             adoption = adoption_mod.stochastic_diffusion_step(
                 adoption, adoption_pi, adoption_delta, adoption_rng
+            )
+        elif using_switching and t >= switching_window - 1:
+            start = t - switching_window + 1
+            seg_null = null_profit[start : t + 1]
+            seg_adv = advanced_profit[start : t + 1]
+            ce_null = float(seg_null.mean() - 0.5 * switching_a * seg_null.var())
+            ce_adv = float(seg_adv.mean() - 0.5 * switching_a * seg_adv.var())
+            score = ce_adv - ce_null
+            switching_score[t] = score
+            adoption = adoption_mod.performance_switching_step(
+                adoption, score, switching_alpha, switching_beta, adoption_rng
             )
         adoption_share[t] = adoption.mean()
 
@@ -141,4 +195,7 @@ def run(
         "demand": demand,
         "forecasts": forecasts,
         "adoption_share": adoption_share,
+        "null_profit": null_profit,
+        "advanced_profit": advanced_profit,
+        "switching_score": switching_score,
     }

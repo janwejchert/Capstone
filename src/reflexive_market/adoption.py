@@ -25,3 +25,23 @@ def stochastic_diffusion_step(adoption, pi, delta, rng):
         u = rng.random(adoption.size)
         new[(adoption == 1) & (u < delta)] = 0
     return new
+
+
+def performance_switching_step(adoption, ce_score, alpha, beta, rng):
+    """Equation (15): non-adopters switch with logistic probability in the
+    certainty-equivalent score gap S = CE^(A) - CE^(0).
+
+    The proposal specifies only the entry direction, P(a_{i,t+1} = 1 |
+    a_{i,t} = 0) = Lambda(alpha + beta * S). Adopters keep their state.
+    This matches the asymmetric form used by stochastic diffusion in
+    equations (11) and (12) and lets per-period rates stay slow even when
+    Lambda would otherwise jump near 0.5.
+    """
+    adoption = np.asarray(adoption, dtype=int)
+    # Clip the logit so that extreme score gaps do not overflow np.exp.
+    logit = float(np.clip(alpha + beta * ce_score, -500.0, 500.0))
+    p_up = 1.0 / (1.0 + np.exp(-logit))
+    new = adoption.copy()
+    u = rng.random(adoption.size)
+    new[(adoption == 0) & (u < p_up)] = 1
+    return new
