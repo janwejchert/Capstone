@@ -1,23 +1,33 @@
 # CLAUDE.md
 
 This file gives the working agreement for building the project described in
-`docs/proposal/reflexive_forecast_proposal_v2.pdf`. Read the proposal first.
+`docs/proposal/reflexive_forecast_proposal_v3.pdf`. Read the proposal first.
 Everything below exists to make that proposal implementable in clean stages.
 
 ## What we are building
 
-A single-asset agent-based market that tests one mechanism: when a shared
-autoregressive forecast is adopted by more and more traders, does the forecast
-lose predictive and economic value because adopter trades crowd the predictable
-component out of next-period returns?
+A single-asset agent-based market that studies how adoption of a shared
+autoregressive forecast affects three distinct quantities: realised-return
+predictive performance, residual predictive content after removing
+contemporaneous price impact, and net trading value relative to a null
+benchmark. The proposal anticipates and the implemented simulator confirms a
+**dual-channel result**: adoption can simultaneously raise realised-return R^2
+(self-fulfilling channel) and lower residual-return R^2 (residual-erosion
+channel) on the same path, while economic value stays roughly intact in the
+cost-free baseline.
 
 The market combines two well-known building blocks from the heterogeneous-agent
 literature. Trader demand is mean-variance with constant absolute risk aversion,
 following Brock and Hommes (1998). Price formation is a risk-neutral market
 maker that absorbs net order flow, following Beja and Goldman (1980) and Farmer
-and Joshi (2002). The headline summary statistic is the critical adoption share
-A*, the smallest adoption level at which the rule stops paying off out of
-sample.
+and Joshi (2002). The compact summary statistics are the endpoint-specific
+critical adoption shares from section 4.3 of the proposal:
+`A*_{R2,resid}` (residual predictive content), `A*_{profit}` (economic
+endpoint), and the optional `A*_{vol}` (volatility threshold). In the cost-free
+baseline `A*_{R2,resid}` never reaches an absolute zero crossing, so phase 6
+reports a pre-registered relative analogue `A*_{R2,resid,rel}` (half the
+low-adoption baseline) plus the analogous `A*_{phi,rel}` on the effective AR
+coefficient diagnostic.
 
 ## Repository layout
 
@@ -39,7 +49,7 @@ Each `src/` module maps to a small slice of the proposal:
 | `traders.py`  | null random rule, demand mapping with cap       | (1), (2), (3), (8) |
 | `forecast.py` | rolling AR(p) fit and out-of-sample forecast    | (9), (10) |
 | `adoption.py` | stochastic diffusion, CE-based switching        | (11)-(15) |
-| `metrics.py`  | MSFE, OOS R^2, effective phi, sync, A*          | section 4 |
+| `metrics.py`  | MSFE, OOS R^2 (realised and residual), effective phi | section 4 |
 | `simulate.py` | one function that runs T steps end to end       | section 3.6 timing |
 
 ## Implementation phases
@@ -84,45 +94,59 @@ give lower variance estimates of the AR coefficient.
 ### Phase 4: forecast-based trading and stochastic adoption
 Adopters now trade per equations (1) and (3). Adoption follows the stochastic
 diffusion in (11) and (12). Compares three regimes: zero adoption, slow
-diffusion, fast diffusion. The headline plot shows rolling out-of-sample R^2
-versus adoption share, and rolling effective phi versus adoption share, on the
-same x-axis. This is the first phase where the central mechanism becomes
-visible.
+diffusion, fast diffusion. Headline plots show the rolling OOS R^2 against the
+realised return and against the residual return, side by side, plus rolling
+effective phi versus adoption share. This is the first phase where the
+dual-channel result becomes visible.
 
 Notebook: `notebooks/phase_04_stochastic_adoption.ipynb`
-Done when: at high adoption shares, the rolling out-of-sample R^2 is visibly
-lower than at low adoption shares, with effective phi shrinking in step.
+Done when: at high adoption shares, the rolling OOS R^2 against realised
+returns is visibly higher than at low adoption (self-fulfilling channel) while
+the rolling OOS R^2 against residual returns is visibly lower (residual-erosion
+channel), with effective phi rising in step.
 
 ### Phase 5: risk-adjusted performance-based adoption
 Replaces the diffusion rule with the certainty-equivalent switching rule in
-(13), (14), (15). Compares against phase 4 to see whether endogenous switching
-accelerates or dampens erosion.
+(13), (14), (15). Compares against phase 4 on the residual-channel R^2 and
+effective-phi diagnostics (paired shocks) to see whether endogenous switching
+follows the same underlying erosion path as exogenous diffusion.
 
 Notebook: `notebooks/phase_05_performance_adoption.ipynb`
 Done when: the comparison plot makes the difference between exogenous and
-endogenous adoption clear.
+endogenous adoption clear, and both regimes display the residual-R^2 / phi
+amplification pattern.
 
-### Phase 6: experiments and the critical adoption share A*
-Sweeps mu, phi, and the rolling window length w. For each combination, finds
-the smallest adoption share at which out-of-sample R^2 crosses zero or net
-profit crosses zero. Produces two heatmaps and a small summary table. This is
-the compact headline result of the project.
+### Phase 6: experiments and the relative residual-erosion thresholds
+Sweeps mu, phi, rolling window length w, and AR order p (p = 1 baseline; p
+in {2, 5, 10} robustness). For each (p, w, phi, mu) cell, locates the relative
+analogues of the proposal's endpoint-specific A* values in the cost-free
+baseline. Two relative thresholds are reported: `A*_{R2,resid,rel}`, the
+smallest A at which the rolling residual-R^2 has fallen to half its low-
+adoption baseline; and `A*_{phi,rel}`, the smallest A at which effective phi
+has grown to 1.5x its baseline. Both are explicitly relative analogues of
+section 4.3, used because the cost-free baseline does not produce an absolute
+zero crossing. Produces AR(1) headline heatmaps, by-p robustness grids, a
+delta-from-AR(1) heatmap, and a representative erosion-path figure.
 
 Notebook: `notebooks/phase_06_experiments_threshold.ipynb`
-Done when: the heatmaps tell a coherent story about which parameter
-combinations make the forecast self-eroding and which do not.
+Done when: the AR(1) heatmaps populate the bulk of the (mu, phi) grid, larger
+mu makes residual erosion bite earlier, and the by-p robustness grids
+demonstrate the mechanism is not specific to AR(1).
 
 ### Phase 7: evaluation and one extension
-Summarises primary findings, reports the diagnostics in section 4.2 of the
-proposal, and adds one extension from section 3.7. The natural choice is
-transaction costs, since it directly tests whether statistical erosion shows up
-economically. A second optional extension is heterogeneous trader ecology
-(trend followers and contrarians replacing the random null), if time allows.
+Summarises primary findings under the dual-channel framing, reports the
+diagnostics in section 4.2 of the proposal, and adds the transaction-cost
+extension from section 3.7. Holds AR order at p = 1 to remain on the proposal's
+baseline rule. Reports two views of `A*_{profit}`: an absolute view (smallest
+A at which adopter net profit crosses zero) and the null-relative view that is
+the proposal's primary economic endpoint. A second optional extension is
+heterogeneous trader ecology (trend followers and contrarians replacing the
+random null), if time allows.
 
 Notebook: `notebooks/phase_07_evaluation_extensions.ipynb`
 Done when: the report cell at the top of the notebook clearly states which
 findings are core, which are robustness, and what the boundary conditions of
-the mechanism are.
+the dual-channel mechanism are.
 
 ## Notebook conventions
 
@@ -191,8 +215,10 @@ The simulator must follow it exactly.
 3. The market maker absorbs aggregate demand and moves the quote immediately.
 4. The exogenous news shock and the residual autoregressive term realise.
 
-Forecast success is evaluated against the residual return remaining after the
-contemporaneous demand impact. Do not change this ordering when adding new
+Forecast success is evaluated against two distinct targets and both readings
+are reported: the realised return `r_{t+1}` (self-fulfilling channel) and the
+residual return `x_{t+1} = r_{t+1} - mu D_t = phi r_t + sigma eps_{t+1}`
+(residual-erosion channel). Do not change this ordering when adding new
 features.
 
 ## What not to do at this stage

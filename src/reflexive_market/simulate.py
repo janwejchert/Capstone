@@ -92,8 +92,10 @@ def run(
         prices, returns, demand : as in the phase 1 baseline.
         forecasts : ndarray of shape (T,), one-period-ahead AR forecast each
             period (NaN before the warm-up).
-        adoption_share : ndarray of shape (T,), share of adopters at the end
-            of each period after the diffusion or switching step.
+        adoption_share : ndarray of shape (T,), share of adopters that drove
+            returns[t]/demand[t]/null_profit[t]/advanced_profit[t]. Recorded
+            before the end-of-period transition fires, so adoption_share[t]
+            is the state used to generate period t's outcomes.
         null_profit, advanced_profit : ndarray of shape (T,), per-period
             realised profit of a representative trader following each rule
             (eq 7). Used by the phase 5 CE computation.
@@ -168,8 +170,15 @@ def run(
         null_profit[t] = float(null.mean()) * r_new
         advanced_profit[t] = q_adv * r_new
 
+        # Record the adopter state that actually drove returns[t],
+        # demand[t], null_profit[t], and advanced_profit[t]. This must
+        # happen BEFORE the end-of-period transition, otherwise adoption
+        # plots and A* thresholds end up one period ahead of the outcomes
+        # they bin. Edge case: with adoption_pi = 1, returns[0] is
+        # generated under zero adoption, so adoption_share[0] must be 0.
+        adoption_share[t] = adoption.mean()
+
         if t < adoption_start_t:
-            adoption_share[t] = adoption.mean()
             continue
 
         if using_stochastic:
@@ -187,7 +196,6 @@ def run(
             adoption = adoption_mod.performance_switching_step(
                 adoption, score, switching_alpha, switching_beta, adoption_rng
             )
-        adoption_share[t] = adoption.mean()
 
     return {
         "prices": prices,

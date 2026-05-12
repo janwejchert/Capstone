@@ -1,9 +1,12 @@
 """Evaluation metrics.
 
 Covers section 4 of the proposal. Primary endpoints: rolling MSFE, rolling
-out-of-sample R^2, rolling effective AR coefficient, position synchronization,
-and the critical adoption share A*. Added incrementally as each phase needs
-new metrics.
+out-of-sample R^2 (against both the realised return and the residual return
+r_{t+1} - mu D_t), and the rolling effective AR coefficient. Endpoint-specific
+critical adoption shares (A*_{R2,resid}, A*_{profit}, A*_{vol}) are computed
+inside their respective phase notebooks, not here, because they need access
+to the simulator output rather than just the return series. Added incrementally
+as each phase needs new metrics.
 """
 
 import numpy as np
@@ -41,7 +44,9 @@ def rolling_phi(returns, window):
 
     Phase 2 uses this to show the effective AR coefficient does not drift in
     expectation when no one is trading on a forecast. Later phases reuse it
-    to track erosion as adoption rises.
+    as the market-dynamics diagnostic that tracks the rise of the empirical
+    AR coefficient under adoption, which is the mechanical cause of
+    residual-channel R^2 erosion.
 
     Output has the same length as ``returns``. The first ``window - 1``
     entries are NaN. Each later entry is the lag-1 autocorrelation of the
