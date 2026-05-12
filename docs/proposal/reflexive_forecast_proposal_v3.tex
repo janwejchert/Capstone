@@ -1,0 +1,487 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{XCharter}
+\usepackage{microtype}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{accent}{HTML}{1F4E79}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accent,
+  citecolor=accent
+}
+
+\titleformat{\section}{\Large\bfseries\color{accent}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{}{0em}{}
+
+\setlength{\parskip}{0.55em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
+
+\newtcolorbox{callout}{colback=accent!5,colframe=accent,arc=2pt,boxrule=0.5pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+\title{
+  {\LARGE\bfseries Public Signals, Reflexive Adoption,\\ and Forecast Reflexivity in a Single-Asset Market}\\[0.8em]
+  {\large\itshape A Focused Research Proposal in Econometrics, Agent-Based\\ Computational Finance, and Predictive Modeling}
+}
+\author{\textit{Author Placeholder}}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\vspace{0.25em}
+\begin{center}
+{\Large\bfseries\color{accent} Abstract}
+\end{center}
+\vspace{0.15em}
+
+This proposal studies how adoption of a shared autoregressive forecasting rule affects three distinct quantities in a single-asset market with linear price impact: realised-return predictive performance, residual predictive content after removing contemporaneous price impact, and net trading value relative to a null benchmark.
+
+The realised return is decomposed throughout as
+\begin{equation*}
+  r_{t+1} \;=\; \mu D_t \;+\; x_{t+1}, \qquad x_{t+1} \;=\; \varphi\, r_t \;+\; \sigma\, \varepsilon_{t+1},
+\end{equation*}
+where $D_t$ is aggregate signed demand and $x_{t+1}$ is the residual return that does not depend on contemporaneous adopter trading. The forecast can be evaluated against either target. Widespread adoption can make the forecast \emph{self-fulfilling} against $r_{t+1}$, because adopter orders coordinated by the public signal push the realised return in the forecast direction. The same forecast can simultaneously \emph{lose} predictive content against $x_{t+1}$, because the rolling fit picks up an amplified empirical autocorrelation and over-predicts the underlying residual process. Whether economic value erodes is a separate question: in the cost-free baseline mean adopter profit grows with adoption, and transaction costs shift profit levels but do not reverse the adoption-amplification pattern in the regimes tested.
+
+The project develops a disciplined single-asset agent-based market in which traders may switch from a null trading rule to a shared AR rule. Individual demand is microfounded as mean-variance with constant absolute risk aversion (Brock and Hommes, 1998), and price formation follows the disequilibrium market-maker tradition of Beja and Goldman (1980), formalised in discrete log-linear form by Farmer and Joshi (2002). The framework is intentionally narrow: a transparent simulation environment, clear benchmarks, and a staged implementation plan that is feasible for a Master's capstone. The methodological contribution is a clean separation of the realised, residual, and economic channels of forecast reflexivity, with endpoint-specific critical adoption shares $A^{*}_{R^{2},\mathrm{resid}}$, $A^{*}_{\mathrm{profit}}$, and an optional volatility threshold $A^{*}_{\mathrm{vol}}$ as the compact summary.
+
+\begin{callout}
+\textbf{Core research question.} How does adoption of a shared autoregressive forecasting rule affect realised predictive performance, residual predictive content, and net trading value in a single-asset market with linear price impact?
+\end{callout}
+
+
+\section{Introduction}
+
+Predictive models are now deeply embedded in financial markets. They appear in discretionary investment research, quantitative trading, portfolio construction, and automated decision systems. Most evaluation frameworks treat forecasting as a problem of learning a stable relation from historical data and then applying it to new observations. That approach is often useful, but it becomes fragile when the use of a forecast changes the market environment on which the forecast is evaluated.
+
+The proposal addresses that problem in a focused setting: a discrete-time market for one risky asset, populated by interacting traders. The core intuition is straightforward. Suppose a forecasting rule identifies a weak but usable pattern in returns. When only a few traders use the rule, the pattern may retain predictive and trading value. When many traders use the same rule, their trades become more similar. That synchronization can alter order flow, move prices sooner, change volatility, and change the relationship between the signal and the underlying return process. Crucially, it can change that relationship along different evaluation targets in different ways: the forecast can become more accurate against realised returns and less accurate against the residual return at the same time, on the same path. The proposal separates three channels and reports them under their own names: a self-fulfilling channel, a residual-erosion channel, and an economic channel.
+
+This question matters for two reasons. First, it speaks directly to the reliability of predictive systems in markets where information diffuses quickly and strategies are often imitated. Second, it links several literatures that are rarely integrated operationally: structural instability in econometrics, heterogeneous-agent finance, performative prediction in machine learning, and empirical evidence on signal crowding and post-publication decay (Lucas 1976; Brock and Hommes 1998; Farmer and Joshi 2002; McLean and Pontiff 2016; Perdomo et al. 2020; Khandani and Lo 2011). The proposal preserves that intellectual ambition but places it inside a narrow and feasible design.
+
+The scope is intentionally disciplined. The project does \emph{not} attempt to model the whole economy, estimate a realistic market microstructure model, or compare a large menu of forecasting architectures. Instead, it focuses on one transparent mechanism in one market: a shared forecasting rule can change the return process it exploits. The expected contribution is a minimal but rigorous simulation framework that can distinguish a self-fulfilling realised-return effect from an underlying residual-content effect, quantify when each emerges, and identify which ingredients appear necessary for each.
+
+
+\section{Background and motivation}
+
+\subsection{Key concepts}
+
+An \emph{agent-based model} is a simulation in which the aggregate behaviour of a market is generated from the interactions of individual decision-makers, called agents. This approach is especially useful when heterogeneity, feedback, and strategic interaction are central to the question rather than secondary complications (Farmer and Foley 2009; Axtell and Farmer 2025). In the present context, an agent-based model is attractive because forecast reflexivity is not a property of one trader alone; it is a property of many traders responding to a common signal.
+
+\emph{Heterogeneous agents} are agents who do not all use the same rule. In finance, this matters because market outcomes depend on how different beliefs and strategies interact. A market with only one type of trader cannot represent imitation, crowding, or switching between rules in a meaningful way. The proposal uses heterogeneity parsimoniously: at baseline, traders differ only in whether they have adopted the shared forecasting rule; richer trader ecologies are reintroduced as extensions.
+
+\emph{Forecasting} in economics and finance means predicting a future variable using currently available information. Here the target is the next-period return. If $p_t$ denotes the log-price of the asset at time $t$, the one-period return is defined as $r_{t+1} = p_{t+1} - p_t$. Forecasting is difficult because useful predictive relations in financial data are often weak, unstable, and sensitive to behavioural change (Rossi 2021).
+
+An \emph{autoregressive model} uses past values of a variable to predict its next value. For example, an AR(1) model predicts $r_{t+1}$ using $r_t$. Such models are a natural starting point for this project because they are transparent, easy to estimate with rolling windows, and directly interpretable in econometric terms. They also provide a clean benchmark before considering richer machine-learning extensions (Mullainathan and Spiess 2017).
+
+\emph{Reflexivity} refers to situations in which beliefs and actions help shape the environment they are meant to describe. In financial markets this means that traders do not merely observe prices; through their orders they also contribute to price formation. The proposal uses the term in a precise and limited way: a forecast influences trading, trading influences returns, and returns then determine whether the forecast continues to perform well, against either the realised or the residual return target (Lo 2004; MacKenzie 2006).
+
+\emph{Performative prediction} is the machine-learning term for prediction problems in which a deployed model changes the future data on which it is evaluated. The core conceptual contribution of that literature is that accuracy can no longer be assessed as though the model were a passive observer (Perdomo et al. 2020; Hardt and Mendler-Dunner 2025). A public trading signal is performative if acting on it changes subsequent returns. The proposal makes the further distinction that performative effects can move different evaluation targets in opposite directions.
+
+\emph{Model crowding} occurs when many market participants rely on the same rule, signal, or model. In practice, crowding can manifest as similar positions, higher turnover in the same direction, and changes in the profitability and predictability characteristics of once-useful signals. In the proposed framework, crowding is measured through adoption rates and changes in forecast performance under each of the three endpoints (Khandani and Lo 2011).
+
+\emph{Endogenous concept drift} describes a change in the relationship between predictors and outcomes that arises from the system itself rather than from an external shock. In this proposal, the relation between lagged returns and future returns may drift because traders adopt the forecasting rule and thereby alter the market process that generated the original predictability. The drift can move the realised-return relation and the residual-return relation in different directions; both are reported.
+
+\subsection{Relation to existing literature}
+
+The proposal draws on four strands of literature.
+
+First, the econometric literature has long emphasised that historically estimated relations need not remain valid after behaviour changes. The classic statement is the Lucas critique (Lucas 1976). More recent work shows that forecast breakdowns and predictive instabilities are common in macro-financial settings (Giacomini and Rossi 2009; Rossi 2021). This literature motivates the need to separate ordinary instability from deterioration created by deployment itself, and further to separate deterioration along different targets.
+
+Second, heterogeneous-agent finance demonstrates that interacting traders with different rules can generate nonlinear dynamics, instability, and regime change. The seminal framework of Brock and Hommes (1998) is particularly relevant here because it links market outcomes to the relative performance of competing forecasting rules, and it supplies the mean-variance microfoundation used in section 3.1. Price formation is taken from the disequilibrium market-maker tradition of Beja and Goldman (1980), formalised in discrete log-linear form by Farmer and Joshi (2002). More broadly, agent-based modelling has matured into a serious methodology for economics and finance when feedback and interaction are central (Farmer and Foley 2009; Axtell and Farmer 2025; Grazzini et al. 2017).
+
+Third, performative prediction in machine learning offers a formal language for systems in which deployed models alter future data distributions (Perdomo et al. 2020; Hardt and Mendler-Dunner 2025). That literature does not by itself provide a market model, but it supplies exactly the conceptual frame needed here: predictive success may generate distributional change rather than merely reveal it, and the change can move different evaluation targets in different directions.
+
+Fourth, empirical finance provides a practical motivation. McLean and Pontiff (2016) document that return predictors tend to weaken outside their discovery sample and weaken further after publication. Khandani and Lo (2011) document the August 2007 quant crisis as an extreme realisation of strategy crowding. MacKenzie and Millo (2003) and MacKenzie (2006) provide the canonical case study of a financial model (Black-Scholes) reshaping the very market it described. That evidence does not prove a single mechanism, but it is consistent with the possibility that awareness and imitation reduce certain measures of predictability while leaving others intact. The present proposal does not claim to identify those empirical effects directly. Instead, it builds a clean market laboratory for one plausible mechanism behind them.
+
+\subsection{Positioning and contribution}
+
+The gap in the literature is not the absence of intuition. Economists, finance researchers, and machine-learning theorists already recognise that behaviour can change predictive environments. The unresolved issue is operational: there is still limited evidence from a transparent and disciplined market simulation showing how a shared forecasting rule can diffuse, alter market dynamics, and change its measured value separately along realised, residual, and economic targets.
+
+This proposal contributes by narrowing the problem to its most interpretable form. It studies one risky asset, one public forecasting rule, and a small number of adoption mechanisms. The narrowing is not a loss of ambition; it is what makes the mechanism identifiable and the results interpretable for an interdisciplinary review panel. The methodological sharpening is to report three endpoint channels rather than one, and to introduce endpoint-specific critical adoption shares so that the dual-channel result is quantifiable rather than rhetorical.
+
+
+\section{Research design and methodology}
+
+\subsection{Baseline market environment}
+
+The baseline combines two well-established building blocks from the heterogeneous-agent literature. Individual trader demand is microfounded as in Brock and Hommes (1998): each trader is a myopic mean-variance maximiser with constant absolute risk aversion (CARA). Price formation follows the disequilibrium market-adjustment tradition of Beja and Goldman (1980), formalised in discrete log-linear form by Farmer and Joshi (2002): a risk-neutral market maker absorbs net order flow and shifts the log-price proportionally to it.
+
+Using these two ingredients places the proposal inside an established tradition while keeping the baseline minimal. Richer ingredients of the Brock-Hommes programme, in particular heterogeneity across trader types and multi-rule discrete-choice switching, are deferred to section 3.7 so that the baseline remains a clean laboratory.
+
+\subsubsection{Asset and agents}
+
+Time is discrete and indexed by $t = 0, 1, \ldots, T$. The market contains one risky asset with log-price $p_t$ and one-period return $r_{t+1} = p_{t+1} - p_t$. The risk-free rate is normalised to zero ($R = 1$) and the asset pays no dividend, so $r_{t+1}$ is interpreted as an excess return. This is the zero-dividend special case of Brock and Hommes (1998, Eqs. 2.1 to 2.3) and the same accounting convention used by Farmer and Joshi (2002). There are $N$ traders indexed by $i = 1, \ldots, N$.
+
+\subsubsection{Trader demand (Brock-Hommes microfoundation)}
+
+Following Brock and Hommes (1998, Eqs. 2.1 to 2.3), each trader has CARA utility and maximises a one-period mean-variance objective over end-of-period wealth. With conditional forecast $\hat{r}_{i,t+1}$ of next-period return and common perceived conditional variance $\sigma^{2} > 0$, the optimal signed position is
+\begin{equation}
+  z_{i,t} \;=\; \frac{\hat{r}_{i,t+1}}{a\, \sigma^{2}},
+\end{equation}
+where $a > 0$ is the coefficient of absolute risk aversion. Equation (1) is the zero-dividend, zero-rate specialisation of the BH98 demand function. Economic meaning: a trader buys when expected next-period return is positive and sells when it is negative. Position size scales inversely with risk aversion and perceived variance, so the same forecast generates smaller trades when the market is perceived as riskier.
+
+\subsubsection{Adoption indicator and trader order}
+
+Let $a_{i,t} \in \{0, 1\}$ indicate whether trader $i$ has adopted the advanced forecasting rule at time $t$. The trader's final order combines the null rule (section 3.3) and the advanced rule (section 3.4):
+\begin{equation}
+  q_{i,t} \;=\; (1 - a_{i,t})\, q_{i,t}^{(0)} \;+\; a_{i,t}\, q_{i,t}^{(A)},
+\end{equation}
+with the advanced order
+\begin{equation}
+  q_{i,t}^{(A)} \;=\; \mathrm{clip}\!\left(\frac{\hat{r}_{t+1}^{(A)}}{a\, \sigma^{2}},\; -\bar{q}_{i},\; +\bar{q}_{i}\right).
+\end{equation}
+Non-adopters trade according to the benchmark rule. Adopters follow the mean-variance demand (1) evaluated at the public forecast $\hat{r}_{t+1}^{(A)}$ rather than at an idiosyncratic forecast. The position cap $\bar{q}_{i} > 0$ plays the role of a leverage or inventory constraint: it prevents unboundedly large trades when rolling-window estimates of $\hat{r}^{(A)}$ are noisy.
+
+\subsubsection{Price formation (market maker)}
+
+Price is set by a risk-neutral market maker who absorbs net order flow and shifts the log-price proportionally, as in Beja and Goldman (1980, Eqs. 2.1 and 2.6) and Farmer and Joshi (2002, Eq. 7). Aggregate signed demand is
+\begin{equation}
+  D_t \;=\; \frac{1}{N} \sum_{i=1}^{N} q_{i,t},
+\end{equation}
+and the market maker updates the log-price according to
+\begin{equation}
+  p_{t+1} \;=\; p_t \;+\; \mu\, D_t \;+\; \sigma\, \varepsilon_{t+1}, \qquad \varepsilon_{t+1} \sim \mathcal{N}(0, 1),
+\end{equation}
+where $\mu = 1/\lambda > 0$ is the market-maker price-impact coefficient and $\sigma > 0$ controls exogenous news. Equation (5) is the zero-fundamental specialisation of Farmer and Joshi (2002, Eq. 7).
+
+\subsubsection{Baseline return equation and the realised vs residual decomposition}
+
+The first-differenced version of (5) gives a one-period market-maker return of $\mu D_t + \sigma \varepsilon_{t+1}$. The baseline return law augments this market-maker return with a residual AR(1) component carried in from prior periods, giving
+\begin{equation}
+  r_{t+1} \;=\; \varphi\, r_t \;+\; \mu\, D_t \;+\; \sigma\, \varepsilon_{t+1}, \qquad |\varphi| < 1\ \text{small.}
+\end{equation}
+The $\varphi r_t$ term is not ad hoc: Farmer and Joshi (2002, Eqs. 8 to 11) show analytically that when a fraction of aggregate demand comes from linear trend-following strategies, the induced return process has first-lag autocorrelation $\rho_r(1) = \alpha / (1 + \alpha) > 0$, of the same order as trend-following intensity $\alpha$. Equation (6) absorbs that empirically plausible component as a reduced-form AR(1) coefficient rather than modelling it as a separate trader type at baseline.
+
+For evaluation purposes, it is useful to rewrite (6) as a decomposition into a contemporaneous price-impact component and a residual:
+\begin{equation}
+  r_{t+1} \;=\; \mu\, D_t \;+\; x_{t+1}, \qquad x_{t+1} \;=\; \varphi\, r_t \;+\; \sigma\, \varepsilon_{t+1}.
+\end{equation}
+The residual return $x_{t+1}$ contains the part of the return that does not depend on contemporaneous adopter trading: the lagged-return component and the exogenous news shock. The forecast $\hat{r}_{t+1}^{(A)}$ is, by construction, an estimate of the AR component of the return process and therefore an estimate of $x_{t+1}$ in expectation. The proposal evaluates the forecast against both $r_{t+1}$ and $x_{t+1}$ and reports the two readings as separate primary endpoints.
+
+\subsubsection{Profit}
+
+For evaluation, the one-period profit of trader $i$ is
+\begin{equation}
+  \Pi_{i,t+1} \;=\; q_{i,t}\, r_{t+1}.
+\end{equation}
+Transaction costs are omitted in the baseline and added as an extension in section 3.7 so that the dual-channel reflexivity can first be isolated as a purely dynamical phenomenon.
+
+
+\subsection{A three-layer model of trader behaviour}
+
+It is useful to make the structure of trader behaviour explicit, because a common ambiguity in proposals of this kind is whether the "forecasting rule" is the whole agent or only one module of a larger decision. Here behaviour is decomposed into three layers.
+
+\begin{enumerate}[itemsep=0.2em]
+  \item \textbf{Belief layer.} What return does the agent expect? The advanced rule uses a rolling autoregressive forecast $\hat{r}_{t+1}^{(A)}$ (section 3.4). The null rule has no belief about returns and generates order flow that is directionally uninformative on average (section 3.3).
+  \item \textbf{Decision layer.} How does that belief become a position? For adopters, the belief is mapped to a position through the Brock-Hommes mean-variance demand (1) and the position cap (3). For non-adopters, the null order enters directly.
+  \item \textbf{Switching layer.} How does an agent decide whether to use the shared rule? Two mechanisms are considered: stochastic diffusion (section 3.5) and risk-adjusted performance-based switching (section 3.5).
+\end{enumerate}
+
+This decomposition keeps the forecasting rule separable from the decision and switching rules. It matters analytically because the mechanism of interest operates on the belief layer (public information) and transmits to returns through the decision and switching layers (private action). Separating the three makes it possible to say precisely where each channel of the dual-channel result is produced.
+
+\subsection{Null model of trading}
+
+The null rule is intentionally simple, because it serves as a reference point rather than as a realistic trading strategy. The proposed baseline is a no-skill random trading rule:
+\begin{equation}
+  q_{i,t}^{(0)} \;=\; \xi_{i,t}, \qquad \xi_{i,t} \sim \mathcal{N}(0, \sigma_{q}^{2}),
+\end{equation}
+with independent draws across agents and time.
+
+Economic meaning: in the absence of the advanced model, traders generate order flow that is directionally uninformative on average. This provides a transparent benchmark: any systematic predictability or profitability generated by the advanced rule can be assessed relative to a market in which trading is active but not forecast-driven.
+
+\subsection{Advanced forecasting rule}
+
+The advanced rule is based on an autoregressive forecast estimated on a rolling window of recent returns. Let $w$ denote the rolling-window length and $p$ the autoregressive order. At time $t$, the public model estimates
+\begin{equation}
+  r_{s+1} \;=\; c \;+\; \sum_{j=1}^{p} \varphi_{j}\, r_{s+1-j} \;+\; u_{s+1},
+\end{equation}
+using only the observations in the window $s = t - w, \ldots, t - 1$. This yields the out-of-sample forecast
+\begin{equation}
+  \hat{r}_{t+1}^{(A)}(w, p) \;=\; \hat{c}_{t, w, p} \;+\; \sum_{j=1}^{p} \hat{\varphi}_{j, t, w, p}\, r_{t+1-j}.
+\end{equation}
+Economic meaning: the model estimates how recent returns help predict the next return, using only information that would have been available at time $t$. Rolling estimation allows the coefficients to adapt gradually if the return process changes.
+
+The core implementation begins with AR(1) models and a small set of rolling windows, for example $w \in \{50, 100, 250\}$. Higher-order AR models are reported as a robustness check in the experiments stage (section 5, phase 6). Penalized regressions, tree-based ensembles, and recurrent architectures are intentionally left outside the core design (Mullainathan and Spiess 2017). The purpose of the baseline is not to maximise predictive accuracy, but to establish whether reflexive adoption can be observed in the simplest forecasting environment that should, in principle, work.
+
+\subsection{Adoption and diffusion mechanism}
+
+Two mechanisms are considered by which traders may adopt the advanced rule. Both act on the switching layer of section 3.2.
+
+\subsubsection{Stochastic diffusion}
+
+Non-adopters discover or adopt the public model with a fixed probability $\pi \in (0, 1)$ each period:
+\begin{equation}
+  P(a_{i,t+1} = 1 \mid a_{i,t} = 0) \;=\; \pi,
+\end{equation}
+with an optional small exit probability $\delta$:
+\begin{equation}
+  P(a_{i,t+1} = 0 \mid a_{i,t} = 1) \;=\; \delta.
+\end{equation}
+Adoption spreads gradually without explicitly modelling social learning or profitability comparisons. This mechanism is analytically and computationally simple, making it ideal for early debugging and for isolating the pure effect of wider use of a common signal.
+
+\subsubsection{Risk-adjusted performance-based switching}
+
+In the economically meaningful version, adoption depends on recent relative risk-adjusted success. Because the decision layer is mean-variance based, the switching score is constructed to be consistent with that preference structure. Let $\mathrm{CE}(\cdot)$ denote the one-period certainty-equivalent return of a strategy,
+\begin{equation}
+  \mathrm{CE}_t^{(k)} \;=\; \bar{\Pi}_t^{(k)} \;-\; \tfrac{a}{2}\, \hat{\sigma}_{t}^{2,(k)},
+\end{equation}
+where $\bar{\Pi}_t^{(k)}$ and $\hat{\sigma}_{t}^{2,(k)}$ are the rolling mean and variance of profit for rule $k \in \{(0), (A)\}$, computed over a window of length $W_A$. Define the switching score $S_t = \mathrm{CE}_t^{(A)} - \mathrm{CE}_t^{(0)}$. The adoption probability is
+\begin{equation}
+  P(a_{i,t+1} = 1 \mid a_{i,t} = 0) \;=\; \Lambda(\alpha + \beta\, S_t),
+\end{equation}
+where $\Lambda(z) = 1 / (1 + e^{-z})$ is the logistic function, $\alpha$ is a baseline adoption term, and $\beta > 0$ controls sensitivity to recent performance. The specification is the binary BH98 discrete-choice mechanism applied at the switching layer.
+
+The stochastic mechanism is implemented first because it is easier to interpret, and is especially useful for identifying whether wider use of the forecast is \emph{by itself} sufficient to change predictability along any channel. The performance-based mechanism is then added to study feedback between early success and later crowding.
+
+
+\subsection{Intra-period timing and the two evaluation channels}
+
+The positive-sign market-impact term $\mu D_t$ in (6) creates a subtle timing question: if adopter demand today pushes the quote up today, the forecast can appear self-fulfilling rather than self-eroding unless the order of events within a period is made explicit. The proposal resolves this by fixing the following sequence inside each period.
+
+\begin{enumerate}[label=\arabic*., leftmargin=2em, itemsep=0.2em]
+  \item Agents observe returns up to and including period $t$ and form forecasts $\hat{r}_{t+1}^{(A)}$.
+  \item Adopters and non-adopters submit orders $q_{i,t}$ per (2) and (3).
+  \item The market maker absorbs aggregate demand $D_t$ and moves the quote immediately, as in (5).
+  \item The exogenous news shock $\sigma \varepsilon_{t+1}$ and the residual autoregressive term $\varphi r_t$ realise.
+\end{enumerate}
+
+Given this timing, the forecast can be evaluated against either of two distinct targets, and the proposal reports both as primary endpoints.
+
+\textbf{Self-fulfilling channel.} The forecast is compared to the \emph{realised} return $r_{t+1} = \mu D_t + x_{t+1}$. When many adopters trade on a positive $\hat{r}_{t+1}^{(A)}$, the contemporaneous $\mu D_t$ component pushes $r_{t+1}$ in the same direction as the forecast. The realised-return reading therefore answers the question: does the forecast correctly point at where the realised price goes, including its own contemporaneous price impact?
+
+\textbf{Residual-erosion channel.} The forecast is compared to the \emph{residual} return $x_{t+1} = r_{t+1} - \mu D_t$. The residual contains the lagged-return component plus exogenous news, that is, the part of the return process the forecast was actually designed to estimate. The residual-return reading therefore answers the question: after removing the contemporaneous demand impact, does the forecast still carry independent predictive content?
+
+The two channels are not in conflict. They answer different questions about the same forecast on the same path, and they can move in opposite directions as adoption rises. Both are reported under their own names, on equal footing, and neither is treated as the canonical evaluation target.
+
+\subsection{Extensions and robustness}
+
+The proposal is deliberately structured around a core design and a set of optional extensions. The core consists of one asset, the return law (6), the random null rule, a shared rolling AR(1) forecast, and one adoption mechanism. These elements are sufficient to test the main hypothesis.
+
+Once the core is functioning, the following extensions are natural, ordered by priority for a tractable capstone:
+
+\begin{itemize}[itemsep=0.2em]
+  \item \textbf{Higher-order AR rule (robustness check).} Replace AR(1) with AR(p) for $p \in \{2, 5, 10\}$ on the same paired-seed grid. The implemented project reports this as a robustness check in phase 6.
+  \item \textbf{Transaction costs.} Subtract proportional trading costs from profits to evaluate whether modest statistical predictability survives economically. The implemented project addresses this in phase 7, fixing $p = 1$ to remain on the proposal's baseline rule.
+  \item \textbf{Heterogeneous trader ecology.} Replace the purely random null rule with a small ecology of trend followers, contrarians, and fundamentalists, as in Farmer and Joshi (2002).
+  \item \textbf{Retraining frequency.} Compare slow versus frequent model updates to examine whether retraining delays, freezes, or accelerates the residual-erosion channel (Mendler-Dunner et al. 2020; Kabra and Patel 2024).
+  \item \textbf{Delayed information diffusion.} Allow only a fraction of agents to observe the forecast immediately, with delayed adoption by others.
+  \item \textbf{Multiple forecasting models.} Allow agents to choose among several AR specifications or between econometric and machine-learning rules. A diversity-versus-monoculture comparison becomes possible.
+  \item \textbf{Endogenous volatility.} Replace constant $\sigma$ with a volatility process that rises with large aggregate demand or large recent returns.
+  \item \textbf{Adoption frictions.} Introduce fixed costs, minimum trial periods, or heterogeneous willingness to switch rules.
+  \item \textbf{Multiple assets.} Extend the framework to a small portfolio environment.
+\end{itemize}
+
+These extensions are valuable but are not required to answer the central question. They are treated explicitly as second-stage exercises so that the scope remains disciplined.
+
+
+\section{Metrics and expected results}
+
+The metric set is organised into three primary endpoints, a diagnostic set, and a threshold-metric block. The realised-return and residual-return readings of the forecast are reported as separate primary endpoints, in line with the dual-channel framing of section 3.6.
+
+\subsection{Primary endpoints}
+
+\subsubsection{Realised-return predictive performance (self-fulfilling diagnostic)}
+
+The first primary metric is the out-of-sample $R^{2}$ of the forecast against the realised return,
+\begin{equation*}
+  R^{2}_{\mathrm{realised}}(t) \;=\; 1 \;-\; \frac{\sum (r_{s+1} - \hat{r}^{(A)}_{s+1})^{2}}{\sum (r_{s+1} - \bar{r})^{2}},
+\end{equation*}
+computed in a trailing window ending at $t$. This measures the self-fulfilling channel. It can rise with adoption because contemporaneous adopter demand pushes the realised return in the forecast direction.
+
+\subsubsection{Residual-return predictive content (statistical erosion endpoint)}
+
+The second primary metric is the out-of-sample $R^{2}$ of the forecast against the residual return,
+\begin{equation*}
+  R^{2}_{\mathrm{resid}}(t) \;=\; 1 \;-\; \frac{\sum (x_{s+1} - \hat{r}^{(A)}_{s+1})^{2}}{\sum (x_{s+1} - \bar{x})^{2}}, \qquad x_{s+1} = r_{s+1} - \mu D_{s}.
+\end{equation*}
+This measures the residual-erosion channel. It can fall with adoption because the rolling fit picks up the amplified empirical autocorrelation from realised returns and over-predicts the residual process. The two $R^{2}$ readings are reported on equal footing as separate primary endpoints; neither is treated as the canonical evaluation target.
+
+\subsubsection{Effective AR coefficient (market-dynamics diagnostic)}
+
+The rolling effective AR coefficient $\hat{\varphi}^{\mathrm{eff}}(t)$ is estimated directly from the realised return series in a trailing window. In the implemented return law (6), adopter buying on a positive AR forecast reinforces the lagged-return component through $\mu D_t$, so $\hat{\varphi}^{\mathrm{eff}}$ is expected to rise with adoption. A naive reading of the same return law might instead predict $\hat{\varphi}^{\mathrm{eff}}$ to fall, on the grounds that contemporaneous absorption through $\mu D_t$ should reduce the lagged coefficient carried into next-period returns; that reading does not survive once the sign of the price-impact term is tracked carefully. The market-dynamics diagnostic $\hat{\varphi}^{\mathrm{eff}}$ is reported alongside the two $R^{2}$ endpoints, because it is the mechanical reason $R^{2}_{\mathrm{resid}}$ falls while $R^{2}_{\mathrm{realised}}$ rises.
+
+\subsubsection{Net trading value (economic endpoint)}
+
+The headline economic measure is net profit after transaction costs, reported both in absolute terms and relative to the null benchmark. Two quantities are reported.
+
+\begin{itemize}[itemsep=0.2em]
+  \item \textbf{Net profit relative to the null benchmark} (primary). For each cost level $c$, the per-period adopter net profit $q_{i,t}^{(A)} r_{t+1} - c \lvert q_{i,t}^{(A)} \rvert$ minus a null benchmark that accounts for the null trader's realised gross P\&L and its own per-period cost $c \cdot E[\lvert q^{(0)} \rvert]$. This is the proposal's intended economic endpoint and is reported as the primary economic measure.
+  \item \textbf{Absolute net profit} (secondary). Per-period adopter net profit measured against zero. This is a useful secondary diagnostic but it does not control for the cost a null rule itself pays in any cost regime $c > 0$.
+\end{itemize}
+
+\subsection{Diagnostic and market-dynamics metrics}
+
+The following are reported as diagnostics rather than as headline endpoints:
+
+\begin{itemize}[itemsep=0.2em]
+  \item Rolling return volatility and excess kurtosis.
+  \item Turnover and aggregate trading volume.
+  \item Adoption share $A_t = (1/N) \sum_i a_{i,t}$ as a function of time.
+  \item Position synchronization across adopters (proposed diagnostic; not implemented in the current results, listed here as part of the planned metric set): pairwise Pearson correlation of positions $\rho_q(t)$, and the fraction-on-same-side $F_{ss}(t) = \max(\text{share long}, \text{share short})$ among adopters.
+  \item Sign accuracy of $\hat{r}^{(A)}$. This is intentionally demoted to a diagnostic, because in finance getting the sign right is not sufficient: return magnitudes may shrink while signs remain correct, and transaction costs can then erase the edge.
+\end{itemize}
+
+\subsection{Threshold metrics: endpoint-specific critical adoption shares}
+
+A single combined critical adoption share across endpoints is ambiguous: the same forecast can erode along one endpoint while persisting along another. The proposal therefore reports one threshold per primary endpoint, so the result reads honestly under each reading of "the rule has stopped paying off".
+
+\begin{itemize}[itemsep=0.2em]
+  \item \textbf{$A^{*}_{R^{2},\mathrm{resid}}$}: smallest adoption share at which the rolling residual-return $R^{2}$ crosses zero. If the cost-free baseline produces no zero crossing, a pre-registered relative threshold is used (for example, $R^{2}_{\mathrm{resid}}$ falls to half its low-adoption baseline). The relative version is labelled $A^{*}_{R^{2},\mathrm{resid},\mathrm{rel}}$ to keep it distinct from the zero-crossing definition.
+  \item \textbf{$A^{*}_{\mathrm{profit}}$}: smallest adoption share at which net profit relative to the null benchmark crosses zero, at a given transaction-cost level.
+  \item \textbf{$A^{*}_{\mathrm{vol}}$}: smallest adoption share at which realised volatility exceeds a pre-registered threshold. This is an optional endpoint included in the planned metric set; the present results do not compute it.
+\end{itemize}
+
+For the realised-return $R^{2}$ channel, the corresponding "first crossing" need not exist in the direction the proposal anticipates a priori: realised $R^{2}$ may rise with adoption, in which case there is no realised-return erosion threshold to report. This is itself a finding and is recorded as such; an empty $A^{*}_{R^{2},\mathrm{realised}}$ field carries information.
+
+Reporting endpoint-specific $A^{*}$ across parameter regimes converts the qualitative dual-channel claim into a quantitative one, and lets the reader see which endpoints actually erode, at what adoption share, and under which $(\mu, \varphi, w)$ combinations.
+
+\subsection{Expected results}
+
+The dual-channel framing replaces a single direction for "forecast accuracy and profitability" with conditional expectations along the three primary endpoints. These expectations are guided by analytical inspection of the return law (6) and by the implemented simulator results.
+
+\begin{enumerate}[itemsep=0.2em]
+  \item \textbf{Realised-return $R^{2}$ may rise with adoption.} Self-fulfilment can dominate erosion when the price-impact channel is strong. There may be no realised-return erosion threshold.
+  \item \textbf{Residual-return $R^{2}$ should decline with adoption} if the rolling fit picks up the amplified empirical autocorrelation and over-predicts the residual process. The implementation in phases 1 to 6 confirms this with tight Monte Carlo bands across paired-shock seeds.
+  \item \textbf{Effective AR coefficient should rise with adoption} in the implemented return law (6), because adopter trading reinforces rather than offsets the lagged-return component.
+  \item \textbf{Economic value may persist or rise in the cost-free baseline} because adopter trades coordinate and the realised return moves in the forecast direction. Whether the rule's economic edge survives once transaction costs are introduced depends on the cost level; phase 7 maps that dependence.
+  \item \textbf{Endogenous performance-based switching} (CE-rule) and exogenous stochastic diffusion produce the same terminal residual erosion and effective-$\varphi$ amplification at full adoption; the path through adoption space differs but the steady state agrees, in the regimes tested.
+\end{enumerate}
+
+A particularly informative result would be a threshold pattern in $A^{*}_{R^{2},\mathrm{resid}}$: residual predictive content stable at low adoption, declining sharply once adoption exceeds the threshold. That would be strong evidence that crowding, rather than ordinary forecasting noise, is responsible for residual-channel erosion.
+
+\subsection{Scope and limitations}
+
+The proposal also admits meaningful null results. Residual-channel erosion may fail to appear if price impact is too weak, if adoption remains sparse, or if the predictive relation is robust enough to survive imitation. Such findings would still be scientifically useful: they would identify the conditions under which deployment-induced residual erosion is limited rather than pervasive. A well-specified null result is therefore not a failure of the design; it is evidence about the boundary of the mechanism.
+
+One specific outcome that the dual-channel framing makes safe to report is the pattern where realised-return $R^{2}$ \emph{rises} while residual $R^{2}$ \emph{falls}. Both channels are reported under their own names, so a positive realised-return result and a negative residual-return result do not have to be reconciled into a single direction before the reader sees them.
+
+At the same time, the conclusions should remain carefully bounded. Positive findings would support the proposition that residual-channel forecast erosion is a plausible and measurable mechanism in a class of single-asset markets. They would \emph{not} establish that all return predictors fail for performative reasons, that the same mechanism explains every empirical anomaly, or that autoregressive models are realistic descriptions of actual trading practice.
+
+The main limitations are equally clear. The price-impact specification is reduced form. The market contains one asset and only a limited set of behaviours. The return process is stylised rather than calibrated to a specific dataset. These limitations are acceptable because the proposal aims at tractability and interpretability first.
+
+\subsection{Scope for unexpected findings}
+
+A particularly informative outcome is one that does not fall along a single direction. If the simulator shows that realised-return $R^{2}$ rises with adoption and that economic value persists in the cost-free baseline, that does not invalidate the project. It identifies a dual-channel reflexivity result and locates precisely which evaluation target the deployment-induced effect attaches to and which it does not. An outcome of the form "residual content erodes, realised performance and P\&L do not, in this model" is a stronger and more honest finding than a single-direction claim, because it specifies the channel under which the effect operates and the channels under which it does not.
+
+
+\section{Feasibility and implementation plan}
+
+The implementation strategy is staged so that each component is verified before the next is added. This sequencing is central to feasibility. The seven phases below describe the staged build; all seven are implemented in the accompanying simulator at the time of writing.
+
+\begin{center}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{0.18\textwidth}YY@{}}
+\toprule
+\textbf{Phase} & \textbf{Objective} & \textbf{Main output} \\
+\midrule
+\textbf{1. Baseline} &
+Implement the single-asset market with return law (6), random null rule (8), Brock-Hommes demand (1), and reproducible simulation routines. &
+Working simulator under the null model; price, return, and demand series. \\
+\midrule
+\textbf{2. Benchmark} &
+Verify the null market behaves as intended; descriptive statistics stay stable across runs; no adoption-free variant shows drift in $\hat{\varphi}^{\mathrm{eff}}$. &
+Validated benchmark environment. \\
+\midrule
+\textbf{3. AR rule} &
+Add rolling AR estimation, forecast generation, and forecast-based trading with position caps for $w \in \{50, 100, 250\}$. &
+Out-of-sample forecast and small positive $R^{2}_{\mathrm{realised}}$ at zero adoption. \\
+\midrule
+\textbf{4. Stochastic adoption} &
+Introduce stochastic adoption (eqs 11 to 12) and run paired-shock regimes. &
+Adoption paths; realised and residual $R^{2}$ versus adoption share; effective $\varphi$ versus adoption share. \\
+\midrule
+\textbf{5. CE switching} &
+Replace stochastic diffusion with the certainty-equivalent switching rule (eqs 13 to 15). &
+Stochastic versus performance-based adoption comparison; same terminal residual erosion. \\
+\midrule
+\textbf{6. Experiments} &
+Sweep $(\mu, \varphi, w, p)$; locate endpoint-specific critical adoption shares; report robustness across AR order. &
+Heatmaps for $A^{*}_{R^{2},\mathrm{resid},\mathrm{rel}}$ and an effective-$\varphi$ threshold; paired-seed erosion curves. \\
+\midrule
+\textbf{7. Evaluation} &
+Summarise primary findings under the dual-channel framing; add transaction-cost extension at $p = 1$ as the proposal baseline rule. &
+Final report; cost-dependent crossing in absolute net profit; persistence under the null-relative endpoint. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The most important feasibility principle is to preserve a strict order of construction. The market simulator should function before the forecasting rule is added. The forecasting rule should function before adoption is added. Extensions should be attempted only after the baseline produces stable and interpretable results. This prevents the project from becoming overly broad and ensures that any observed reflexivity effect can be traced to a small number of identifiable ingredients.
+
+The empirical burden is also realistic. The baseline proposal relies on simulation rather than large-scale calibration or proprietary market data. Performance can be evaluated with standard and interpretable metrics: the primary endpoints in section 4.1, together with the diagnostics in section 4.2 and the threshold metrics in section 4.3. These are sufficient for a first-pass assessment of the mechanism.
+
+Finally, the proposal remains computationally manageable. Rolling autoregressive models are inexpensive to estimate, and the single-asset design keeps the state space small. That allows attention to remain on the scientific question rather than on engineering complexity.
+
+
+\section{Conclusion}
+
+This proposal advances a focused and feasible research programme on reflexive forecast adoption in financial markets. Its central claim is that the underlying mechanism is not single-directional. When a forecasting rule becomes widely used, the resulting coordination of trading behaviour can simultaneously raise realised-return predictive performance, erode residual predictive content, and leave economic value largely intact in the cost-free baseline. The proposal studies that possibility in the simplest setting where the mechanism can be examined transparently: a single-asset agent-based market with Brock-Hommes mean-variance demand, a Beja-Goldman / Farmer-Joshi market maker, a shared autoregressive forecasting rule, and explicit adoption dynamics.
+
+The proposal is intentionally disciplined. It narrows a broad intellectual agenda into a design that is interpretable, implementable, and relevant to reviewers from multiple fields. Its originality lies not in asserting that markets are adaptive, but in operationalising a specific dual-channel mechanism by which predictive success can move different evaluation targets in different directions, and in measuring that mechanism through a tightened set of endpoints: realised-return $R^{2}$, residual-return $R^{2}$, effective AR coefficient, and net trading value relative to the null benchmark, summarised by endpoint-specific critical adoption shares $A^{*}_{R^{2},\mathrm{resid}}$ and $A^{*}_{\mathrm{profit}}$ (with $A^{*}_{\mathrm{vol}}$ as an optional addition).
+
+If successful, the project provides a tractable framework for distinguishing deployment-induced deterioration along the residual channel from self-fulfilling reinforcement along the realised channel, clarifying when model crowding matters, and identifying the conditions under which predictive systems remain robust along all three channels or become self-undermining along some and self-reinforcing along others.
+
+
+\section*{References}
+
+\begin{small}
+\setlength{\parskip}{0.3em}
+
+Axtell, R. L. and J. D. Farmer (2025). ``Agent-Based Modeling in Economics and Finance: Past, Present, and Future.'' \textit{Journal of Economic Literature} 63(1), 197 to 287. DOI: 10.1257/jel.20221319.
+
+Beja, A. and M. B. Goldman (1980). ``On the Dynamic Behavior of Prices in Disequilibrium.'' \textit{Journal of Finance} 35(2), 235 to 248. DOI: 10.1111/j.1540-6261.1980.tb02151.x.
+
+Brock, W. A. and C. H. Hommes (1998). ``Heterogeneous Beliefs and Routes to Chaos in a Simple Asset Pricing Model.'' \textit{Journal of Economic Dynamics and Control} 22(8 to 9), 1235 to 1274. DOI: 10.1016/S0165-1889(98)00011-6.
+
+Farmer, J. D. and D. Foley (2009). ``The Economy Needs Agent-Based Modelling.'' \textit{Nature} 460, 685 to 686. DOI: 10.1038/460685a.
+
+Farmer, J. D. and S. Joshi (2002). ``The Price Dynamics of Common Trading Strategies.'' \textit{Journal of Economic Behavior \& Organization} 49(2), 149 to 171. DOI: 10.1016/S0167-2681(02)00065-3.
+
+Giacomini, R. and B. Rossi (2009). ``Detecting and Predicting Forecast Breakdowns.'' \textit{Review of Economic Studies} 76(2), 669 to 705. DOI: 10.1111/j.1467-937X.2009.00545.x.
+
+Grazzini, J., M. G. Richiardi, and M. Tsionas (2017). ``Bayesian Estimation of Agent-Based Models.'' \textit{Journal of Economic Dynamics and Control} 77, 26 to 47. DOI: 10.1016/j.jedc.2017.01.014.
+
+Hardt, M. and C. Mendler-Dunner (2025). ``Performative Prediction: Past and Future.'' \textit{Statistical Science} 40(3), 417 to 436. DOI: 10.1214/25-STS986.
+
+Kabra, A. and M. Patel (2024). ``The Limitations of Model Retraining in the Face of Performativity.'' arXiv:2408.08499.
+
+Khandani, A. E. and A. W. Lo (2011). ``What Happened to the Quants in August 2007? Evidence from Factors and Transactions Data.'' \textit{Journal of Financial Markets} 14(1), 1 to 46. DOI: 10.1016/j.finmar.2010.07.005.
+
+Lo, A. W. (2004). ``The Adaptive Markets Hypothesis: Market Efficiency from an Evolutionary Perspective.'' \textit{Journal of Portfolio Management} 30(5), 15 to 29. DOI: 10.3905/jpm.2004.442611.
+
+Lucas, R. E., Jr. (1976). ``Econometric Policy Evaluation: A Critique.'' \textit{Carnegie-Rochester Conference Series on Public Policy} 1, 19 to 46. DOI: 10.1016/S0167-2231(76)80003-6.
+
+MacKenzie, D. (2006). \textit{An Engine, Not a Camera: How Financial Models Shape Markets}. MIT Press. DOI: 10.7551/mitpress/9780262134606.001.0001.
+
+MacKenzie, D. and Y. Millo (2003). ``Constructing a Market, Performing Theory: The Historical Sociology of a Financial Derivatives Exchange.'' \textit{American Journal of Sociology} 109(1), 107 to 145. DOI: 10.1086/374404.
+
+McLean, R. D. and J. Pontiff (2016). ``Does Academic Research Destroy Stock Return Predictability?'' \textit{Journal of Finance} 71(1), 5 to 32. DOI: 10.1111/jofi.12365.
+
+Mendler-Dunner, C., J. Perdomo, T. Zrnic, and M. Hardt (2020). ``Stochastic Optimization for Performative Prediction.'' In \textit{Advances in Neural Information Processing Systems} 33.
+
+Mullainathan, S. and J. Spiess (2017). ``Machine Learning: An Applied Econometric Approach.'' \textit{Journal of Economic Perspectives} 31(2), 87 to 106. DOI: 10.1257/jep.31.2.87.
+
+Perdomo, J. C., T. Zrnic, C. Mendler-Dunner, and M. Hardt (2020). ``Performative Prediction.'' In \textit{Proceedings of the 37th International Conference on Machine Learning}, PMLR 119, 7599 to 7609.
+
+Rossi, B. (2021). ``Forecasting in the Presence of Instabilities: How We Know Whether Models Predict Well and How to Improve Them.'' \textit{Journal of Economic Literature} 59(4), 1135 to 1190. DOI: 10.1257/jel.20201479.
+\end{small}
+
+\end{document}
