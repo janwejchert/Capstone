@@ -51,6 +51,19 @@ def test_rolling_ar_forecast_shape_and_warmup():
     assert np.all(np.isfinite(params[50:]))
 
 
+def test_rolling_ar_forecast_shape_with_higher_order():
+    returns = np.linspace(-1.0, 1.0, 200)
+
+    forecasts, params = forecast.rolling_ar_forecast(returns, window=50, p=3)
+
+    assert forecasts.shape == (200,)
+    assert params.shape == (200, 4)
+    assert np.all(np.isnan(forecasts[:50]))
+    assert np.all(np.isnan(params[:50]))
+    assert np.all(np.isfinite(forecasts[50:]))
+    assert np.all(np.isfinite(params[50:]))
+
+
 def test_rolling_ar_forecast_uses_only_past_returns():
     base = np.sin(np.arange(100) / 10.0)
     altered_future = base.copy()
