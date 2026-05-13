@@ -6,7 +6,7 @@ proposal:
     1. Agents form forecasts using returns up to and including period t.
     2. Adopters and non-adopters submit orders.
     3. The market maker absorbs aggregate demand and moves the quote.
-    4. The exogenous news shock and residual AR term realise.
+    4. The exogenous news shock and the autoregressive term phi*r_prev realise.
 
 Phase 1 added the loop with null traders only. Phase 4 extends the same
 function with the rolling AR forecast, the BH98 advanced order with cap, and

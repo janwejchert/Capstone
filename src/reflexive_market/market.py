@@ -18,6 +18,6 @@ def next_return(r_prev, demand, mu, phi, sigma_news, epsilon):
 
     The intra-period order is fixed in section 3.6 of the proposal: traders
     submit orders, the market maker moves the quote by mu * D_t, and then the
-    residual AR term plus the exogenous news shock realise.
+    autoregressive term phi*r_prev plus the exogenous news shock realise.
     """
     return phi * r_prev + mu * demand + sigma_news * epsilon

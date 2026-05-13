@@ -1,6 +1,6 @@
 """Reflexive forecast adoption in a single-asset market.
 
-See docs/proposal/reflexive_forecast_proposal_v3.pdf for the full design.
+See docs/proposal/reflexive_forecast_proposal_v4.pdf for the full design.
 See CLAUDE.md for the phased implementation plan.
 """
 
