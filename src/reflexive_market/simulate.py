@@ -98,7 +98,12 @@ def run(
             is the state used to generate period t's outcomes.
         null_profit, advanced_profit : ndarray of shape (T,), per-period
             realised profit of a representative trader following each rule
-            (eq 7). Used by the phase 5 CE computation.
+            (eq 7). For the null rule, the representative trader is the
+            lowest-indexed non-adopter at period t, so null_profit[t] has
+            per-trader mean and variance independent of the adoption share.
+            null_profit[t] is NaN at periods where every trader is an adopter
+            (no non-adopter representative exists). Used by the phase 5 CE
+            computation and the phase 7 null-relative profit endpoint.
         switching_score : ndarray of shape (T,), score S_t from eq 14 each
             period switching is performed; NaN otherwise.
     """
@@ -163,11 +168,24 @@ def run(
         r_prev = r_new
 
         # Per-period realised profit of a representative trader following
-        # each rule (equation 7). The null rule's representative profit is
-        # the population-average null-trader profit; the advanced rule's
-        # representative profit is q_adv times the realised return, common
-        # across all adopters since the forecast is public.
-        null_profit[t] = float(null.mean()) * r_new
+        # each rule (equation 7). The advanced rule's representative profit
+        # is q_adv times the realised return, common across all adopters
+        # since the forecast is public. The null rule's representative is
+        # the lowest-indexed non-adopter: their realised order is null[i]
+        # and their realised profit is null[i] * r_new. Using a single
+        # representative non-adopter (rather than the population mean of
+        # all N null draws) gives per-trader mean and variance that do not
+        # depend on the adoption share; the population-mean version
+        # decays linearly in (1 - A) in expectation and has variance scaled
+        # by 1/N, which biases both the phase 5 CE risk penalty and the
+        # phase 7 null-relative profit endpoint. When every trader is an
+        # adopter there is no non-adopter representative and null_profit
+        # is NaN; downstream code already handles NaN inputs.
+        non_adopter_idx = np.flatnonzero(adoption == 0)
+        if non_adopter_idx.size > 0:
+            null_profit[t] = float(null[non_adopter_idx[0]]) * r_new
+        else:
+            null_profit[t] = np.nan
         advanced_profit[t] = q_adv * r_new
 
         # Record the adopter state that actually drove returns[t],
@@ -189,7 +207,17 @@ def run(
             start = t - switching_window + 1
             seg_null = null_profit[start : t + 1]
             seg_adv = advanced_profit[start : t + 1]
-            ce_null = float(seg_null.mean() - 0.5 * switching_a * seg_null.var())
+            # nan-safe: null_profit is NaN at periods where every trader is
+            # an adopter (no non-adopter representative). The CE statistics
+            # then skip those entries instead of poisoning the whole window.
+            # When the entire window is NaN (full adoption throughout the
+            # window) the score is NaN and the logistic switch step at full
+            # adoption is a no-op anyway.
+            seg_null_finite = seg_null[np.isfinite(seg_null)]
+            if seg_null_finite.size > 0:
+                ce_null = float(seg_null_finite.mean() - 0.5 * switching_a * seg_null_finite.var())
+            else:
+                ce_null = float("nan")
             ce_adv = float(seg_adv.mean() - 0.5 * switching_a * seg_adv.var())
             score = ce_adv - ce_null
             switching_score[t] = score

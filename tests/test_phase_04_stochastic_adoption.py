@@ -105,6 +105,30 @@ def test_adoption_share_records_state_that_drove_outcomes():
     np.testing.assert_array_equal(out["adoption_share"][1:], 1.0)
 
 
+def test_null_profit_is_per_trader_not_population_mean():
+    """null_profit[t] must be the realised profit of a single representative
+    non-adopter (per eq 7), not the population mean of all N null draws times
+    r. The population-mean version decays linearly in (1 - A) toward zero as
+    adoption rises because adopter null draws are independent of the market,
+    which biases the phase 7 null-relative endpoint and the phase 5 CE risk
+    penalty.
+
+    Edge case: when every trader is an adopter there is no non-adopter
+    representative, so null_profit[t] must be NaN. With adoption_pi = 1 the
+    first period generates outcomes under zero adoption (null_profit[0] is a
+    finite single-trader draw), and every subsequent period is at full
+    adoption (null_profit[1:] must be NaN).
+    """
+    out = simulate.run(
+        T=5, N=10, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(0),
+        forecast_window=2, forecast_p=1, risk_scale=0.001, q_cap=1.0,
+        adoption_pi=1.0, adoption_delta=0.0,
+    )
+    assert np.isfinite(out["null_profit"][0])
+    assert np.all(np.isnan(out["null_profit"][1:]))
+
+
 def test_adoption_start_t_holds_indicators_then_releases():
     """With initial adoption at zero, no transitions can fire until
     ``adoption_start_t``. After that index the share rises as usual."""
