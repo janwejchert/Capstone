@@ -22,3 +22,14 @@ Thumbs.db
 results/data/*.npz
 !results/data/.gitkeep
 !results/data/phase_*.npz
+
+# LaTeX aux (track .tex, .bib, .pdf only)
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
