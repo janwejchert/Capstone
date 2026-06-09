@@ -1,0 +1,191 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{XCharter}
+\usepackage{microtype}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{accent}{HTML}{1F4E79}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accent,
+  citecolor=accent
+}
+
+\titleformat{\section}{\Large\bfseries\color{accent}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{}{0em}{}
+
+\setlength{\parskip}{0.55em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
+
+\begin{document}
+
+%% Title page
+\begin{titlepage}
+\centering
+\vspace*{0.2cm}
+
+{\LARGE\bfseries\color{accent} Performative Prediction\\ in a Single-Asset Market\par}
+\vspace{0.5em}
+{\large\itshape Self-Fulfilment, Signal Erosion, and Economic\\ Value under Forecast Adoption\par}
+
+\vspace{0.9cm}
+
+\includegraphics[width=0.30\textwidth]{IELogo.jpeg}
+
+\vspace{0.9cm}
+
+{\Large Jan Jacek Wejchert\par}
+\vspace{0.3em}
+{\large June 2026\par}
+
+\vspace{0.8cm}
+\rule{0.7\textwidth}{0.4pt}\par
+\vspace{0.4em}
+
+{\Large\bfseries\color{accent} Abstract\par}
+\vspace{0.3em}
+
+\begin{minipage}{0.86\textwidth}
+\justifying\small
+This report studies how widespread adoption of a shared autoregressive forecasting rule affects forecast performance and economic value in a single-asset agent-based market. The market combines Brock-Hommes mean-variance demand with a Beja-Goldman / Farmer-Joshi market-maker price update. Traders may switch from a no-skill null rule to a public rolling AR forecast under either exogenous stochastic diffusion or endogenous certainty-equivalent switching. The forecast is evaluated against two distinct targets on the same path: the realised return, which is the metric a deployed forecaster actually sees, and a demand-adjusted counterfactual that strips out contemporaneous price impact.
+
+The simulator identifies a dual-channel result. As adoption rises, the rolling out-of-sample $R^{2}$ against realised returns climbs from roughly 0.09 to 0.19 through coordinated adopter demand, while the same forecast's $R^{2}$ against the demand-adjusted return falls from roughly 0.07 to 0.04, with the rolling effective AR coefficient rising from 0.32 to 0.45 in step. Economic value does not erode in the cost-free baseline. The headline summary is therefore that adoption raises realised predictive performance through a self-fulfilment channel while reducing the independent demand-adjusted signal the forecast was originally designed to exploit.
+\end{minipage}
+
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+
+\section{Introduction}
+
+\subsection{Motivation}
+
+\subsection{Relation to previous work}
+
+\subsection{Research question and contribution}
+
+\subsection{Report roadmap}
+
+
+\section{Background and theoretical framework}
+
+\subsection{Reflexivity and performative prediction}
+
+\subsection{Heterogeneous-agent finance and price formation}
+
+\subsection{Forecast evaluation under self-fulfilment}
+
+\subsection{Key concepts and notation}
+
+
+\section{The model}
+
+\subsection{Single-asset market with linear price impact}
+
+\subsection{Trader behaviour: belief, decision, and switching layers}
+
+\subsection{Null rule and rolling AR forecasting rule}
+
+\subsection{Adoption mechanisms}
+
+\subsubsection{Stochastic diffusion}
+
+\subsubsection{Certainty-equivalent performance-based switching}
+
+\subsection{Intra-period timing}
+
+\subsection{The realised vs demand-adjusted decomposition}
+
+
+\section{Metrics and experimental design}
+
+\subsection{Primary forecast-performance endpoints}
+
+\subsubsection{Realised-return $R^{2}$}
+
+\subsubsection{Demand-adjusted-return $R^{2}$}
+
+\subsection{Primary economic endpoint}
+
+\subsection{Effective AR coefficient as a market-dynamics diagnostic}
+
+\subsection{Target-specific critical adoption shares}
+
+\subsection{Simulation protocol, seed handling, and parameter grid}
+
+
+\section{Implementation}
+
+\subsection{Software architecture}
+
+\subsection{Phased construction}
+
+\subsection{Reproducibility}
+
+
+\section{Results}
+
+\subsection{Baseline market and benchmark validation (phases 1 and 2)}
+
+\subsection{AR forecast performance without adoption (phase 3)}
+
+\subsection{Dual-channel result under stochastic adoption (phase 4)}
+
+\subsection{Endogenous CE-based switching (phase 5)}
+
+\subsection{Parameter sweep and critical adoption shares (phase 6)}
+
+\subsection{Transaction-cost extension and economic endpoint (phase 7)}
+
+
+\section{Discussion}
+
+\subsection{Interpretation of the dual-channel mechanism}
+
+\subsection{Why the effective AR coefficient rises with adoption}
+
+\subsection{Boundary conditions and the realised-channel non-result}
+
+\subsection{Limitations}
+
+
+\section{Conclusion}
+
+\subsection{Summary of findings}
+
+\subsection{Implications for forecasting under adoption}
+
+\subsection{Directions for future work}
+
+
+\section*{References}
+
+
+\appendix
+
+\section{Model equations and derivations}
+
+\section{Additional figures}
+
+\section{Parameter tables and reproducibility details}
+
+\end{document}
