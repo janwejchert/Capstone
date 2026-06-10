@@ -102,11 +102,34 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \section{The model}
 
-\subsection{Single-asset market with linear price impact}
+\subsection{Single-asset market with linear price impact}\label{sec:model-market}
+
+The market is deliberately minimal. Time is discrete and indexed by $t = 0, 1, \ldots, T$. A single risky asset trades at log-price $p_t$, with one-period return $r_{t+1} = p_{t+1} - p_t$; the risk-free rate is normalised to zero and the asset pays no dividend, so $r_{t+1}$ is an excess return. There are $N$ traders, each submitting a signed order $q_{i,t}$ every period. % src: proposal v4 section 3.1.1 (asset and agents)
+There is no Walrasian auctioneer clearing supply against demand. Price formation instead follows the disequilibrium market-adjustment tradition, in which a risk-neutral market maker absorbs whatever aggregate order flow arrives and shifts the log-price in proportion to it \citep{beja1980,farmerjoshi2002}. Linear price impact is the single channel through which trading feeds back into returns, and therefore the channel that carries every reflexive effect this report studies. The three equations below reproduce equations (4) to (6) of the proposal, renumbered locally; trader-level order formation, proposal equations (1) to (3), is the subject of the next subsection. % src: proposal v4 section 3.1 (Baseline market environment), eqs. (4)-(6)
+
+Aggregate signed demand is the per-trader average order,
+\begin{equation}
+  D_t \;=\; \frac{1}{N} \sum_{i=1}^{N} q_{i,t},
+  \label{eq:aggregate-demand}
+\end{equation}
+and the market maker updates the log-price according to
+\begin{equation}
+  p_{t+1} \;=\; p_t \;+\; \mu\, D_t \;+\; \sigma\, \varepsilon_{t+1}, \qquad \varepsilon_{t+1} \sim \mathcal{N}(0, 1),
+  \label{eq:price-update}
+\end{equation}
+where $\mu = 1/\lambda > 0$ is the market-maker price-impact coefficient, the reciprocal of the market maker's liquidity $\lambda$, and $\sigma > 0$ scales the exogenous news shock; equation~\eqref{eq:price-update} is the zero-fundamental special case of the Farmer-Joshi log-linear price update. % src: proposal v4 section 3.1.4 (eqs. 4 and 5; "zero-fundamental specialisation of Farmer and Joshi (2002, Eq. 7)"); liquidity reading of lambda per farmerjoshi2002 (discussion of their eq. 7)
+First-differencing \eqref{eq:price-update} gives a one-period market-maker return of $\mu D_t + \sigma\varepsilon_{t+1}$; the baseline return law augments it with an autoregressive component carried in from prior periods,
+\begin{equation}
+  r_{t+1} \;=\; \varphi\, r_t \;+\; \mu\, D_t \;+\; \sigma\, \varepsilon_{t+1}, \qquad |\varphi| < 1\ \text{small.}
+  \label{eq:return-law}
+\end{equation}
+Equation~\eqref{eq:return-law} splits the return into the three pieces the rest of the model works with: a small predictable component $\varphi r_t$, the signal the rolling AR rule of section~\ref{sec:model-rules} is built to estimate; the contemporaneous price impact $\mu D_t$, the only term through which trader behaviour enters; and unpredictable news $\sigma\varepsilon_{t+1}$. The $\varphi r_t$ term is not ad hoc: \citet{farmerjoshi2002} show analytically that when part of aggregate demand comes from linear trend-following strategies, the induced return process has positive first-lag autocorrelation of the same order as the trend-following intensity, and \eqref{eq:return-law} absorbs that component as a single reduced-form coefficient rather than modelling a separate trader type at baseline. % src: proposal v4 section 3.1.5 (eq. 6; Farmer and Joshi (2002, Eqs. 8 to 11), rho_r(1) = alpha/(1+alpha))
+
+One implementation choice deserves note. In \citet{farmerjoshi2002} the market maker absorbs net order flow, that is, changes in positions; the simulator's \texttt{market.py} has it absorb the level of aggregate demand each period, closer in spirit to the Beja-Goldman excess-demand adjustment, so a persistent position exerts persistent price pressure. The profit and transaction-cost accounting of later phases prices a full position turnover every period, consistent with this convention. % src: src/reflexive_market/market.py module docstring
 
 \subsection{Trader behaviour: belief, decision, and switching layers}
 
-\subsection{Null rule and rolling AR forecasting rule}
+\subsection{Null rule and rolling AR forecasting rule}\label{sec:model-rules}
 
 \subsection{Adoption mechanisms}
 
