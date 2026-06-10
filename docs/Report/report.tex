@@ -147,6 +147,21 @@ The switching layer is a single binary state: $a_{i,t} \in \{0, 1\}$ indicates w
 
 \subsection{Null rule and rolling AR forecasting rule}\label{sec:model-rules}
 
+Non-adopters trade by the null rule, proposal equation (9): trader $i$ submits the order $q_{i,t}^{(0)} = \xi_{i,t}$ with $\xi_{i,t} \sim \mathcal{N}(0, \sigma_{q}^{2})$, drawn independently across traders and time. The rule is deliberately a reference point rather than a model of real trading. It keeps every trader active every period while injecting order flow that is zero mean and directionally uninformative on average, so any systematic predictability or profitability the advanced rule generates is measured against a market in which trading happens but is not forecast-driven. One design feature matters downstream: the null order bypasses the demand mapping of the previous subsection and is subject to no position cap. It enters aggregate demand as drawn, with typical magnitude set by $\sigma_q$ alone, while the advanced order \eqref{eq:advanced-order} is clipped at $\bar{q}_{i}$. This position-size asymmetry between the two rules returns in section~\ref{sec:phase7-results}, where it dominates the null-relative economic endpoint in both directions. % src: proposal v4 section 3.3 (Null model of trading, eq. 9; "no-skill random trading rule", "directionally uninformative on average"); src/reflexive_market/traders.py null_orders (draws returned unclipped; the clip in eq. (3) applies only in advanced_order)
+
+Adopters share a single advanced rule: an autoregressive forecast of the next return, estimated on a rolling window of recent returns. The two equations below reproduce equations (10) and (11) of the proposal, renumbered locally. With rolling-window length $w$ and autoregressive order $p$, at time $t$ the public model fits by least squares % src: proposal v4 section 3.4 (Advanced forecasting rule, eqs. 10 and 11)
+\begin{equation}
+  r_{s+1} \;=\; c \;+\; \sum_{j=1}^{p} \varphi_{j}\, r_{s+1-j} \;+\; u_{s+1},
+  \label{eq:ar-fit}
+\end{equation}
+using only the observations in the window $s = t - w, \ldots, t - 1$, and issues the one-step-ahead out-of-sample forecast
+\begin{equation}
+  \hat{r}_{t+1}^{(A)}(w, p) \;=\; \hat{c}_{t, w, p} \;+\; \sum_{j=1}^{p} \hat{\varphi}_{j, t, w, p}\, r_{t+1-j}.
+  \label{eq:ar-forecast}
+\end{equation}
+Nothing estimated at time $t$ uses information from after $t$, so the forecast is out of sample by construction, and rolling estimation lets the coefficients adapt when the return process changes, which under adoption it does: the rolling fit of \eqref{eq:ar-fit} is exactly the object that later absorbs the amplified empirical autocorrelation of realised returns. % src: proposal v4 section 3.4 ("using only information that would have been available at time t"; "Rolling estimation allows the coefficients to adapt"); section 4.1.2 (rolling fit picks up an amplified empirical autocorrelation)
+The rule is built to recover the $\varphi r_t$ component of the return law \eqref{eq:return-law}, the simplest forecasting environment that should in principle work; penalised regressions, tree ensembles, and recurrent architectures are deliberately excluded. In the simulator, \texttt{forecast.py} implements the fit as ordinary least squares on a lagged design matrix with an intercept, the order parameter defaults to $p = 1$, and the first $w$ entries of the forecast series are NaN, the warm-up that the non-finite-forecast guard of the previous subsection converts into adopter inactivity. The core design holds $p = 1$ with windows $w \in \{50, 100, 250\}$; higher orders $p \in \{2, 5, 10\}$ enter only as a robustness check in phase 6. % src: proposal v4 section 3.4 (purpose of the baseline, excluded model classes, w in {50, 100, 250}, AR(1) core); section 3.7 (higher-order AR rule, p in {2, 5, 10}, phase 6 robustness); src/reflexive_market/forecast.py rolling_ar_forecast (np.linalg.lstsq via fit_ar, p=1 default, first window entries NaN)
+
 \subsection{Adoption mechanisms}\label{sec:model-adoption}
 
 \subsubsection{Stochastic diffusion}
