@@ -211,7 +211,7 @@ The equations of the preceding subsections fix what each trader and the market m
 
 The sequence separates what the forecast knows from what its users cause. Everything the forecast may legitimately use, returns through period $t$, is in hand before any order is placed; everything its own adopters do to the price, the $\mu D_t$ move of step 3, is in the books before next period's news arrives in step 4. With that separation fixed, it becomes well defined to score the same forecast against two different targets on the same path, the realised return that includes the impact of step 3 or a counterfactual that strips it out, which is the subject of the next subsection. % src: proposal v4 section 3.6 ("Given this timing, the forecast can be evaluated against either of two distinct targets")
 
-\subsection{The realised vs demand-adjusted decomposition}
+\subsection{The realised vs demand-adjusted decomposition}\label{sec:model-decomposition}
 
 The timing of the previous subsection makes it well defined to score the same forecast against two targets on the same path; this subsection constructs them. For evaluation purposes the return law \eqref{eq:return-law} is rewritten as a decomposition into a contemporaneous price-impact component and an ex-feedback remainder. The two displays below reproduce equation (7) of the proposal, renumbered locally. The realised return splits as % src: proposal v4 section 3.1.5 (eq. 7; "a decomposition into a contemporaneous price-impact component and an ex-feedback remainder")
 \begin{equation}
@@ -234,9 +234,29 @@ The distinction is the source of the erosion channel's name. The news shock is i
 
 \subsection{Primary forecast-performance endpoints}
 
-\subsubsection{Realised-return $R^{2}$}
+\subsubsection{Realised-return $R^{2}$}\label{sec:metrics-r2-realised}
+
+The first primary endpoint scores the shared forecast against the return a deployed forecaster can observe. It is the standard out-of-sample $R^{2}$ of the one-step forecast \eqref{eq:ar-forecast} against the realised return,
+\begin{equation}
+  R^{2}_{\mathrm{realised}}(t) \;=\; 1 \;-\; \frac{\sum_{s=t-W}^{t-1} \bigl(r_{s+1} - \hat{r}^{(A)}_{s+1}\bigr)^{2}}{\sum_{s=t-W}^{t-1} \bigl(r_{s+1} - \bar{r}\bigr)^{2}},
+  \label{eq:r2-realised}
+\end{equation}
+where the sums run over the most recent $W$ forecast-target pairs ending at period $t$ and $\bar{r}$ is the mean realised return over that window. % src: proposal v4 section 4.1.1 (R^2_realised display, "computed in a trailing window ending at t"); src/reflexive_market/metrics.py rolling_oos_r2
+The evaluation window is a separate knob from the AR estimation window $w$ of section~\ref{sec:model-rules}; every reported run uses $W = 1000$ periods, the notebooks' \texttt{eval\_window} parameter. % src: phase_03_ar_forecast.npz['eval_window'] = phase_04_stochastic_adoption.npz['eval_window'] = phase_06_a_star_grid.npz['eval_window'] = 1000
+
+The forecasts entering \eqref{eq:r2-realised} are strictly out of sample, each $\hat{r}^{(A)}_{s+1}$ being fitted on returns through period $s$ only. The constant benchmark follows one implementation convention worth stating once: \texttt{rolling\_oos\_r2} in \texttt{metrics.py} takes the trailing window's in-sample mean of the target as the benchmark, not a real-time prevailing mean recomputed from the data available before each $s$. The choice slightly favours the benchmark, and with near-zero-mean returns the difference is negligible. % src: src/reflexive_market/metrics.py rolling_oos_r2 docstring ("The benchmark is the trailing window's in-sample mean of the target, not a real-time prevailing mean, which slightly favours the benchmark. With near-zero-mean returns the difference is negligible. The forecasts themselves are strictly out of sample.")
+Because the target $r_{s+1}$ contains the contemporaneous impact term $\mu D_s$ of the decomposition \eqref{eq:decomposition}, this is the total-performance reading of section~\ref{sec:model-decomposition}, expected to rise with adoption through the self-fulfilling channel. % src: proposal v4 section 4.1.1 ("expected to rise with adoption rather than fall, because coordinated adopter trading pushes r_{t+1} in the forecast direction")
 
 \subsubsection{Demand-adjusted-return $R^{2}$}
+
+The second primary endpoint scores the same forecast, on the same path and over the same trailing window, against the demand-adjusted return $x_{s+1}$ of \eqref{eq:demand-adjusted}:
+\begin{equation}
+  R^{2}_{\mathrm{da}}(t) \;=\; 1 \;-\; \frac{\sum_{s=t-W}^{t-1} \bigl(x_{s+1} - \hat{r}^{(A)}_{s+1}\bigr)^{2}}{\sum_{s=t-W}^{t-1} \bigl(x_{s+1} - \bar{x}\bigr)^{2}},
+  \label{eq:r2-da}
+\end{equation}
+with $\bar{x}$ the window mean of the demand-adjusted return; the benchmark convention of section~\ref{sec:metrics-r2-realised} applies unchanged. % src: proposal v4 section 4.1.2 (R^2_da display with x_{s+1} = r_{s+1} - mu D_s); src/reflexive_market/metrics.py rolling_oos_r2 applied to the demand-adjusted target, e.g. notebooks/phase_05_performance_adoption.ipynb metrics cell (rolling_oos_r2(demand_adjusted, forecasts, eval_window))
+The same forecast can earn two different $R^{2}$ readings on the same path because the targets differ by exactly that impact term: adopter orders are aligned with the forecast, so $\mu D_s$ systematically moves the realised target toward the forecast, while a rolling fit that has absorbed the resulting amplified autocorrelation over-predicts the demand-adjusted target, from which the term is removed. % src: proposal v4 section 4.1.1 ("coordinated adopter trading pushes r_{t+1} in the forecast direction") and section 4.1.2 ("the rolling fit picks up an amplified empirical autocorrelation from realised returns and over-predicts the demand-adjusted process")
+The two endpoints are reported on equal footing, neither being the canonical evaluation target: $R^{2}_{\mathrm{realised}}$ measures what a deployed forecaster sees, and $R^{2}_{\mathrm{da}}$ measures whether the independent signal the forecast was built to exploit survives once self-fulfilment is stripped out, the demand-adjusted-erosion channel whose thresholds section~\ref{sec:metrics-a-star} defines. % src: proposal v4 section 4.1.2 ("The two R^2 readings are reported on equal footing; neither is the canonical evaluation target, and each answers a different question") and section 4 intro (realised reading is the total performance a deployed forecaster sees; demand-adjusted reading is the counterfactual that tests whether the independent signal survives once self-fulfilment is stripped out)
 
 \subsection{Primary economic endpoint}
 
