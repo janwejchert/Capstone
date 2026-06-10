@@ -92,6 +92,9 @@ def run(
         prices, returns, demand : as in the phase 1 baseline.
         forecasts : ndarray of shape (T,), one-period-ahead AR forecast each
             period (NaN before the warm-up).
+        advanced_order : ndarray of shape (T,), the common adopter order
+            q^(A)_t from equation (3) each period (0.0 while the forecast
+            is unavailable), so advanced_profit = advanced_order * returns.
         adoption_share : ndarray of shape (T,), share of adopters that drove
             returns[t]/demand[t]/null_profit[t]/advanced_profit[t]. Recorded
             before the end-of-period transition fires, so adoption_share[t]
@@ -104,6 +107,11 @@ def run(
             null_profit[t] is NaN at periods where every trader is an adopter
             (no non-adopter representative exists). Used by the phase 5 CE
             computation and the phase 7 null-relative profit endpoint.
+            Note the null representative's expected profit is positive,
+            E[null_profit] = mu * sigma_q^2 / N, not zero: the trader's own
+            order moves the within-period quote by mu * q / N and the
+            position is marked at the post-impact price (own-impact paper
+            profit). The phase 7 null-relative endpoint inherits this term.
         switching_score : ndarray of shape (T,), the score S_t = CE^(A) -
             CE^(0) defined below equation (14), each period switching is
             performed; NaN otherwise.
@@ -126,6 +134,7 @@ def run(
     returns = np.zeros(T)
     demand = np.zeros(T)
     forecasts = np.full(T, np.nan)
+    advanced_order = np.zeros(T)
     adoption_share = np.zeros(T)
     null_profit = np.zeros(T)
     advanced_profit = np.zeros(T)
@@ -158,6 +167,7 @@ def run(
         else:
             q_adv = 0.0
             orders = null
+        advanced_order[t] = q_adv
 
         D_t = market.aggregate_demand(orders)
         epsilon = rng.standard_normal()
@@ -231,6 +241,7 @@ def run(
         "returns": returns,
         "demand": demand,
         "forecasts": forecasts,
+        "advanced_order": advanced_order,
         "adoption_share": adoption_share,
         "null_profit": null_profit,
         "advanced_profit": advanced_profit,

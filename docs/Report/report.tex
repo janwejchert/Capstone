@@ -29,7 +29,7 @@
 
 \titleformat{\section}{\Large\bfseries\color{accent}}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.5em}{}
-\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{\thesubsubsection}{0.5em}{}
 
 \linespread{1.0}
 \setlength{\parskip}{0pt}
@@ -68,7 +68,7 @@
 \justifying\small
 This report studies how widespread adoption of a shared autoregressive forecasting rule affects forecast performance and economic value in a single-asset agent-based market. The market combines Brock-Hommes mean-variance demand with a Beja-Goldman / Farmer-Joshi market-maker price update. Traders may switch from a no-skill null rule to a public rolling AR forecast under either exogenous stochastic diffusion or endogenous certainty-equivalent switching. The forecast is evaluated against two distinct targets on the same path: the realised return, which is the metric a deployed forecaster actually sees, and a demand-adjusted counterfactual that strips out contemporaneous price impact.
 
-The simulator identifies a dual-channel result. As adoption rises, the rolling out-of-sample $R^{2}$ against realised returns climbs from roughly 0.09 to 0.19 through coordinated adopter demand, while the same forecast's $R^{2}$ against the demand-adjusted return falls from roughly 0.07 to 0.04, with the rolling effective AR coefficient rising from 0.32 to 0.45 in step. Economic value does not erode in the cost-free baseline. The headline summary is therefore that adoption raises realised predictive performance through a self-fulfilment channel while reducing the independent demand-adjusted signal the forecast was originally designed to exploit.
+The simulator identifies a dual-channel result. As adoption rises, the rolling out-of-sample $R^{2}$ against realised returns reaches roughly 0.19 at full adoption, against 0.07 for a zero-adoption control on the same shocks, through coordinated adopter demand. The same forecast's $R^{2}$ against the demand-adjusted return falls to roughly 0.04, against 0.08 under the control, with the rolling effective AR coefficient rising from 0.28 to 0.45 in step. Mean adopter profit is amplified rather than eroded in the cost-free baseline; the null-relative economic comparison is dominated by position-size asymmetry between the null rule and the capped adopter rule and is reported with that caveat. The headline summary is therefore that adoption raises realised predictive performance through a self-fulfilment channel while reducing the independent demand-adjusted signal the forecast was originally designed to exploit.
 \end{minipage}
 
 \vfill

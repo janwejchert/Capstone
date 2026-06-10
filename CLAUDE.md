@@ -14,7 +14,11 @@ impact), and net trading value relative to a null benchmark. The proposal
 anticipates and the implemented simulator confirms a **dual-channel result**:
 adoption *raises* realised-return R^2 (self-fulfilling channel) while *lowering*
 demand-adjusted R^2 (demand-adjusted-erosion channel) on the same path, and
-economic value stays roughly intact in the cost-free baseline.
+mean adopter profit grows with adoption in the cost-free baseline. The
+null-relative economic endpoint is confounded by position-size asymmetry
+(the null rule trades ~sigma_q while adopters are capped at q_cap, so the
+null books larger own-impact paper profit at c = 0 and a larger cost bill
+at c > 0); phase 7 reports it with that caveat.
 
 The market combines two well-known building blocks from the heterogeneous-agent
 literature. Trader demand is mean-variance with constant absolute risk aversion,
@@ -143,8 +147,11 @@ Summarises primary findings under the dual-channel framing, reports the
 diagnostics in section 4.2 of the proposal, and adds the transaction-cost
 extension from section 3.7. Holds AR order at p = 1 to remain on the proposal's
 baseline rule. Reports two views of `A*_{profit}`: an absolute view (smallest
-A at which adopter net profit crosses zero) and the null-relative view that is
-the proposal's primary economic endpoint. A second optional extension is
+A at which adopter net profit crosses zero; in this regime a from-below
+profitability onset, the reverse of the proposal's from-above erosion
+reading) and the null-relative view that is the proposal's primary economic
+endpoint (read it with the null self-impact and position-size caveats stated
+in the notebook). A second optional extension is
 heterogeneous trader ecology (trend followers and contrarians replacing the
 random null), if time allows.
 
