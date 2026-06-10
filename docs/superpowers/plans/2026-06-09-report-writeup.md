@@ -187,11 +187,11 @@ The Results section is written first because the numbers are concrete and frozen
 - `results/figures/phase_01_price_path.png`, `phase_01_return_series.png`, `phase_01_return_histogram.png`
 - `results/figures/phase_02_rolling_phi.png`, `phase_02_seed_mean.png`, `phase_02_seed_std.png`, `phase_02_seed_lag1.png`, `phase_02_seed_kurtosis.png`
 
-- [ ] **Step 1: Read the source notebooks' parameters cells and report cells**
+- [x] **Step 1: Read the source notebooks' parameters cells and report cells**
 
 Open both phase 01 and phase 02 notebooks. Note the parameters (`N`, `T`, `phi`, `sigma`, seed values, rolling window length). Note what each notebook concludes in its final markdown cell.
 
-- [ ] **Step 2: Load the .npz summaries and confirm the numbers you will cite**
+- [x] **Step 2: Load the .npz summaries and confirm the numbers you will cite**
 
 Run:
 
@@ -209,13 +209,13 @@ print('rolling phi flatness: range over time:', d2['mean_phi_trace'].max() - d2[
 
 Record the output. These are the numbers the subsection will cite.
 
-- [ ] **Step 3: Draft the prose (target ~400 words)**
+- [x] **Step 3: Draft the prose (target ~400 words)**
 
 Two paragraphs. First paragraph describes phase 1: null-trader baseline, the AR(1) input parameter `phi_input`, the empirical lag-1 autocorrelation matches within sampling error, returns look roughly Gaussian. Second paragraph describes phase 2: stability of per-seed descriptive stats (mean, std, lag-1 autocorrelation, kurtosis) across the 100-seed sweep, and the absence of drift in the rolling effective `phi` estimate over T=5000 steps. End with the role of this section: this is the no-adoption, no-drift control needed before any erosion claim is meaningful.
 
 Insert into `report.tex` at `\subsection{Baseline market and benchmark validation (phases 1 and 2)}`. Use inline source comments on each numeric claim.
 
-- [ ] **Step 4: Add two figures**
+- [x] **Step 4: Add two figures**
 
 Choose the two strongest. Recommended:
 - `phase_01_return_histogram.png` (shows null-trader return distribution).
@@ -234,22 +234,22 @@ Add via:
 
 Fill the bracketed values from Step 2's output. Same shape for the second figure.
 
-- [ ] **Step 5: Add citation entries for proposal section references**
+- [x] **Step 5: Add citation entries for proposal section references**
 
 The subsection should reference proposal section 3.1 (market) and section 3.3 (null rule). No external citations needed in this subsection beyond the proposal itself.
 
-- [ ] **Step 6: Compile and check rendering**
+- [x] **Step 6: Compile and check rendering**
 
 Run the four-command pdflatex sequence from Stage 0 Step 8. Open the PDF and verify the new subsection prose, both figures, captions, and cross-refs render cleanly.
 
-- [ ] **Step 7: Cross-check protocol**
+- [x] **Step 7: Cross-check protocol**
 
-  - [ ] **Numbers traced:** every numeric claim has an inline `% src:` comment pointing to a specific `.npz` field or notebook cell.
-  - [ ] **Definitions match proposal v4:** `phi`, `r_t`, `D_t`, "null rule" terminology consistent with proposal section 3.1-3.2.
-  - [ ] **Figures verified:** both PNG files exist at the cited paths; captions describe what is actually in the image (open and look).
-  - [ ] **Style pass:** no em dashes; plain English; PDF compiles cleanly.
+  - [x] **Numbers traced:** every numeric claim has an inline `% src:` comment pointing to a specific `.npz` field or notebook cell.
+  - [x] **Definitions match proposal v4:** `phi`, `r_t`, `D_t`, "null rule" terminology consistent with proposal section 3.1-3.2.
+  - [x] **Figures verified:** both PNG files exist at the cited paths; captions describe what is actually in the image (open and look).
+  - [x] **Style pass:** no em dashes; plain English; PDF compiles cleanly.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -270,11 +270,11 @@ git commit -m "report: 6.1 baseline market and benchmark validation"
 - `results/data/phase_03_ar_forecast.npz`, fields: `summary` (3, 5), `ar_windows` (3,) typically `[50, 100, 250]`, `ar_order`, `eval_window`, `phi_input`, `seed`
 - `results/figures/phase_03_ar_coefficients.png`, `phase_03_rolling_msfe.png`, `phase_03_rolling_oos_r2.png`
 
-- [ ] **Step 1: Open phase_03 notebook and inspect the structure of `summary`**
+- [x] **Step 1: Open phase_03 notebook and inspect the structure of `summary`**
 
 Open the notebook. Find the cell that builds the `summary` array and note what each of the 5 columns means (likely: window, mean MSFE, std MSFE, mean OOS R^2, std OOS R^2, or similar). Confirm by reading the cell text.
 
-- [ ] **Step 2: Load .npz and extract the numbers**
+- [x] **Step 2: Load .npz and extract the numbers**
 
 ```bash
 python3 -c "
@@ -289,13 +289,13 @@ print('phi_input:', d['phi_input'], 'ar_order:', d['ar_order'])
 
 Record the OOS R^2 by window length. These are the central numbers in the subsection.
 
-- [ ] **Step 3: Draft the prose (target ~400 words)**
+- [x] **Step 3: Draft the prose (target ~400 words)**
 
 One paragraph on the setup (rolling AR(1) fit, no trader uses the forecast yet, simulate from the null market, then post-hoc evaluate the forecast on realised returns). One paragraph on the result: a small positive rolling OOS R^2 driven by the `phi` term, lower variance for longer windows, AR coefficient estimates that cluster near `phi_input`. End with the framing point: this confirms the rule recovers the linear-persistence signal before any adoption is introduced.
 
 Insert into report.tex with inline source comments.
 
-- [ ] **Step 4: Add figures**
+- [x] **Step 4: Add figures**
 
 Recommended:
 - `phase_03_rolling_oos_r2.png`: central evidence (positive, stable, low for small windows).
@@ -303,13 +303,13 @@ Recommended:
 
 Same figure-block format as Stage 1.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
 Same pdflatex sequence. Open PDF and verify.
 
-- [ ] **Step 6: Cross-check protocol** (all four checks, as in Stage 1)
+- [x] **Step 6: Cross-check protocol** (all four checks, as in Stage 1)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -330,11 +330,11 @@ git commit -m "report: 6.2 AR forecast performance without adoption"
 - `results/data/phase_04_stochastic_adoption.npz`, fields: `summary` (3, 8), `regime_pi` (3,), `regime_delta` (3,), `regime_names` (3,), likely `['zero', 'slow', 'fast']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `T`, `N`, `seed`
 - 9 figures in `results/figures/phase_04_*.png` (full list at bottom of plan).
 
-- [ ] **Step 1: Open notebook and identify the 8 summary columns**
+- [x] **Step 1: Open notebook and identify the 8 summary columns**
 
 Open phase_04 notebook. Find the cell that builds the (3, 8) `summary` array. The 8 columns likely cover: regime name, regime adoption parameters, mean adoption share, OOS R^2 against realised at low vs high adoption, OOS R^2 against demand-adjusted at low vs high adoption, effective phi at low vs high adoption.
 
-- [ ] **Step 2: Load the .npz and extract numbers per regime**
+- [x] **Step 2: Load the .npz and extract numbers per regime**
 
 ```bash
 python3 -c "
@@ -351,7 +351,7 @@ print('mu:', d['mu'], 'phi:', d['phi_input'])
 
 Record the actual rolling OOS R^2 values at low and high adoption for both targets, plus the effective phi at low and high adoption. Anchor the low-adoption side to the zero-adoption control row (realised 0.0695, demand-adjusted 0.0821, phi 0.2821): the fast regime's own low window already averages adoption ~0.5, which is why the README quotes 0.07 to 0.19, 0.08 to 0.04, and 0.28 to 0.45 against the control rather than the ramp window.
 
-- [ ] **Step 3: Draft the prose (target ~700 words)**
+- [x] **Step 3: Draft the prose (target ~700 words)**
 
 Suggested four paragraphs:
 
@@ -362,7 +362,7 @@ Suggested four paragraphs:
 
 End with the one-line headline: adoption raises realised predictive performance through the self-fulfilment channel while reducing the independent demand-adjusted signal.
 
-- [ ] **Step 4: Add two figures**
+- [x] **Step 4: Add two figures**
 
 Recommended:
 - `phase_04_oos_r2_vs_adoption_mc.png`: Monte Carlo dual-channel plot.
@@ -372,18 +372,18 @@ The time-series view `phase_04_oos_r2_over_time.png` goes to Appendix B.
 
 Same figure-block format as Stage 1. Captions describe what is *actually shown*, not what the prose says.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
 Same pdflatex sequence.
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-  - [ ] **Numbers traced:** every "from X to Y" claim points to a specific row/column of `summary` or a notebook cell.
-  - [ ] **Definitions match proposal v4:** `x_{t+1} = r_{t+1} - mu D_t` is the demand-adjusted return, NOT the full regression residual (proposal section 3.6). Get this exactly right.
-  - [ ] **Figures verified:** all three PNG files opened, captions accurate.
-  - [ ] **Style pass:** no em dashes, plain English, compile clean.
+  - [x] **Numbers traced:** every "from X to Y" claim points to a specific row/column of `summary` or a notebook cell.
+  - [x] **Definitions match proposal v4:** `x_{t+1} = r_{t+1} - mu D_t` is the demand-adjusted return, NOT the full regression residual (proposal section 3.6). Get this exactly right.
+  - [x] **Figures verified:** all three PNG files opened, captions accurate.
+  - [x] **Style pass:** no em dashes, plain English, compile clean.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -404,11 +404,11 @@ git commit -m "report: 6.3 dual-channel result under stochastic adoption"
 - `results/data/phase_05_performance_adoption.npz`, fields: `summary` (2, 6), `regime_names` (2,), likely `['stochastic', 'CE-switching']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `stochastic_pi`, `switching_window`, `switching_a`, `switching_alpha`, `switching_beta`, `T`, `N`, `seed`
 - `results/figures/phase_05_adoption_share.png`, `phase_05_erosion_vs_adoption.png`, `phase_05_switching_score.png`
 
-- [ ] **Step 1: Open notebook and inspect 6-column summary**
+- [x] **Step 1: Open notebook and inspect 6-column summary**
 
 Open phase_05. Identify what the 6 columns of `summary` mean for the two regimes.
 
-- [ ] **Step 2: Load .npz**
+- [x] **Step 2: Load .npz**
 
 ```bash
 python3 -c "
@@ -421,14 +421,14 @@ print('switching params: a=', d['switching_a'], 'alpha=', d['switching_alpha'], 
 "
 ```
 
-- [ ] **Step 3: Draft the prose (target ~500 words)**
+- [x] **Step 3: Draft the prose (target ~500 words)**
 
 Three paragraphs:
   1. The CE switching rule (proposal equations 13-15). Each agent compares forecast and null certainty-equivalent net of risk penalty and switches with logistic intensity.
   2. Paired-shock comparison against the fast stochastic regime: both regimes show the demand-adjusted R^2 decline and the effective-phi amplification, with quantitative comparisons from `summary`.
   3. Interpretive line: endogenous switching does not change the underlying erosion path, which means the dual-channel mechanism is not an artefact of exogenous diffusion.
 
-- [ ] **Step 4: Add one figure**
+- [x] **Step 4: Add one figure**
 
 Recommended:
 - `phase_05_erosion_vs_adoption.png`: the central comparison.
@@ -436,11 +436,11 @@ Recommended:
 `phase_05_switching_score.png` (the CE switching signal driving adoption)
 goes to Appendix B.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -468,11 +468,11 @@ git commit -m "report: 6.4 endogenous CE-based switching"
   - Thresholds-of-thresholds: `r2_threshold_factor` (typically 0.5), `phi_threshold_factor` (typically 1.5), `min_hit_rate`
 - 12 figures in `results/figures/phase_06_*.png` (full list at bottom of plan).
 
-- [ ] **Step 1: Open notebook and confirm threshold definitions**
+- [x] **Step 1: Open notebook and confirm threshold definitions**
 
 Re-read the cells that compute `a_star_R2_da_rel` and `a_star_phi_rel`. Confirm: `A*_{R2,da,rel}` is the smallest adoption share at which rolling DA R^2 has fallen to `r2_threshold_factor × baseline`, and `A*_{phi,rel}` is the smallest adoption share at which effective phi has grown to `phi_threshold_factor × baseline`.
 
-- [ ] **Step 2: Load .npz and compute summary numbers**
+- [x] **Step 2: Load .npz and compute summary numbers**
 
 ```bash
 python3 -c "
@@ -496,7 +496,7 @@ print('phi_threshold_factor:', d['phi_threshold_factor'])
 
 The README references hit rates "~26%" for realised and "~50%" for demand-adjusted. Verify against this output.
 
-- [ ] **Step 3: Draft the prose (target ~800 words)**
+- [x] **Step 3: Draft the prose (target ~800 words)**
 
 Suggested five paragraphs:
   1. Sweep design: (mu, phi, w, p) grid sizes, what each axis varies, AR(1) as baseline plus p in {2, 5, 10} for robustness.
@@ -505,7 +505,7 @@ Suggested five paragraphs:
   4. Realised channel non-result: `A*_{R2,realised}` is mostly not reached; the finite hits cluster at very low A in the weak-signal corner of the grid (low `mu` and/or low `phi`) and are noise crossings, not erosion. Explain why: when baseline realised R^2 is near zero, the half-baseline threshold sits at zero and rolling noise can satisfy it spuriously.
   5. By-p robustness: the dual-channel pattern is present for all p tested; the delta-from-AR(1) figure shows the magnitude of the effect.
 
-- [ ] **Step 4: Add 2-3 figures**
+- [x] **Step 4: Add 2-3 figures**
 
 Recommended:
 - `phase_06_a_star_R2_heatmap.png`: `A*_{R2,da,rel}` heatmap.
@@ -514,16 +514,16 @@ Recommended:
 
 `phase_06_delta_a_star_r2_from_ar1.png` goes to Appendix B.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-  - [ ] **Numbers traced:** hit rate numbers, mean A* values, baseline references.
-  - [ ] **Definitions match proposal v4:** `A*` definitions match section 4.3; the "relative" qualifier matches the proposal's pre-registration discussion.
-  - [ ] **Figures verified:** all 3-4 heatmaps opened and verified.
-  - [ ] **Style pass.**
+  - [x] **Numbers traced:** hit rate numbers, mean A* values, baseline references.
+  - [x] **Definitions match proposal v4:** `A*` definitions match section 4.3; the "relative" qualifier matches the proposal's pre-registration discussion.
+  - [x] **Figures verified:** all 3-4 heatmaps opened and verified.
+  - [x] **Style pass.**
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -544,11 +544,11 @@ git commit -m "report: 6.5 parameter sweep and critical adoption shares"
 - `results/data/phase_07_transaction_costs.npz`, fields: `c_grid` (8,), `bin_centers` (30,), `binned_abs_means` (8, 30), `binned_abs_stds` (8, 30), `binned_rel_means` (8, 30), `binned_rel_stds` (8, 30), `binned_counts` (8, 30), `a_star_profit_abs` (8,), `a_star_profit_rel` (8,), `null_mean_abs`, `summary` (8, 5), `phi`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `adoption_pi`, `T`, `N`, `num_seeds`, `base_seed`
 - `results/figures/phase_07_a_star_profit_vs_cost.png`, `phase_07_net_profit_vs_adoption.png`
 
-- [ ] **Step 1: Open notebook and inspect summary**
+- [x] **Step 1: Open notebook and inspect summary**
 
 Open phase_07 notebook. The 5 columns of `summary` are: cost level, pooled mean absolute net profit at A < 0.2 and at A > 0.6, pooled mean null-relative net profit at A < 0.2 and at A > 0.6.
 
-- [ ] **Step 2: Load .npz**
+- [x] **Step 2: Load .npz**
 
 ```bash
 python3 -c "
@@ -563,25 +563,25 @@ print(d['summary'])
 "
 ```
 
-- [ ] **Step 3: Draft the prose (target ~500 words)**
+- [x] **Step 3: Draft the prose (target ~500 words)**
 
 Three paragraphs:
   1. Setup: linear transaction cost `c` applied to every trade, sweep over `c_grid`. Define `A*_{profit,abs}` (smallest A where adopter net profit crosses zero) and `A*_{profit,rel}` (smallest A where adopter net profit crosses `null_mean_abs`, the proposal's primary economic endpoint).
   2. Results: at zero cost adopter profit rises with adoption; `A*_{profit,abs}` crosses zero only in the c ~ 0.003 to 0.004 band, and the crossing is from below (a profitability onset), the reverse of the proposal's from-above erosion reading; say so explicitly. The null-relative curve is uniformly positive at every positive cost level and slightly negative everywhere at c = 0.
   3. Interpretation: the null benchmark books own-impact paper profit E[null profit] = mu sigma_q^2 / N = 2.5e-4 per period on a position roughly 16x the adopter cap, which is why the c = 0 null-relative mean is systematically (slightly) negative at every observed adoption share; the single binned crossing at A ~ 0.68 is noise around that mean, not a threshold. At c > 0 the same size asymmetry flips sign through the null's larger cost bill. Present the null-relative endpoint as faithful to the proposal but dominated by position-size asymmetry in both directions; the absolute endpoint is the cleaner economic read in this baseline, and adopter mean profit grows with adoption at every cost level tested.
 
-- [ ] **Step 4: Add 2 figures**
+- [x] **Step 4: Add 2 figures**
 
 - `phase_07_a_star_profit_vs_cost.png`: central economic-endpoint result.
 - `phase_07_net_profit_vs_adoption.png`: adopter net profit vs adoption across costs.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-  - [ ] **Definitions match proposal v4:** `A*_{profit}` definitions match proposal section 4.3 and section 3.7 (transaction-cost extension).
+  - [x] **Definitions match proposal v4:** `A*_{profit}` definitions match proposal section 4.3 and section 3.7 (transaction-cost extension).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
