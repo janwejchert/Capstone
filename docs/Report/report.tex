@@ -149,6 +149,28 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \subsection{Baseline market and benchmark validation (phases 1 and 2)}
 
+Phase 1 checks that the simulator reproduces the baseline market of section 3.1 of the proposal when every trader follows the random null rule of section 3.3. A single run uses $N=200$ traders, $T=5000$ periods, price-impact coefficient $\mu=0.05$, input autoregressive coefficient $\varphi=0.10$ in the return law $r_{t+1}=\varphi r_t+\mu D_t+\sigma\varepsilon_{t+1}$, news scale $\sigma=0.01$, null-order scale $\sigma_q=1.0$, and seed 42. % src: notebooks/phase_01_baseline_market.ipynb parameters cell (cell 1); phase_01_baseline.npz['seed']
+Null orders are independent Gaussian draws, so aggregate demand $D_t$ is directionally uninformative and feeds the return only as unpredictable price-impact noise; the only structure in returns that a forecast could exploit is the $\varphi r_t$ term. The run behaves accordingly. The log price wanders without systematic drift (the mean one-step return of $2.0\times10^{-4}$ sits within 1.4 standard errors of zero), and the return series is roughly stationary with standard deviation $0.0105$. % src: phase_01_baseline.npz['returns'] (mean = 1.998e-4, std = 0.01050, se = std/sqrt(5000) = 1.485e-4); results/figures/phase_01_price_path.png
+The empirical lag-1 autocorrelation of returns is $0.103$, matching the input $\varphi=0.10$ within the sampling error of roughly $1/\sqrt{T}\approx0.014$ for a series of this length. % src: phase_01_baseline.npz['phi_empirical'] vs ['phi_input']
+
+Phase 2 reruns the null-rule market across 100 independent seeds (0 through 99) with $N=128$, $T=5000$, and the same market parameters, to confirm the baseline is a stable control rather than a one-seed accident. % src: notebooks/phase_02_benchmark_validation.ipynb parameters cell (cell 1); phase_02_benchmark.npz['seeds']
+The per-seed descriptive statistics cluster tightly around their theoretical values. The per-seed mean return averages $1.5\times10^{-5}$ with a cross-seed standard deviation of $1.6\times10^{-4}$, consistent with a zero unconditional mean; % src: phase_02_benchmark.npz['mean_per_seed'] (mean, std)
+the per-seed return standard deviation averages $0.0110$ with cross-seed spread $0.00012$; % src: phase_02_benchmark.npz['std_per_seed'] (mean, std)
+the per-seed lag-1 autocorrelation averages $0.103$ with spread $0.012$, clustered around the input $\varphi=0.10$; % src: phase_02_benchmark.npz['rho_per_seed'] (mean, std) vs ['phi_input']
+and the per-seed excess kurtosis averages $-0.0065$ with spread $0.071$, indistinguishable from the Gaussian value of zero. % src: phase_02_benchmark.npz['kurt_per_seed'] (mean, std); excess (Fisher) kurtosis per src/reflexive_market/metrics.py kurtosis()
+The kurtosis reading, together with the symmetric single-seed return histogram from phase 1, supports treating null-rule returns as approximately Gaussian, as expected when the news shock and the individual null orders are both Gaussian and aggregate demand averages across many traders. % src: phase_02_benchmark.npz['kurt_per_seed']; results/figures/phase_01_return_histogram.png
+The sharpest control statistic is the rolling effective AR coefficient shown in Figure~\ref{fig:phase02-rolling-phi}. Estimated on a 1000-period sliding window and averaged across seeds, the trace sits near the input value and stays flat: its total range over the 4001 periods with a complete window is $0.016$, with no trend in either direction. % src: phase_02_benchmark.npz['mean_phi_trace'] (nanmax - nanmin = 0.0156); ['rolling_window'] = 1000
+This subsection is the control that the rest of the results lean on. Later phases attribute movements in forecast $R^{2}$ and in the effective AR coefficient to adoption of the shared forecast; that attribution is meaningful only because the same market with no adoption, simulated over the same horizon, shows no comparable drift.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.78\textwidth]{../../results/figures/phase_02_rolling_phi.png}
+\caption{Rolling lag-1 autocorrelation of returns under the null rule, estimated on a 1000-period sliding window for each of 100 seeds (faint lines). The black line is the cross-seed mean and the dashed line marks the input $\varphi=0.10$. The mean trace stays flat for the full run, with a total range of $0.016$ over the 4001 periods where the window is complete, so the effective AR coefficient shows no drift in the absence of adoption.} % src: phase_02_benchmark.npz['mean_phi_trace'], ['rolling_window'], ['seeds']
+\label{fig:phase02-rolling-phi}
+\end{figure}
+
+% appendix B candidate: phase_01_return_histogram.png
+
 \subsection{AR forecast performance without adoption (phase 3)}
 
 \subsection{Dual-channel result under stochastic adoption (phase 4)}
