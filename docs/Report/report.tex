@@ -199,6 +199,18 @@ Unlike stochastic diffusion, this mechanism closes a second reflexive loop: earl
 
 \subsection{Intra-period timing}
 
+The equations of the preceding subsections fix what each trader and the market maker do, but not when within a period they do it, and in an agent-based market that order of operations is not implied by the equations alone. The positive-sign price-impact term $\mu D_t$ in the return law \eqref{eq:return-law} is what makes the order load-bearing: if adopter demand formed on today's forecast moves today's quote, then the forecast and its evaluation target are entangled within the period, and the forecast can appear self-fulfilling rather than self-eroding unless the sequence of events is made explicit. The proposal resolves this by fixing the following sequence inside each period, and the simulator's single state-evolution loop, \texttt{run()} in \texttt{simulate.py}, follows it exactly. % src: proposal v4 section 3.6 (Intra-period timing and the two evaluation channels), opening paragraph; src/reflexive_market/simulate.py module docstring (loop follows the section 3.6 timing)
+
+\begin{enumerate}[itemsep=2pt]
+\item Agents observe returns up to and including period $t$ and form forecasts $\hat{r}_{t+1}^{(A)}$ per \eqref{eq:ar-forecast}.
+\item Adopters and non-adopters submit orders $q_{i,t}$: the advanced order \eqref{eq:advanced-order} and the null order, combined through proposal equation (2).
+\item The market maker absorbs aggregate demand $D_t$ and moves the quote immediately, as in the price update \eqref{eq:price-update}.
+\item The exogenous news shock $\sigma\,\varepsilon_{t+1}$ and the autoregressive term $\varphi\, r_t$ realise.
+\end{enumerate}
+% src: proposal v4 section 3.6, four-step sequence (its references to proposal eqs. (2), (3), (5) map to proposal eq. (2) inline, \eqref{eq:advanced-order}, \eqref{eq:price-update}); CLAUDE.md "Intra-period timing" steps 1 to 4 (identical substance and order)
+
+The sequence separates what the forecast knows from what its users cause. Everything the forecast may legitimately use, returns through period $t$, is in hand before any order is placed; everything its own adopters do to the price, the $\mu D_t$ move of step 3, is in the books before next period's news arrives in step 4. With that separation fixed, it becomes well defined to score the same forecast against two different targets on the same path, the realised return that includes the impact of step 3 or a counterfactual that strips it out, which is the subject of the next subsection. % src: proposal v4 section 3.6 ("Given this timing, the forecast can be evaluated against either of two distinct targets")
+
 \subsection{The realised vs demand-adjusted decomposition}
 
 
