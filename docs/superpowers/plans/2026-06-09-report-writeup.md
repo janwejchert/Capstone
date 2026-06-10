@@ -706,17 +706,17 @@ git commit -m "report: 5.3 reproducibility"
 - Proposal v4 section 2.1, section 3.1, equations (4), (5), (6).
 - `src/reflexive_market/market.py`.
 
-- [ ] **Step 1: Read proposal section 3.1 and `market.py`**
+- [x] **Step 1: Read proposal section 3.1 and `market.py`**
 
-- [ ] **Step 2: Lift equations (4), (5), (6) into the subsection**
+- [x] **Step 2: Lift equations (4), (5), (6) into the subsection**
 
 Copy from `docs/proposal/reflexive_forecast_proposal_v4.tex` directly to preserve exact symbol usage. Number them locally.
 
-- [ ] **Step 3: Draft prose (~400 words)**
+- [x] **Step 3: Draft prose (~400 words)**
 
 One paragraph framing the Beja-Goldman / Farmer-Joshi market-maker setup (citation `\citep{beja1980,farmerjoshi2002}`). One paragraph stating equations (4)-(6) with their interpretations: aggregate demand, price update, return law.
 
-- [ ] **Step 4: Add Beja-Goldman and Farmer-Joshi BibTeX entries**
+- [x] **Step 4: Add Beja-Goldman and Farmer-Joshi BibTeX entries**
 
 Add to `references.bib`:
 
@@ -742,11 +742,11 @@ Add to `references.bib`:
 }
 ```
 
-- [ ] **Step 5: Compile and check rendering** (bibtex must run cleanly with the new entries; check the References section appears)
+- [x] **Step 5: Compile and check rendering** (bibtex must run cleanly with the new entries; check the References section appears)
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex docs/Report/references.bib
@@ -765,13 +765,13 @@ git commit -m "report: 3.1 single-asset market with linear price impact"
 - Proposal v4 section 3.2 and equations (1), (2), (3), (8).
 - `src/reflexive_market/traders.py`.
 
-- [ ] **Step 1: Read proposal section 3.2 and `traders.py`**
+- [x] **Step 1: Read proposal section 3.2 and `traders.py`**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Three short paragraphs covering: belief layer (forecast value), decision layer (mean-variance demand mapping per Brock-Hommes), switching layer (binary adopter status). Equations (1), (2), and (3) for the demand mapping and the position cap.
 
-- [ ] **Step 3: Add Brock-Hommes BibTeX entry**
+- [x] **Step 3: Add Brock-Hommes BibTeX entry**
 
 ```bibtex
 @article{brockhommes1998,
@@ -785,11 +785,11 @@ Three short paragraphs covering: belief layer (forecast value), decision layer (
 }
 ```
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex docs/Report/references.bib
@@ -808,17 +808,17 @@ git commit -m "report: 3.2 trader behaviour"
 - Proposal v4 sections 3.3 and 3.4, equations (9), (10), (11).
 - `src/reflexive_market/forecast.py`.
 
-- [ ] **Step 1: Read proposal section 3.3 and `forecast.py`**
+- [x] **Step 1: Read proposal section 3.3 and `forecast.py`**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 One paragraph on the null random rule (zero-mean i.i.d. order noise, equation (9); the null rule has no position cap). One paragraph on the AR(p) rule (equations (10) and (11): rolling least-squares fit on a window of size w, one-step-ahead OOS forecast, parameter `p` defaults to 1).
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -837,21 +837,21 @@ git commit -m "report: 3.3 null rule and rolling AR forecasting rule"
 - Proposal v4 section 3.5, equations (12)-(15).
 - `src/reflexive_market/adoption.py`.
 
-- [ ] **Step 1: Read proposal section 3.4 and `adoption.py`**
+- [x] **Step 1: Read proposal section 3.4 and `adoption.py`**
 
-- [ ] **Step 2: Draft 3.4.1 Stochastic diffusion**
+- [x] **Step 2: Draft 3.4.1 Stochastic diffusion**
 
 Equations (12) and (13). Discrete-time Bernoulli adoption with rate `pi`. One paragraph (~150 words).
 
-- [ ] **Step 3: Draft 3.4.2 Certainty-equivalent switching**
+- [x] **Step 3: Draft 3.4.2 Certainty-equivalent switching**
 
 Equations (14) and (15). The certainty equivalent CE = mean - (a/2) var per rule, the score S_t = CE^(A) - CE^(0), and the logistic switch probability Lambda(alpha + beta S_t). One paragraph (~250 words).
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -870,17 +870,17 @@ git commit -m "report: 3.4 adoption mechanisms"
 - Proposal v4 section 3.6.
 - `CLAUDE.md` intra-period timing section.
 
-- [ ] **Step 1: Read proposal section 3.6**
+- [x] **Step 1: Read proposal section 3.6**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 One short paragraph framing why intra-period timing matters in agent-based markets (order of operations is not given by the equations alone). Then the four-step enumeration: observe returns, submit orders, market maker absorbs demand and moves the quote, exogenous shock and AR term realise. Word-for-word match to CLAUDE.md and to proposal section 3.6.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -899,19 +899,19 @@ git commit -m "report: 3.5 intra-period timing"
 - Proposal v4 equation (7) and section 3.6 (definition of `x_{t+1}`).
 - `CLAUDE.md` (the "not the full regression residual" caveat in the overview).
 
-- [ ] **Step 1: Read both sources carefully**
+- [x] **Step 1: Read both sources carefully**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Two paragraphs. First: define realised return `r_{t+1}` and demand-adjusted return `x_{t+1} = r_{t+1} - mu D_t`. Display both equations. Explain why this decomposition matters: realised R^2 is what a deployed forecaster sees, demand-adjusted R^2 is the counterfactual that strips out contemporaneous price impact. Second: the caveat. `x_{t+1}` is NOT the full regression residual `sigma eps = r_{t+1} - phi r_t - mu D_t`. It strips out only the contemporaneous adopter-demand channel, leaving the lagged-return persistence channel intact. This distinction is important because it is the source of the "demand-adjusted erosion" channel name.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-  - [ ] **Definitions match proposal v4:** the `x_{t+1}` formula and the residual caveat are verbatim from the proposal.
+  - [x] **Definitions match proposal v4:** the `x_{t+1}` formula and the residual caveat are verbatim from the proposal.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
