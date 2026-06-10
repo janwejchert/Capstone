@@ -3,6 +3,13 @@
 Implements equations (4), (5), (6) from the proposal. Functions are added
 phase by phase. Phase 1 introduces the price update and the return law for
 a market with null traders only.
+
+The market maker absorbs the level of aggregate demand each period, in the
+spirit of Beja and Goldman's excess-demand price adjustment. Farmer and
+Joshi's equation (7) absorbs net order flow (position changes) instead; the
+log-linear form follows them, but under level absorption a persistent
+position exerts persistent price pressure. Consistently, profit (8) and the
+phase 7 cost term price a full position turnover every period.
 """
 
 import numpy as np

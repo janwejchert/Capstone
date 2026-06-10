@@ -139,8 +139,11 @@ erosion-path figure.
 
 Notebook: `notebooks/phase_06_experiments_threshold.ipynb`
 Done when: the AR(1) heatmaps populate the bulk of the (mu, phi) grid, larger
-mu makes demand-adjusted erosion bite earlier, and the by-p robustness grids
-demonstrate the mechanism is not specific to AR(1).
+mu deepens the high-adoption demand-adjusted erosion and pulls the
+effective-phi threshold `A*_{phi,rel}` earlier (the `A*_{R2,da,rel}` crossing
+itself is roughly flat in mu because the relative threshold scales with the
+baseline), and the by-p robustness grids demonstrate the mechanism is not
+specific to AR(1).
 
 ### Phase 7: evaluation and one extension
 Summarises primary findings under the dual-channel framing, reports the

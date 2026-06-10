@@ -103,7 +103,13 @@ def rolling_msfe(actual, forecast, window):
 
 
 def rolling_oos_r2(actual, forecast, window):
-    """Rolling out-of-sample R^2 against a constant-mean benchmark."""
+    """Rolling out-of-sample R^2 against a constant-mean benchmark.
+
+    The benchmark is the trailing window's in-sample mean of the target,
+    not a real-time prevailing mean, which slightly favours the benchmark.
+    With near-zero-mean returns the difference is negligible. The forecasts
+    themselves are strictly out of sample.
+    """
     actual = np.asarray(actual, dtype=float)
     forecast = np.asarray(forecast, dtype=float)
     if actual.shape != forecast.shape:
