@@ -602,28 +602,28 @@ git commit -m "report: 6.6 transaction-cost extension and economic endpoint"
 - `src/reflexive_market/__init__.py` (7 lines), `adoption.py` (47 lines), `forecast.py` (75 lines), `market.py` (30 lines), `metrics.py` (150 lines), `simulate.py` (249 lines), `traders.py` (30 lines). Total 588 lines.
 - `CLAUDE.md` module-to-proposal-equation table (lines ~48-58).
 
-- [ ] **Step 1: Read each module's docstring and public functions**
+- [x] **Step 1: Read each module's docstring and public functions**
 
 ```bash
 for f in src/reflexive_market/*.py; do echo "=== $f ==="; head -30 "$f"; done
 ```
 
-- [ ] **Step 2: Reproduce the module table from CLAUDE.md in LaTeX**
+- [x] **Step 2: Reproduce the module table from CLAUDE.md in LaTeX**
 
 The table maps each module to its responsibility and the proposal equations it implements. Use `tabularx` (already in preamble).
 
-- [ ] **Step 3: Draft prose (~300 words) around the table**
+- [x] **Step 3: Draft prose (~300 words) around the table**
 
 One paragraph naming the design constraints (pure numpy, no pandas/scipy/sklearn in `src/`, deterministic given seed, no module-level randomness, functions never print or plot), followed by the table.
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-  - [ ] **Numbers traced:** the module-to-equation mapping matches `CLAUDE.md` and the line counts match the checkout.
-  - [ ] **Definitions match proposal v4:** equation numbers in the table match the proposal.
+  - [x] **Numbers traced:** the module-to-equation mapping matches `CLAUDE.md` and the line counts match the checkout.
+  - [x] **Definitions match proposal v4:** equation numbers in the table match the proposal.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -642,17 +642,17 @@ git commit -m "report: 5.1 software architecture"
 - `CLAUDE.md` phase-definitions section (lines ~60-155).
 - `notebooks/README.md` phase status table.
 
-- [ ] **Step 1: Read CLAUDE.md phases and notebooks/README.md**
+- [x] **Step 1: Read CLAUDE.md phases and notebooks/README.md**
 
-- [ ] **Step 2: Draft a numbered list of the seven phases**
+- [x] **Step 2: Draft a numbered list of the seven phases**
 
 One paragraph framing the staging discipline (no phase N starts until N-1 is committed). Then the seven-phase list, each phase with its name and one-line goal. Mirrors the format of section 5 of the proposal.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -671,21 +671,21 @@ git commit -m "report: 5.2 phased construction"
 - `CLAUDE.md` reproducibility section.
 - `requirements.txt`, `pyproject.toml`.
 
-- [ ] **Step 1: Inspect `requirements.txt` and `pyproject.toml`**
+- [x] **Step 1: Inspect `requirements.txt` and `pyproject.toml`**
 
 ```bash
 cat requirements.txt pyproject.toml
 ```
 
-- [ ] **Step 2: Draft prose (~250 words)**
+- [x] **Step 2: Draft prose (~250 words)**
 
 Cover: every notebook has a `seed` parameter; every `.npz` is named with phase + name; same seed + same parameters reproduce the same figure; CI runs pytest on every commit (link to `.github/workflows/`); Python version; pure-numpy commitment.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
