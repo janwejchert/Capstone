@@ -54,12 +54,12 @@ def run(
     Parameters
     ----------
     T, N, mu, phi, sigma_news, sigma_q, rng :
-        Phase 1 parameters. See equations (5), (6), (8).
+        Phase 1 parameters. See equations (5), (6), (9).
     forecast_window : int or None
         Rolling AR window length. None disables forecasting; adopters then
         always trade the null rule.
     forecast_p : int
-        AR order. Defaults to 1, matching equations (9), (10).
+        AR order. Defaults to 1, matching equations (10), (11).
     risk_scale : float or None
         Combined ``a * sigma^2`` denominator from equation (3). Required when
         forecast_window is set.
@@ -67,7 +67,7 @@ def run(
         Per-trader position cap from equation (3). Required when
         forecast_window is set.
     adoption_pi, adoption_delta : float
-        Per-period transition probabilities for equations (11), (12).
+        Per-period transition probabilities for equations (12), (13).
     initial_adoption_share : float
         Fraction of agents who already use the advanced rule at t = 0.
     adoption_start_t : int
@@ -76,11 +76,11 @@ def run(
         align the adoption onset with metric warm-up.
     switching_window : int or None
         Rolling window length for certainty-equivalent computation
-        (equation 13). When set, equations (13)-(15) replace the stochastic
-        diffusion. Cannot be combined with non-zero adoption_pi or
-        adoption_delta.
+        (equation 14). When set, equations (14) and (15) replace the
+        stochastic diffusion. Cannot be combined with non-zero adoption_pi
+        or adoption_delta.
     switching_a : float
-        Risk-aversion coefficient ``a`` in CE = mean - (a/2) * var (eq 13).
+        Risk-aversion coefficient ``a`` in CE = mean - (a/2) * var (eq 14).
     switching_alpha : float
         Baseline adoption term in equation (15).
     switching_beta : float
@@ -98,14 +98,15 @@ def run(
             is the state used to generate period t's outcomes.
         null_profit, advanced_profit : ndarray of shape (T,), per-period
             realised profit of a representative trader following each rule
-            (eq 7). For the null rule, the representative trader is the
+            (eq 8). For the null rule, the representative trader is the
             lowest-indexed non-adopter at period t, so null_profit[t] has
             per-trader mean and variance independent of the adoption share.
             null_profit[t] is NaN at periods where every trader is an adopter
             (no non-adopter representative exists). Used by the phase 5 CE
             computation and the phase 7 null-relative profit endpoint.
-        switching_score : ndarray of shape (T,), score S_t from eq 14 each
-            period switching is performed; NaN otherwise.
+        switching_score : ndarray of shape (T,), the score S_t = CE^(A) -
+            CE^(0) defined below equation (14), each period switching is
+            performed; NaN otherwise.
     """
     using_switching = switching_window is not None
     using_stochastic = adoption_pi > 0.0 or adoption_delta > 0.0
@@ -168,7 +169,7 @@ def run(
         r_prev = r_new
 
         # Per-period realised profit of a representative trader following
-        # each rule (equation 7). The advanced rule's representative profit
+        # each rule (equation 8). The advanced rule's representative profit
         # is q_adv times the realised return, common across all adopters
         # since the forecast is public. The null rule's representative is
         # the lowest-indexed non-adopter: their realised order is null[i]

@@ -27,7 +27,7 @@
 
 \titleformat{\section}{\Large\bfseries\color{accent}}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.5em}{}
-\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape\color{accent}}{\thesubsubsection}{0.5em}{}
 
 \setlength{\parskip}{0.55em}
 \setlength{\parindent}{0pt}
@@ -401,7 +401,7 @@ The implementation strategy is staged so that each component is verified before 
 \textbf{Phase} & \textbf{Objective} & \textbf{Main output} \\
 \midrule
 \textbf{1. Baseline} &
-Implement the single-asset market with return law (6), random null rule (8), Brock-Hommes demand (1), and reproducible simulation routines. &
+Implement the single-asset market with return law (6), random null rule (9), Brock-Hommes demand (1), and reproducible simulation routines. &
 Working simulator under the null model; price, return, and demand series. \\
 \midrule
 \textbf{2. Benchmark} &
@@ -413,11 +413,11 @@ Add rolling AR estimation, forecast generation, and forecast-based trading with 
 Out-of-sample forecast and small positive $R^{2}_{\mathrm{realised}}$ at zero adoption. \\
 \midrule
 \textbf{4. Stochastic adoption} &
-Introduce stochastic adoption (eqs 11 to 12) and run paired-shock regimes. &
+Introduce stochastic adoption (eqs 12 and 13) and run paired-shock regimes. &
 Adoption paths; realised-return and demand-adjusted $R^{2}$ versus adoption share; effective $\varphi$ versus adoption share. \\
 \midrule
 \textbf{5. CE switching} &
-Replace stochastic diffusion with the certainty-equivalent switching rule (eqs 13 to 15). &
+Replace stochastic diffusion with the certainty-equivalent switching rule (eqs 14 and 15). &
 Stochastic versus performance-based adoption comparison; same terminal demand-adjusted erosion. \\
 \midrule
 \textbf{6. Experiments} &

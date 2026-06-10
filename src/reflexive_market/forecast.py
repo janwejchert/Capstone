@@ -1,6 +1,6 @@
 """Rolling autoregressive forecast.
 
-Implements equations (9), (10) from the proposal. Estimation uses
+Implements equations (10), (11) from the proposal. Estimation uses
 np.linalg.lstsq on a lagged design matrix. Added in phase 3.
 """
 
@@ -23,7 +23,7 @@ def ar_design(returns, p=1):
 
 
 def fit_ar(returns, p=1):
-    """Estimate equation (9), returning [intercept, phi_1, ..., phi_p]."""
+    """Estimate equation (10), returning [intercept, phi_1, ..., phi_p]."""
     x, y = ar_design(returns, p)
     params, *_ = np.linalg.lstsq(x, y, rcond=None)
     return params

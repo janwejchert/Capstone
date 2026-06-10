@@ -50,9 +50,9 @@ Each `src/` module maps to a small slice of the proposal:
 | Module        | What it implements                              | Proposal eqs |
 |---------------|-------------------------------------------------|--------------|
 | `market.py`   | aggregate demand, price update, return law      | (4), (5), (6) |
-| `traders.py`  | null random rule, demand mapping with cap       | (1), (2), (3), (8) |
-| `forecast.py` | rolling AR(p) fit and out-of-sample forecast    | (9), (10) |
-| `adoption.py` | stochastic diffusion, CE-based switching        | (11)-(15) |
+| `traders.py`  | null random rule, demand mapping with cap       | (1), (2), (3), (9) |
+| `forecast.py` | rolling AR(p) fit and out-of-sample forecast    | (10), (11) |
+| `adoption.py` | stochastic diffusion, CE-based switching        | (12)-(15) |
 | `metrics.py`  | MSFE, OOS R^2 (realised and demand-adjusted), effective phi | section 4 |
 | `simulate.py` | one function that runs T steps end to end       | section 3.6 timing |
 
@@ -63,7 +63,7 @@ end and is committed. This is the same staging used in section 5 of the
 proposal.
 
 ### Phase 1: baseline market with null traders only
-Implements equations (1), (2), (4), (5), (6), (7), (8). Every trader uses the
+Implements equations (1), (2), (4), (5), (6), (8), (9). Every trader uses the
 random null rule. The notebook runs the simulator, plots a sample price path
 and return series, and confirms the empirical AR(1) coefficient of returns
 matches the input phi within sampling error.
@@ -97,7 +97,7 @@ give lower variance estimates of the AR coefficient.
 
 ### Phase 4: forecast-based trading and stochastic adoption
 Adopters now trade per equations (1) and (3). Adoption follows the stochastic
-diffusion in (11) and (12). Compares three regimes: zero adoption, slow
+diffusion in (12) and (13). Compares three regimes: zero adoption, slow
 diffusion, fast diffusion. Headline plots show the rolling OOS R^2 against the
 realised return and against the demand-adjusted return, side by side, plus
 rolling effective phi versus adoption share. This is the first phase where the
@@ -111,7 +111,7 @@ the rolling OOS R^2 against demand-adjusted returns is visibly lower
 
 ### Phase 5: risk-adjusted performance-based adoption
 Replaces the diffusion rule with the certainty-equivalent switching rule in
-(13), (14), (15). Compares against phase 4 on the demand-adjusted-channel R^2
+(14) and (15). Compares against phase 4 on the demand-adjusted-channel R^2
 and effective-phi diagnostics (paired shocks) to see whether endogenous
 switching follows the same underlying erosion path as exogenous diffusion.
 

@@ -1,7 +1,7 @@
 """Adoption mechanisms.
 
-Implements equations (11), (12) for stochastic diffusion (added in phase 4)
-and equations (13), (14), (15) for risk-adjusted performance-based switching
+Implements equations (12), (13) for stochastic diffusion (added in phase 4)
+and equations (14) and (15) for risk-adjusted performance-based switching
 (added in phase 5).
 """
 
@@ -9,7 +9,7 @@ import numpy as np
 
 
 def stochastic_diffusion_step(adoption, pi, delta, rng):
-    """Equations (11) and (12): one period of independent per-agent transitions.
+    """Equations (12) and (13): one period of independent per-agent transitions.
 
     Each non-adopter switches to adopter with probability ``pi``. Each
     adopter exits to non-adopter with probability ``delta``. Transitions
@@ -34,7 +34,7 @@ def performance_switching_step(adoption, ce_score, alpha, beta, rng):
     The proposal specifies only the entry direction, P(a_{i,t+1} = 1 |
     a_{i,t} = 0) = Lambda(alpha + beta * S). Adopters keep their state.
     This matches the asymmetric form used by stochastic diffusion in
-    equations (11) and (12) and lets per-period rates stay slow even when
+    equations (12) and (13) and lets per-period rates stay slow even when
     Lambda would otherwise jump near 0.5.
     """
     adoption = np.asarray(adoption, dtype=int)

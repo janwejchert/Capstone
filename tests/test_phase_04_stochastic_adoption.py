@@ -107,7 +107,7 @@ def test_adoption_share_records_state_that_drove_outcomes():
 
 def test_null_profit_is_per_trader_not_population_mean():
     """null_profit[t] must be the realised profit of a single representative
-    non-adopter (per eq 7), not the population mean of all N null draws times
+    non-adopter (per eq 8), not the population mean of all N null draws times
     r. The population-mean version decays linearly in (1 - A) toward zero as
     adoption rises because adopter null draws are independent of the market,
     which biases the phase 7 null-relative endpoint and the phase 5 CE risk
