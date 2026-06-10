@@ -131,7 +131,7 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \subsection{Effective AR coefficient as a market-dynamics diagnostic}
 
-\subsection{Target-specific critical adoption shares}
+\subsection{Target-specific critical adoption shares}\label{sec:metrics-a-star}
 
 \subsection{Simulation protocol, seed handling, and parameter grid}
 
@@ -168,12 +168,29 @@ The functions in \texttt{metrics.py} score completed runs after the fact; the ta
 
 \subsection{Phased construction}
 
+The simulator was built in seven strictly ordered phases, following the staging laid out in section 5 of the proposal; under the working agreement, phase $N$ does not start until phase $N-1$ runs end to end, meets its recorded done-when condition, and is committed. % src: proposal v4 section 5 staging table (verify-before-extend ordering); CLAUDE.md "Implementation phases" preamble (lines 65-67, run-end-to-end-and-commit gate); per-phase "Done when" blocks and "How to work on a phase" steps 3 and 6 (lines 256 and 259, done-when confirmation and next-phase gate)
+The done-when criteria for phases 1 to 3 are unchanged since the scaffold; those for phases 4 to 7 were restated under the dual-channel framing when the proposal was revised to its v3 form, after all seven phases had been implemented. % src: git diff 52b885a..HEAD -- CLAUDE.md (phase 1-3 "Done when" blocks unchanged; phase 4-7 blocks edited in v3-alignment commit 82ddb73, phase 7's as a dual-channel relabel of "the mechanism"; phase 4-6 blocks relabelled to demand-adjusted terms in c1778ca and phase 6 refined again in ba41aad; all postdating phase 7 commit 1a334cf)
+The ordering enforces the proposal's central feasibility principle: the market must work before the forecasting rule is added, the rule must work before adoption is added, and extensions come only once the baseline produces stable, interpretable results, so that any observed reflexivity effect can be traced to a small number of identifiable ingredients. % src: proposal v4 section 5, "most important feasibility principle" paragraph
+Each phase owns one notebook (\texttt{notebooks/phase\_NN\_<name>.ipynb}) with every parameter in a single cell at the top, and saves its figures and \texttt{npz} summaries under \texttt{results/}. All seven phases are implemented; section 6 reports their results in build order. % src: notebooks/README.md phase status table ("All seven phases are implemented"); CLAUDE.md notebook conventions (parameters cell, save cell)
+
+\begin{enumerate}[itemsep=2pt]
+\item \textbf{Baseline market.} Implement the single-asset market with every trader on the random null rule and confirm the empirical lag-1 autocorrelation of returns matches the input $\varphi$ (section~\ref{sec:phases12-results}). % src: CLAUDE.md phase 1 definition
+\item \textbf{Benchmark validation.} Rerun the null market across many seeds and verify that the descriptive statistics are stable and the rolling effective AR coefficient shows no drift; this is the no-adoption control behind every later erosion claim (section~\ref{sec:phases12-results}). % src: CLAUDE.md phase 2 definition
+\item \textbf{AR forecasting rule, offline.} Add rolling AR fitting and score the forecast against realised returns while no trader acts on it, recovering a small positive out-of-sample $R^{2}$ driven by the $\varphi r_t$ term (section~\ref{sec:phase3-results}). % src: CLAUDE.md phase 3 definition (kept offline, as built; the proposal v4 section 5 table folds forecast-based trading with position caps into its phase 3 row, which the build defers to phase 4)
+\item \textbf{Forecast-based trading and stochastic adoption.} Let adopters trade the shared forecast while its use spreads by stochastic diffusion; the dual-channel result first appears here (section~\ref{sec:phase4-results}). % src: CLAUDE.md phase 4 definition; notebooks/README.md phase table
+\item \textbf{Performance-based adoption.} Replace diffusion with certainty-equivalent switching and compare the two adoption mechanisms on paired shocks (section~\ref{sec:phase5-results}). % src: CLAUDE.md phase 5 definition; notebooks/README.md phase table
+\item \textbf{Experiments and thresholds.} Sweep $(\mu, \varphi, w, p)$ and locate the relative critical adoption shares $A^{*}_{R^{2},\mathrm{da},\mathrm{rel}}$ and $A^{*}_{\varphi,\mathrm{rel}}$, defined in section~\ref{sec:metrics-a-star}, across the grid (section~\ref{sec:phase6-results}). % src: CLAUDE.md phase 6 definition; notebooks/README.md phase table
+\item \textbf{Evaluation and extension.} Summarise the findings under the dual-channel framing and add the transaction-cost extension, reading $A^{*}_{\mathrm{profit}}$ against zero and against the null benchmark (section~\ref{sec:phase7-results}). % src: CLAUDE.md phase 7 definition; notebooks/README.md phase table
+\end{enumerate}
+
+The phases group into three blocks. Phases 1 to 3 establish the pre-adoption control: a market with no forecast trading and a forecast with no market feedback, each verified on its own. Phases 4 and 5 switch the feedback on and establish the dual-channel mechanism under two different adoption processes. Phases 6 and 7 quantify the mechanism, first across the parameter grid and then in economic terms, with phase 7 also serving as the evaluation summary of the whole build.
+
 \subsection{Reproducibility}
 
 
 \section{Results}
 
-\subsection{Baseline market and benchmark validation (phases 1 and 2)}
+\subsection{Baseline market and benchmark validation (phases 1 and 2)}\label{sec:phases12-results}
 
 Phase 1 checks that the simulator reproduces the baseline market of section 3.1 of the proposal when every trader follows the random null rule of section 3.3. A single run uses $N=200$ traders, $T=5000$ periods, price-impact coefficient $\mu=0.05$, input autoregressive coefficient $\varphi=0.10$ in the return law $r_{t+1}=\varphi r_t+\mu D_t+\sigma\varepsilon_{t+1}$, news scale $\sigma=0.01$, null-order scale $\sigma_q=1.0$, and seed 42. % src: notebooks/phase_01_baseline_market.ipynb parameters cell (cell 1); phase_01_baseline.npz['seed']
 Null orders are independent Gaussian draws, so aggregate demand $D_t$ is directionally uninformative and feeds the return only as unpredictable price-impact noise; the only structure in returns that a forecast could exploit is the $\varphi r_t$ term. The run behaves accordingly. The log price wanders without systematic drift (the mean one-step return of $2.0\times10^{-4}$ sits within 1.4 standard errors of zero), and the return series is roughly stationary with standard deviation $0.0105$. % src: phase_01_baseline.npz['returns'] (mean = 1.998e-4, std = 0.01050, se = std/sqrt(5000) = 1.485e-4); results/figures/phase_01_price_path.png
@@ -197,7 +214,7 @@ This subsection is the control that the rest of the results lean on. Later phase
 
 % appendix B candidate: phase_01_return_histogram.png
 
-\subsection{AR forecast performance without adoption (phase 3)}
+\subsection{AR forecast performance without adoption (phase 3)}\label{sec:phase3-results}
 
 Phase 3 attaches the rolling AR(1) forecasting rule of section 3.4 of the proposal to the null-market design of the previous subsection, in offline mode: the forecast is estimated and scored, but no trader acts on it. A single run uses $N=200$ traders, $T=8000$ periods, $\mu=0.05$, $\sigma=0.01$, $\sigma_q=1.0$, and seed 43, with the input autoregressive coefficient raised to $\varphi=0.25$ so the rule has a clearly detectable signal to recover. % src: notebooks/phase_03_ar_forecast.ipynb parameters cell (cell 1); phase_03_ar_forecast.npz['phi_input'], ['seed']
 Each period the rule fits an AR(1) by least squares on the most recent $w \in \{50, 100, 250\}$ returns and issues a strictly out-of-sample one-step forecast $\hat{r}^{(A)}_{t+1}$, scored post hoc against realised returns by out-of-sample $R^{2}$ against a constant-mean benchmark (section 4.1 of the proposal), tracked on a trailing 1000-period window, and by full-sample mean squared forecast error (MSFE). % src: phase_03_ar_forecast.npz['ar_windows'], ['ar_order'], ['eval_window']; src/reflexive_market/metrics.py rolling_oos_r2(), msfe()
@@ -221,7 +238,7 @@ This completes the pre-adoption baseline. The previous subsection showed that th
 
 % appendix B candidate: phase_03_ar_coefficients.png
 
-\subsection{Dual-channel result under stochastic adoption (phase 4)}
+\subsection{Dual-channel result under stochastic adoption (phase 4)}\label{sec:phase4-results}
 
 Phase 4 turns the offline forecast of the previous subsection into a tradeable rule and lets its use spread. Adopters map the shared rolling AR(1) forecast ($w=250$) into positions through the mean-variance demand of equation (1) of the proposal, clipped at the position cap of equation (3); non-adopters keep the random null rule. % src: notebooks/phase_04_stochastic_adoption.ipynb parameters cell (cell 1); phase_04_stochastic_adoption.npz['forecast_window']
 With combined risk scaling $a\sigma^{2}=0.001$ and per-trader cap $\bar{q}=0.05$ the cap binds in nearly every period, so adopters are effectively fixed-size traders on the forecast's sign and their impact stays comparable in magnitude to the $\varphi r_t$ term rather than dominating it. % src: phase_04_stochastic_adoption.npz['risk_scale'], ['q_cap']; notebooks/phase_04_stochastic_adoption.ipynb cell 1 (comment on q_cap)
@@ -258,7 +275,7 @@ This is the dual-channel result, and it is the headline finding of the report: a
 
 % appendix B candidate: phase_04_oos_r2_over_time.png
 
-\subsection{Endogenous CE-based switching (phase 5)}
+\subsection{Endogenous CE-based switching (phase 5)}\label{sec:phase5-results}
 
 Phase 5 makes adoption respond to how the forecast is actually paying: the stochastic diffusion of equations (12) and (13) of the proposal is replaced by the risk-adjusted performance-based switching of its section 3.5. Each period the simulator records the realised one-period profit of equation (8) for a representative trader under each rule: the common capped adopter position, and a representative non-adopter's order. % src: notebooks/phase_05_performance_adoption.ipynb cell 0; src/reflexive_market/simulate.py run() docstring (null_profit, advanced_profit, eq. 8)
 Each rule's certainty equivalent $\mathrm{CE}^{(k)}_t=\bar{\Pi}^{(k)}_t-\tfrac{a}{2}\,\hat{\sigma}^{2,(k)}_t$, the rolling mean profit net of a risk penalty on its rolling variance, is computed over $W_A=500$ periods with $a=1$, per equation (14), and each non-adopter switches to the advanced rule with the logistic probability $\Lambda(\alpha+\beta S_t)$ of equation (15) in the score gap $S_t=\mathrm{CE}^{(A)}_t-\mathrm{CE}^{(0)}_t$, with $\alpha=-5$ and $\beta=10000$. % src: phase_05_performance_adoption.npz['switching_window'] = 500, ['switching_a'] = 1.0, ['switching_alpha'] = -5.0, ['switching_beta'] = 10000.0; proposal section 3.5, eqs. (14) and (15)
@@ -284,7 +301,7 @@ Whether transaction costs change that is taken up in section~\ref{sec:phase7-res
 % appendix B candidate: phase_05_adoption_share.png
 % appendix B candidate: phase_05_switching_score.png
 
-\subsection{Parameter sweep and critical adoption shares (phase 6)}
+\subsection{Parameter sweep and critical adoption shares (phase 6)}\label{sec:phase6-results}
 
 Phase 6 turns the single-configuration findings of phases 4 and 5 into a map. The sweep crosses $\mu\in\{0.025, 0.05, 0.075, 0.10, 0.15\}$, $\varphi\in\{0.05,\dots,0.30\}$, forecast windows $w\in\{100, 250, 500\}$, and AR orders $p\in\{1, 2, 5, 10\}$, with AR(1) the proposal's baseline rule and the higher orders a robustness extension, at 10 seeds per cell (3600 runs). % src: phase_06_a_star_grid.npz['mu_grid'], ['phi_grid'], ['w_grid'], ['forecast_p_grid'], ['num_seeds']; notebooks/phase_06_experiments_threshold.ipynb cell 1
 Everything else follows the phase 4 design ($N=200$, $T=8000$, trailing 1000-period metrics) under slow stochastic diffusion ($\pi=3\times10^{-4}$, $\delta=0$). Adoption stays at zero until a 1500-period baseline window has completed, so each run measures its own pre-adoption baseline; by the end of the run the share reaches roughly 0.8. % src: phase_06_a_star_grid.npz['N'], ['T'], ['eval_window'], ['adoption_pi'], ['baseline_span']; notebooks/phase_06_experiments_threshold.ipynb cell 4 (adoption_start_t_w = w + eval_window + baseline_span); ['line_curve_adoption_share'] ends at A = 0.78, matching the diffusion expectation 1-(1-pi)^(T-t0) = 0.78 to 0.80 across w
