@@ -138,7 +138,7 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \section{Implementation}
 
-\subsection{Software architecture}
+\subsection{Software architecture}\label{sec:software-architecture}
 
 The simulator is a small pure-numpy Python package, \texttt{reflexive\_market}, under \texttt{src/}: six working modules plus a seven-line \texttt{\_\_init\_\_.py} holding only a docstring and the version string, 588 lines in total. % src: wc -l src/reflexive_market/*.py (7+47+75+30+150+249+30 = 588)
 Four design constraints, fixed in the project working agreement before any simulator code was written, shaped the package. % src: CLAUDE.md, Code conventions section (lines 203-209); scaffold commit 52b885a adds CLAUDE.md with "No simulator or notebook code yet"
@@ -186,6 +186,15 @@ Each phase owns one notebook (\texttt{notebooks/phase\_NN\_<name>.ipynb}) with e
 The phases group into three blocks. Phases 1 to 3 establish the pre-adoption control: a market with no forecast trading and a forecast with no market feedback, each verified on its own. Phases 4 and 5 switch the feedback on and establish the dual-channel mechanism under two different adoption processes. Phases 6 and 7 quantify the mechanism, first across the parameter grid and then in economic terms, with phase 7 also serving as the evaluation summary of the whole build.
 
 \subsection{Reproducibility}
+
+Every number and figure in this report can be regenerated from the repository checkout. Three conventions from the working agreement carry the load. % src: CLAUDE.md Reproducibility section (lines 215-221)
+First, every notebook fixes its randomness in the parameters cell: single-run notebooks expose a scalar \texttt{seed} (42 for phase 1, 43 for phase 3, 71 for phases 4 and 5), and multi-seed notebooks a \texttt{base\_seed} and a seed count from which each per-run seed is derived deterministically. % src: notebooks parameters cells: phase_01 seed=42, phase_03 seed=43, phase_04 and phase_05 seed=71; phase_02 base_seed=0 num_seeds=100 ("base_seed + 1, base_seed + 2, ..."); phase_06 base_seed=2000 with grid-offset seed formula in the run cell; phase_07 base_seed=4000 with seeds = [base_seed + s for s in range(num_seeds_phase7)]
+Because every random draw flows through the explicitly passed generator (section~\ref{sec:software-architecture}), the same seed and the same parameters reproduce the same run, and with it the same figure; the test suite asserts this determinism directly. % src: CLAUDE.md Reproducibility ("Same seed and same parameters produce the same figure"); tests/test_phase_01_baseline.py::test_same_seed_same_output
+Second, every artifact names its origin: figures save to \texttt{results/figures/phase\_NN\_<name>.png} and numeric summaries to \texttt{results/data/phase\_NN\_<name>.npz}, so each file traces to one phase notebook. The \texttt{npz} summaries store the small arrays behind the report's tables and quoted numbers, so a reader can verify any of them without rerunning a simulation. % src: CLAUDE.md Reproducibility section and notebook conventions (save cell); ls results/data results/figures (7 npz files, 38 figures, all named phase_NN_<name>)
+Third, the environment is thin. The package requires Python 3.10 or newer and depends at runtime on numpy, matplotlib, and joblib alone, per the pure-numpy commitment of section~\ref{sec:software-architecture}; \texttt{requirements.txt} adds only jupyter and pytest, for running the notebooks and the tests. % src: pyproject.toml (requires-python = ">=3.10"; [project] dependencies = numpy, matplotlib, joblib); requirements.txt (adds jupyter>=1.0, pytest>=8.0)
+
+These conventions are enforced, not aspirational. The repository ships a 43-test pytest suite covering package import and per-phase invariants for phases 1 through 5, from seed determinism and recovery of the input $\varphi$ to position-cap clipping and the mutual exclusion of the two adoption mechanisms. % src: pytest --collect-only -q (43 tests collected); tests/ = test_package.py + test_phase_01..05 files; tests/test_phase_01_baseline.py::test_same_seed_same_output, ::test_empirical_phi_recovers_input_phi; tests/test_phase_04_stochastic_adoption.py::test_advanced_order_clips_to_position_cap; tests/test_phase_05_performance_adoption.py::test_simulate_run_rejects_both_adoption_modes
+A single GitHub Actions workflow runs this suite on every push and pull request: it installs the dependencies and the package on Python 3.11 and runs \texttt{pytest -q}, so every push is checked against the full suite. % src: .github/workflows/ci.yml (on: [push, pull_request]; python-version "3.11"; pip install -r requirements.txt; pip install -e .; pytest -q)
 
 
 \section{Results}
