@@ -932,21 +932,21 @@ git commit -m "report: 3.6 realised vs demand-adjusted decomposition"
 - Proposal v4 section 4.1.
 - `src/reflexive_market/metrics.py`.
 
-- [ ] **Step 1: Read proposal section 4.1 and `metrics.py`**
+- [x] **Step 1: Read proposal section 4.1 and `metrics.py`**
 
-- [ ] **Step 2: Draft 4.1.1 Realised-return R^2**
+- [x] **Step 2: Draft 4.1.1 Realised-return R^2**
 
 The standard OOS R^2 formula against `r_{t+1}`. Rolling over a window of `eval_window` steps. Include the formula. State the benchmark convention once: metrics.rolling_oos_r2 uses the trailing window's in-sample mean as the constant benchmark, not a real-time prevailing mean (negligible at near-zero-mean returns).
 
-- [ ] **Step 3: Draft 4.1.2 Demand-adjusted-return R^2**
+- [x] **Step 3: Draft 4.1.2 Demand-adjusted-return R^2**
 
 Same formula but against `x_{t+1}` (referencing the definition from §3.6). One sentence on why the same forecast can have different R^2 on the same path against the two targets.
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -963,17 +963,17 @@ git commit -m "report: 4.1 primary forecast-performance endpoints"
 
 **Source artifacts:** Proposal v4 section 4.1, transaction-cost extension in section 3.7.
 
-- [ ] **Step 1: Read proposal sections 4.1 and 3.7**
+- [x] **Step 1: Read proposal sections 4.1 and 3.7**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Define adopter net profit per period (gross PnL minus transaction cost on volume traded). State the null-relative criterion: adopter net profit minus the null benchmark `null_profit_t - c * E|q^(0)|`, where E|q^(0)| = sqrt(2/pi) * sigma_q is stored as `null_mean_abs` in the phase 7 npz. State that the null benchmark's gross P&L has positive mean mu * sigma_q^2 / N from own price impact and that both legs of the comparison scale with the null's roughly 16x larger position; motivate why the proposal prefers the null-relative view and why phase 7 reports it with the size-asymmetry caveat.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
