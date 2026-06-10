@@ -140,6 +140,32 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \subsection{Software architecture}
 
+The simulator is a small pure-numpy Python package, \texttt{reflexive\_market}, under \texttt{src/}: six working modules plus a seven-line \texttt{\_\_init\_\_.py} holding only a docstring and the version string, 588 lines in total. % src: wc -l src/reflexive_market/*.py (7+47+75+30+150+249+30 = 588)
+Four design constraints, fixed in the project working agreement before any simulator code was written, shaped the package. % src: CLAUDE.md, Code conventions section (lines 203-209); scaffold commit 52b885a adds CLAUDE.md with "No simulator or notebook code yet"
+First, the mathematics uses numpy alone: AR estimation goes through \texttt{np.linalg.lstsq}, and no pandas, scipy, statsmodels, or scikit-learn import appears anywhere in \texttt{src/}. Second, every random draw flows through a \texttt{numpy.random.Generator} passed in as an explicit argument, and no module touches the global \texttt{np.random} state, so output is fully determined by the seed. Third, package functions never print or plot; parameters, figures, and the saved \texttt{npz} summaries live in the phase notebooks, which import the package. Fourth, each module implements one small, named slice of the proposal, so that every equation can be traced to code; Table~\ref{tab:modules} gives the mapping. % src: CLAUDE.md module table (lines 54-61); module docstrings in src/reflexive_market/
+
+\begin{table}[h]
+\centering
+\caption{Modules of \texttt{reflexive\_market}, their responsibilities, and the slice of the proposal each implements. Equation and section numbers refer to proposal v4; line counts are from the final checkout.} % src: CLAUDE.md module table (lines 54-61); wc -l src/reflexive_market/*.py
+\label{tab:modules}
+\begin{tabularx}{\textwidth}{@{}l r X l@{}}
+\toprule
+Module & Lines & Responsibility & Proposal \\
+\midrule
+\texttt{market.py}   & 30  & aggregate demand, market-maker price update, return law & eqs.\ (4), (5), (6) \\
+\texttt{traders.py}  & 30  & null random rule, demand mapping with position cap & eqs.\ (1), (2), (3), (9) \\
+\texttt{forecast.py} & 75  & rolling AR($p$) fit and out-of-sample forecast & eqs.\ (10), (11) \\
+\texttt{adoption.py} & 47  & stochastic diffusion, certainty-equivalent switching & eqs.\ (12)--(15) \\
+\texttt{metrics.py}  & 150 & MSFE, out-of-sample $R^{2}$ (realised and demand-adjusted), effective AR coefficient & section 4 \\
+\texttt{simulate.py} & 249 & \texttt{run()}: one function running $T$ periods end to end & section 3.6 timing \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\texttt{simulate.py} is deliberately the largest module. Its single entry point \texttt{run()} is the only place where state evolves, and it follows the intra-period timing fixed in section 3.6 of the proposal: agents form forecasts on returns up to and including period $t$, adopters and non-adopters submit orders, the market maker absorbs aggregate demand and moves the quote, and only then do the autoregressive term and the exogenous news shock realise. % src: src/reflexive_market/simulate.py module docstring
+Its defaults reproduce the phase 1 baseline with null traders only, so later phases extended the same function through keyword arguments (forecast window, risk scale and position cap, adoption parameters) rather than forking the loop. The two adoption mechanisms are mutually exclusive one-step pure functions invoked inside the loop. % src: src/reflexive_market/simulate.py docstring of run(); switching_window "Cannot be combined with non-zero adoption_pi"
+The functions in \texttt{metrics.py} score completed runs after the fact; the target-specific critical adoption shares are computed in the phase notebooks rather than in \texttt{metrics.py} because they need the full simulator output, not a return series alone. % src: src/reflexive_market/metrics.py module docstring
+
 \subsection{Phased construction}
 
 \subsection{Reproducibility}
