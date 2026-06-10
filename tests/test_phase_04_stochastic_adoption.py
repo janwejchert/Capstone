@@ -199,3 +199,60 @@ def test_high_adoption_changes_lag1_autocorr_relative_to_baseline():
     rho_base = lag1_autocorr(base["returns"])
     rho_full = lag1_autocorr(full["returns"])
     assert abs(rho_base - rho_full) > 0.02
+
+
+def test_demand_adjusted_return_recovers_structural_phi_at_full_adoption():
+    """The central identity behind the dual-channel result: the
+    demand-adjusted return x_{t+1} = r_{t+1} - mu D_t equals
+    phi r_t + sigma eps_{t+1} by construction, so even at full adoption,
+    where the realised lag-1 autocorrelation is amplified well above phi,
+    regressing x_{t+1} on r_t must recover the structural phi and leave a
+    residual with the news-shock scale."""
+    mu, phi, sigma_news = 0.05, 0.25, 0.01
+    out = simulate.run(
+        T=8000, N=200, mu=mu, phi=phi, sigma_news=sigma_news, sigma_q=1.0,
+        rng=np.random.default_rng(99),
+        forecast_window=250, forecast_p=1, risk_scale=0.001, q_cap=0.05,
+        initial_adoption_share=1.0,
+    )
+    r = out["returns"]
+    x = r - mu * out["demand"]
+    r_lag = r[:-1] - r[:-1].mean()
+    x_next = x[1:] - x[1:].mean()
+    beta = float(np.dot(r_lag, x_next) / np.dot(r_lag, r_lag))
+    resid_std = float((x_next - beta * r_lag).std())
+
+    assert lag1_autocorr(r) > phi + 0.05
+    assert abs(beta - phi) < 0.03
+    assert abs(resid_std - sigma_news) < 0.001
+
+
+def test_null_profit_mean_is_own_impact():
+    """A null trader's order moves the within-period quote by mu * q / N
+    and the position is marked at the post-impact price, so the
+    representative null profit has positive mean mu * sigma_q^2 / N, not
+    zero. The phase 7 null-relative endpoint inherits this term, so pin it."""
+    mu, sigma_q, N = 0.05, 1.0, 100
+    means = [
+        simulate.run(
+            T=2000, N=N, mu=mu, phi=0.10, sigma_news=0.01, sigma_q=sigma_q,
+            rng=np.random.default_rng(7000 + s),
+        )["null_profit"].mean()
+        for s in range(20)
+    ]
+    predicted = mu * sigma_q ** 2 / N
+    assert abs(np.mean(means) - predicted) < 0.4 * predicted
+
+
+def test_advanced_order_export_matches_profit_and_warmup():
+    out = simulate.run(
+        T=400, N=64, mu=0.05, phi=0.10, sigma_news=0.01, sigma_q=1.0,
+        rng=np.random.default_rng(3),
+        forecast_window=100, forecast_p=1, risk_scale=0.001, q_cap=1.0,
+        initial_adoption_share=0.5,
+    )
+    np.testing.assert_allclose(
+        out["advanced_profit"], out["advanced_order"] * out["returns"]
+    )
+    assert np.all(out["advanced_order"][:100] == 0.0)
+    assert np.any(out["advanced_order"][100:] != 0.0)
