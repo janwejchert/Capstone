@@ -13,23 +13,23 @@
 ## File Structure
 
 **Modified throughout:**
-- `docs/Report/report.tex` — the report itself, one subsection added per stage. The skeleton already exists with title page, abstract, and full section/subsection structure.
-- `docs/Report/references.bib` — bibliography file, populated incrementally as each stage cites a source.
+- `docs/Report/report.tex`: the report itself, one subsection added per stage. The skeleton already exists with title page, abstract, and full section/subsection structure.
+- `docs/Report/references.bib`: bibliography file, populated incrementally as each stage cites a source.
 
 **Created in Stage 0:**
 - `docs/Report/references.bib` (empty seed file with header comment).
 
 **Read-only sources:**
-- `docs/proposal/reflexive_forecast_proposal_v4.pdf` — the authoritative contract for symbols, endpoints, and definitions.
-- `docs/proposal/reflexive_forecast_proposal_v4.tex` — the LaTeX source, useful for grabbing equation snippets and exact wording.
-- `notebooks/phase_*.ipynb` — the analysis code that produced each figure and each `.npz` summary.
-- `results/data/phase_*.npz` — quantitative summaries (field-level catalog at the bottom of this plan).
-- `results/figures/phase_*.png` — saved figures (full list at the bottom of this plan).
-- `src/reflexive_market/*.py` — implementation modules (~563 lines total across 7 files).
-- `CLAUDE.md` — the working agreement and phased construction summary.
+- `docs/proposal/reflexive_forecast_proposal_v4.pdf`: the authoritative contract for symbols, endpoints, and definitions.
+- `docs/proposal/reflexive_forecast_proposal_v4.tex`: the LaTeX source, useful for grabbing equation snippets and exact wording.
+- `notebooks/phase_*.ipynb`: the analysis code that produced each figure and each `.npz` summary.
+- `results/data/phase_*.npz`: quantitative summaries (field-level catalog at the bottom of this plan).
+- `results/figures/phase_*.png`: saved figures (full list at the bottom of this plan).
+- `src/reflexive_market/*.py`: implementation modules (~588 lines total across 7 files).
+- `CLAUDE.md`: the working agreement and phased construction summary.
 
 **Output:**
-- `docs/Report/report.pdf` — compiled at the end of every stage; final read-through at Stage 28.
+- `docs/Report/report.pdf`: compiled at the end of every stage; final read-through at Stage 28.
 
 ---
 
@@ -46,6 +46,23 @@ The commit at the end of each stage uses the message format: `report: <subsectio
 
 ---
 
+## Page-count control
+
+The format cap is 30 pages and the target is ~22. The word budgets in the
+spec total ~10,200 words of body text (roughly 21 to 22 pages at 12pt single
+spacing), which leaves room for at most about 10 figures in the main text;
+every other figure goes to Appendix B. Recommended main-text set: one figure
+for 6.1, one for 6.2, two for 6.3 (`phase_04_oos_r2_vs_adoption_mc`,
+`phase_04_phi_vs_adoption_mc`), one for 6.4 (`phase_05_erosion_vs_adoption`),
+two or three for 6.5 (`phase_06_a_star_R2_heatmap`,
+`phase_06_a_star_phi_heatmap`, optionally `phase_06_r2_da_heatmap`), and two
+for 6.6. After committing each section group (Results, Model, Metrics,
+Discussion, framing), compile and check the running page count; if it tracks
+above 28 pages, trim Results prose and demote figures to Appendix B before
+writing the next group.
+
+---
+
 ## Stage 0: Format setup
 
 **Files:**
@@ -54,12 +71,12 @@ The commit at the end of each stage uses the message format: `report: <subsectio
 
 **Goal:** Switch the document to 12pt Times Roman with 1.0 line spacing and natbib citations before any prose is written, so every subsequent stage compiles directly into the final format.
 
-- [ ] **Step 1: Open report.tex preamble and inspect current state**
+- [x] **Step 1: Open report.tex preamble and inspect current state**
 
 Run: `head -36 docs/Report/report.tex`
 Expected: confirms `\documentclass[11pt]{article}`, `\usepackage{XCharter}`, `\setlength{\parskip}{0.55em}`, `\setlength{\parindent}{0pt}`.
 
-- [ ] **Step 2: Change document class to 12pt**
+- [x] **Step 2: Change document class to 12pt**
 
 Edit `docs/Report/report.tex` line 1:
 
@@ -67,7 +84,7 @@ Edit `docs/Report/report.tex` line 1:
 \documentclass[12pt]{article}
 ```
 
-- [ ] **Step 3: Replace XCharter with Times Roman (text and math)**
+- [x] **Step 3: Replace XCharter with Times Roman (text and math)**
 
 Edit `docs/Report/report.tex` line 5 (XCharter line). Replace:
 
@@ -81,7 +98,7 @@ with:
 \usepackage{mathptmx}
 ```
 
-- [ ] **Step 4: Switch to traditional indented paragraph style with 1.0 spacing**
+- [x] **Step 4: Switch to traditional indented paragraph style with 1.0 spacing**
 
 Edit `docs/Report/report.tex` lines 32-33 (parskip/parindent). Replace:
 
@@ -98,7 +115,7 @@ with:
 \setlength{\parindent}{1em}
 ```
 
-- [ ] **Step 5: Add natbib and bibliography style to preamble**
+- [x] **Step 5: Add natbib and bibliography style to preamble**
 
 Add after the `\usepackage{hyperref}` line (around line 17):
 
@@ -107,7 +124,7 @@ Add after the `\usepackage{hyperref}` line (around line 17):
 \bibliographystyle{plainnat}
 ```
 
-- [ ] **Step 6: Create the empty references.bib seed file**
+- [x] **Step 6: Create the empty references.bib seed file**
 
 Create `docs/Report/references.bib` with:
 
@@ -117,7 +134,7 @@ Create `docs/Report/references.bib` with:
 % Use natbib's \citet{key} for inline author citations and \citep{key} for parenthetical.
 ```
 
-- [ ] **Step 7: Add \bibliography command at the bottom of report.tex**
+- [x] **Step 7: Add \bibliography command at the bottom of report.tex**
 
 Find the existing `\section*{References}` line (around line 180) and replace it with:
 
@@ -127,7 +144,7 @@ Find the existing `\section*{References}` line (around line 180) and replace it 
 
 (natbib will generate the References heading automatically.)
 
-- [ ] **Step 8: Compile and verify the test PDF renders cleanly**
+- [x] **Step 8: Compile and verify the test PDF renders cleanly**
 
 Run from `docs/Report/`:
 
@@ -140,9 +157,9 @@ Open `docs/Report/report.pdf`. Verify:
 - Title page renders with the IE logo and your full name (Jan Jacek Wejchert).
 - Abstract is present.
 - TOC shows all sections.
-- No compile errors (BibTeX may warn "no bibliography" — acceptable while references.bib is empty).
+- No compile errors (BibTeX may warn "no bibliography", acceptable while references.bib is empty).
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add docs/Report/report.tex docs/Report/references.bib
@@ -151,7 +168,7 @@ git commit -m "report: format setup (12pt Times, 1.0 spacing, natbib)"
 
 ---
 
-## RESULTS — Section 6
+## RESULTS: Section 6
 
 The Results section is written first because the numbers are concrete and frozen in the `.npz` files. Doing this first locks in what every later section must cite accurately.
 
@@ -165,8 +182,8 @@ The Results section is written first because the numbers are concrete and frozen
 **Source artifacts:**
 - `notebooks/phase_01_baseline_market.ipynb`
 - `notebooks/phase_02_benchmark_validation.ipynb`
-- `results/data/phase_01_baseline.npz` — fields: `prices` (5001,), `returns` (5000,), `demand` (5000,), `phi_input`, `phi_empirical`, `seed`
-- `results/data/phase_02_benchmark.npz` — fields: `mean_per_seed` (100,), `std_per_seed` (100,), `rho_per_seed` (100,), `kurt_per_seed` (100,), `mean_phi_trace` (5000,), `std_phi_trace` (5000,), `phi_input`, `rolling_window`, `seeds`
+- `results/data/phase_01_baseline.npz`, fields: `prices` (5001,), `returns` (5000,), `demand` (5000,), `phi_input`, `phi_empirical`, `seed`
+- `results/data/phase_02_benchmark.npz`, fields: `mean_per_seed` (100,), `std_per_seed` (100,), `rho_per_seed` (100,), `kurt_per_seed` (100,), `mean_phi_trace` (5000,), `std_phi_trace` (5000,), `phi_input`, `rolling_window`, `seeds`
 - `results/figures/phase_01_price_path.png`, `phase_01_return_series.png`, `phase_01_return_histogram.png`
 - `results/figures/phase_02_rolling_phi.png`, `phase_02_seed_mean.png`, `phase_02_seed_std.png`, `phase_02_seed_lag1.png`, `phase_02_seed_kurtosis.png`
 
@@ -219,7 +236,7 @@ Fill the bracketed values from Step 2's output. Same shape for the second figure
 
 - [ ] **Step 5: Add citation entries for proposal section references**
 
-The subsection should reference proposal section 3.1 (market) and section 3.2 (null rule). No external citations needed in this subsection beyond the proposal itself.
+The subsection should reference proposal section 3.1 (market) and section 3.3 (null rule). No external citations needed in this subsection beyond the proposal itself.
 
 - [ ] **Step 6: Compile and check rendering**
 
@@ -250,7 +267,7 @@ git commit -m "report: 6.1 baseline market and benchmark validation"
 
 **Source artifacts:**
 - `notebooks/phase_03_ar_forecast.ipynb`
-- `results/data/phase_03_ar_forecast.npz` — fields: `summary` (3, 5), `ar_windows` (3,) typically `[50, 100, 250]`, `ar_order`, `eval_window`, `phi_input`, `seed`
+- `results/data/phase_03_ar_forecast.npz`, fields: `summary` (3, 5), `ar_windows` (3,) typically `[50, 100, 250]`, `ar_order`, `eval_window`, `phi_input`, `seed`
 - `results/figures/phase_03_ar_coefficients.png`, `phase_03_rolling_msfe.png`, `phase_03_rolling_oos_r2.png`
 
 - [ ] **Step 1: Open phase_03 notebook and inspect the structure of `summary`**
@@ -281,8 +298,8 @@ Insert into report.tex with inline source comments.
 - [ ] **Step 4: Add figures**
 
 Recommended:
-- `phase_03_rolling_oos_r2.png` — central evidence (positive, stable, low for small windows).
-- `phase_03_ar_coefficients.png` — shows AR coefficient estimates clustering around `phi_input`.
+- `phase_03_rolling_oos_r2.png`: central evidence (positive, stable, low for small windows).
+- `phase_03_ar_coefficients.png`: shows AR coefficient estimates clustering around `phi_input`.
 
 Same figure-block format as Stage 1.
 
@@ -306,11 +323,11 @@ git commit -m "report: 6.2 AR forecast performance without adoption"
 **Files:**
 - Modify: `docs/Report/report.tex` under `\subsection{Dual-channel result under stochastic adoption (phase 4)}`
 
-**Word budget:** ~700 words plus 3 figures. This is the most important results subsection in the whole report — the dual-channel result first appears here.
+**Word budget:** ~700 words plus 3 figures. This is the most important results subsection in the whole report: the dual-channel result first appears here.
 
 **Source artifacts:**
 - `notebooks/phase_04_stochastic_adoption.ipynb`
-- `results/data/phase_04_stochastic_adoption.npz` — fields: `summary` (3, 8), `regime_pi` (3,), `regime_delta` (3,), `regime_names` (3,) — likely `['zero', 'slow', 'fast']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `T`, `N`, `seed`
+- `results/data/phase_04_stochastic_adoption.npz`, fields: `summary` (3, 8), `regime_pi` (3,), `regime_delta` (3,), `regime_names` (3,), likely `['zero', 'slow', 'fast']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `T`, `N`, `seed`
 - 9 figures in `results/figures/phase_04_*.png` (full list at bottom of plan).
 
 - [ ] **Step 1: Open notebook and identify the 8 summary columns**
@@ -332,7 +349,7 @@ print('mu:', d['mu'], 'phi:', d['phi_input'])
 "
 ```
 
-Record the actual rolling OOS R^2 values at low and high adoption for both targets, plus the effective phi at low and high adoption. The README's "from 0.09 to 0.19" (realised) and "from 0.07 to 0.04" (demand-adjusted) come from these arrays.
+Record the actual rolling OOS R^2 values at low and high adoption for both targets, plus the effective phi at low and high adoption. Anchor the low-adoption side to the zero-adoption control row (realised 0.0695, demand-adjusted 0.0821, phi 0.2821): the fast regime's own low window already averages adoption ~0.5, which is why the README quotes 0.07 to 0.19, 0.08 to 0.04, and 0.28 to 0.45 against the control rather than the ramp window.
 
 - [ ] **Step 3: Draft the prose (target ~700 words)**
 
@@ -345,12 +362,13 @@ Suggested four paragraphs:
 
 End with the one-line headline: adoption raises realised predictive performance through the self-fulfilment channel while reducing the independent demand-adjusted signal.
 
-- [ ] **Step 4: Add three figures**
+- [ ] **Step 4: Add two figures**
 
 Recommended:
-- `phase_04_oos_r2_vs_adoption_mc.png` — Monte Carlo dual-channel plot.
-- `phase_04_phi_vs_adoption_mc.png` — effective phi rising with adoption.
-- `phase_04_oos_r2_over_time.png` — time-series view of the same path.
+- `phase_04_oos_r2_vs_adoption_mc.png`: Monte Carlo dual-channel plot.
+- `phase_04_phi_vs_adoption_mc.png`: effective phi rising with adoption.
+
+The time-series view `phase_04_oos_r2_over_time.png` goes to Appendix B.
 
 Same figure-block format as Stage 1. Captions describe what is *actually shown*, not what the prose says.
 
@@ -383,7 +401,7 @@ git commit -m "report: 6.3 dual-channel result under stochastic adoption"
 
 **Source artifacts:**
 - `notebooks/phase_05_performance_adoption.ipynb`
-- `results/data/phase_05_performance_adoption.npz` — fields: `summary` (2, 6), `regime_names` (2,) — likely `['stochastic', 'CE-switching']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `stochastic_pi`, `switching_window`, `switching_a`, `switching_alpha`, `switching_beta`, `T`, `N`, `seed`
+- `results/data/phase_05_performance_adoption.npz`, fields: `summary` (2, 6), `regime_names` (2,), likely `['stochastic', 'CE-switching']`, `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `stochastic_pi`, `switching_window`, `switching_a`, `switching_alpha`, `switching_beta`, `T`, `N`, `seed`
 - `results/figures/phase_05_adoption_share.png`, `phase_05_erosion_vs_adoption.png`, `phase_05_switching_score.png`
 
 - [ ] **Step 1: Open notebook and inspect 6-column summary**
@@ -410,11 +428,13 @@ Three paragraphs:
   2. Paired-shock comparison against the fast stochastic regime: both regimes show the demand-adjusted R^2 decline and the effective-phi amplification, with quantitative comparisons from `summary`.
   3. Interpretive line: endogenous switching does not change the underlying erosion path, which means the dual-channel mechanism is not an artefact of exogenous diffusion.
 
-- [ ] **Step 4: Add figures**
+- [ ] **Step 4: Add one figure**
 
 Recommended:
-- `phase_05_erosion_vs_adoption.png` — the central comparison.
-- `phase_05_switching_score.png` — shows the CE switching signal driving adoption.
+- `phase_05_erosion_vs_adoption.png`: the central comparison.
+
+`phase_05_switching_score.png` (the CE switching signal driving adoption)
+goes to Appendix B.
 
 - [ ] **Step 5: Compile and check rendering**
 
@@ -438,7 +458,7 @@ git commit -m "report: 6.4 endogenous CE-based switching"
 
 **Source artifacts:**
 - `notebooks/phase_06_experiments_threshold.ipynb`
-- `results/data/phase_06_a_star_grid.npz` — fields (note the 4D shape: forecast_p × window × phi × mu):
+- `results/data/phase_06_a_star_grid.npz`: fields (note the 4D shape: forecast_p × window × phi × mu):
   - Axes: `mu_grid` (5,), `phi_grid` (6,), `w_grid` (3,), `forecast_p_grid` (4,) = [1, 2, 5, 10]
   - Thresholds: `a_star_R2_realised`, `a_star_R2_da`, `a_star_phi` each (4, 3, 6, 5)
   - Hit rates: `hit_rate_R2_realised`, `hit_rate_R2_da`, `hit_rate_phi` each (4, 3, 6, 5)
@@ -481,17 +501,18 @@ The README references hit rates "~26%" for realised and "~50%" for demand-adjust
 Suggested five paragraphs:
   1. Sweep design: (mu, phi, w, p) grid sizes, what each axis varies, AR(1) as baseline plus p in {2, 5, 10} for robustness.
   2. Definition of the relative thresholds, with the threshold factors used (`r2_threshold_factor=0.5`, `phi_threshold_factor=1.5`).
-  3. Headline AR(1) results: `A*_{R2,da,rel}` hit in roughly half the grid at mean adoption share around the value from Step 2; larger `mu` makes DA erosion bite earlier (cite the heatmap).
+  3. Headline AR(1) results: `A*_{R2,da,rel}` hit in roughly half the grid at mean adoption share around the value from Step 2. State the mu gradient accurately: larger `mu` deepens the high-adoption erosion (cite the tail DA R^2 heatmap) and pulls `A*_{phi,rel}` earlier at moderate-to-high phi, while the `A*_{R2,da,rel}` crossing itself is roughly flat in `mu` because the relative threshold scales with the baseline. Also state the measurement caveat: rolling metrics lag adoption by up to eval_window periods, so A* values are detection points (upper bounds), not erosion onsets.
   4. Realised channel non-result: `A*_{R2,realised}` is mostly not reached; the finite hits cluster at very low A in the weak-signal corner of the grid (low `mu` and/or low `phi`) and are noise crossings, not erosion. Explain why: when baseline realised R^2 is near zero, the half-baseline threshold sits at zero and rolling noise can satisfy it spuriously.
   5. By-p robustness: the dual-channel pattern is present for all p tested; the delta-from-AR(1) figure shows the magnitude of the effect.
 
-- [ ] **Step 4: Add 3-4 figures**
+- [ ] **Step 4: Add 2-3 figures**
 
 Recommended:
-- `phase_06_r2_da_heatmap.png` — DA R^2 across the (mu, phi) grid.
-- `phase_06_a_star_R2_heatmap.png` — `A*_{R2,da,rel}` heatmap.
-- `phase_06_a_star_phi_heatmap.png` — `A*_{phi,rel}` heatmap.
-- Optional: `phase_06_delta_a_star_r2_from_ar1.png` if word budget permits.
+- `phase_06_a_star_R2_heatmap.png`: `A*_{R2,da,rel}` heatmap.
+- `phase_06_a_star_phi_heatmap.png`: `A*_{phi,rel}` heatmap.
+- Optional: `phase_06_r2_da_heatmap.png`, the tail-depth view that carries the mu gradient, if the page count allows.
+
+`phase_06_delta_a_star_r2_from_ar1.png` goes to Appendix B.
 
 - [ ] **Step 5: Compile and check rendering**
 
@@ -520,12 +541,12 @@ git commit -m "report: 6.5 parameter sweep and critical adoption shares"
 
 **Source artifacts:**
 - `notebooks/phase_07_evaluation_extensions.ipynb`
-- `results/data/phase_07_transaction_costs.npz` — fields: `c_grid` (8,), `bin_centers` (30,), `binned_abs_means` (8, 30), `binned_abs_stds` (8, 30), `binned_rel_means` (8, 30), `binned_rel_stds` (8, 30), `binned_counts` (8, 30), `a_star_profit_abs` (8,), `a_star_profit_rel` (8,), `null_mean_abs`, `summary` (8, 5), `phi`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `adoption_pi`, `T`, `N`, `num_seeds`, `base_seed`
+- `results/data/phase_07_transaction_costs.npz`, fields: `c_grid` (8,), `bin_centers` (30,), `binned_abs_means` (8, 30), `binned_abs_stds` (8, 30), `binned_rel_means` (8, 30), `binned_rel_stds` (8, 30), `binned_counts` (8, 30), `a_star_profit_abs` (8,), `a_star_profit_rel` (8,), `null_mean_abs`, `summary` (8, 5), `phi`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `adoption_pi`, `T`, `N`, `num_seeds`, `base_seed`
 - `results/figures/phase_07_a_star_profit_vs_cost.png`, `phase_07_net_profit_vs_adoption.png`
 
 - [ ] **Step 1: Open notebook and inspect summary**
 
-Open phase_07 notebook. Identify the 5 columns of `summary` (likely: cost level, mean abs profit, mean rel profit, `A*_{profit,abs}`, `A*_{profit,rel}`).
+Open phase_07 notebook. The 5 columns of `summary` are: cost level, pooled mean absolute net profit at A < 0.2 and at A > 0.6, pooled mean null-relative net profit at A < 0.2 and at A > 0.6.
 
 - [ ] **Step 2: Load .npz**
 
@@ -546,13 +567,13 @@ print(d['summary'])
 
 Three paragraphs:
   1. Setup: linear transaction cost `c` applied to every trade, sweep over `c_grid`. Define `A*_{profit,abs}` (smallest A where adopter net profit crosses zero) and `A*_{profit,rel}` (smallest A where adopter net profit crosses `null_mean_abs`, the proposal's primary economic endpoint).
-  2. Results: at zero cost adopter profit rises with adoption; `A*_{profit,abs}` crosses zero only in the c ~ 0.003 to 0.004 band; `A*_{profit,rel}` is positive across all observed positive cost levels.
-  3. Interpretation: the only c=0 hit on `A*_{profit,rel}` is a noisy first positive crossing around adoption ~0.68, not a stable monotone threshold. Economic value does not visibly erode in the cost-free baseline; transaction costs shift profit levels but do not reverse the adoption-amplification pattern in the regimes tested.
+  2. Results: at zero cost adopter profit rises with adoption; `A*_{profit,abs}` crosses zero only in the c ~ 0.003 to 0.004 band, and the crossing is from below (a profitability onset), the reverse of the proposal's from-above erosion reading; say so explicitly. The null-relative curve is uniformly positive at every positive cost level and slightly negative everywhere at c = 0.
+  3. Interpretation: the null benchmark books own-impact paper profit E[null profit] = mu sigma_q^2 / N = 2.5e-4 per period on a position roughly 16x the adopter cap, which is why the c = 0 null-relative mean is systematically (slightly) negative at every observed adoption share; the single binned crossing at A ~ 0.68 is noise around that mean, not a threshold. At c > 0 the same size asymmetry flips sign through the null's larger cost bill. Present the null-relative endpoint as faithful to the proposal but dominated by position-size asymmetry in both directions; the absolute endpoint is the cleaner economic read in this baseline, and adopter mean profit grows with adoption at every cost level tested.
 
 - [ ] **Step 4: Add 2 figures**
 
-- `phase_07_a_star_profit_vs_cost.png` — central economic-endpoint result.
-- `phase_07_net_profit_vs_adoption.png` — adopter net profit vs adoption across costs.
+- `phase_07_a_star_profit_vs_cost.png`: central economic-endpoint result.
+- `phase_07_net_profit_vs_adoption.png`: adopter net profit vs adoption across costs.
 
 - [ ] **Step 5: Compile and check rendering**
 
@@ -569,7 +590,7 @@ git commit -m "report: 6.6 transaction-cost extension and economic endpoint"
 
 ---
 
-## IMPLEMENTATION — Section 5
+## IMPLEMENTATION: Section 5
 
 ### Stage 7: §5.1 Software architecture
 
@@ -578,7 +599,7 @@ git commit -m "report: 6.6 transaction-cost extension and economic endpoint"
 **Word budget:** ~300 words plus 1 small table or module list.
 
 **Source artifacts:**
-- `src/reflexive_market/__init__.py` (7 lines), `adoption.py` (47 lines), `forecast.py` (75 lines), `market.py` (23 lines), `metrics.py` (144 lines), `simulate.py` (237 lines), `traders.py` (30 lines). Total 563 lines.
+- `src/reflexive_market/__init__.py` (7 lines), `adoption.py` (47 lines), `forecast.py` (75 lines), `market.py` (30 lines), `metrics.py` (150 lines), `simulate.py` (249 lines), `traders.py` (30 lines). Total 588 lines.
 - `CLAUDE.md` module-to-proposal-equation table (lines ~48-58).
 
 - [ ] **Step 1: Read each module's docstring and public functions**
@@ -599,7 +620,7 @@ One paragraph naming the design constraints (pure numpy, no pandas/scipy/sklearn
 
 - [ ] **Step 5: Cross-check protocol** (all four checks)
 
-  - [ ] **Numbers traced:** line counts and the module-to-equation mapping match `CLAUDE.md`.
+  - [ ] **Numbers traced:** the module-to-equation mapping matches `CLAUDE.md` and the line counts match the checkout.
   - [ ] **Definitions match proposal v4:** equation numbers in the table match the proposal.
 
 - [ ] **Step 6: Commit**
@@ -673,7 +694,7 @@ git commit -m "report: 5.3 reproducibility"
 
 ---
 
-## MODEL — Section 3
+## MODEL: Section 3
 
 ### Stage 10: §3.1 Single-asset market with linear price impact
 
@@ -748,7 +769,7 @@ git commit -m "report: 3.1 single-asset market with linear price impact"
 
 - [ ] **Step 2: Draft prose**
 
-Three short paragraphs covering: belief layer (forecast value), decision layer (mean-variance demand mapping per Brock-Hommes), switching layer (binary adopter status). Equations (1), (2), (3) for the demand mapping and (8) for the cap.
+Three short paragraphs covering: belief layer (forecast value), decision layer (mean-variance demand mapping per Brock-Hommes), switching layer (binary adopter status). Equations (1), (2), and (3) for the demand mapping and the position cap.
 
 - [ ] **Step 3: Add Brock-Hommes BibTeX entry**
 
@@ -784,14 +805,14 @@ git commit -m "report: 3.2 trader behaviour"
 **Word budget:** ~350 words plus 1-2 equations.
 
 **Source artifacts:**
-- Proposal v4 section 3.3, equations (9), (10).
+- Proposal v4 sections 3.3 and 3.4, equations (9), (10), (11).
 - `src/reflexive_market/forecast.py`.
 
 - [ ] **Step 1: Read proposal section 3.3 and `forecast.py`**
 
 - [ ] **Step 2: Draft prose**
 
-One paragraph on the null random rule (zero-mean i.i.d. with cap). One paragraph on the AR(p) rule (rolling least-squares fit on a window of size w, one-step-ahead OOS forecast, parameter `p` defaults to 1).
+One paragraph on the null random rule (zero-mean i.i.d. order noise, equation (9); the null rule has no position cap). One paragraph on the AR(p) rule (equations (10) and (11): rolling least-squares fit on a window of size w, one-step-ahead OOS forecast, parameter `p` defaults to 1).
 
 - [ ] **Step 3: Compile and check rendering**
 
@@ -813,18 +834,18 @@ git commit -m "report: 3.3 null rule and rolling AR forecasting rule"
 **Word budget:** ~400 words plus equations (11)-(15).
 
 **Source artifacts:**
-- Proposal v4 section 3.4, equations (11)-(15).
+- Proposal v4 section 3.5, equations (12)-(15).
 - `src/reflexive_market/adoption.py`.
 
 - [ ] **Step 1: Read proposal section 3.4 and `adoption.py`**
 
 - [ ] **Step 2: Draft 3.4.1 Stochastic diffusion**
 
-Equations (11) and (12). Discrete-time Bernoulli adoption with rate `pi`. One paragraph (~150 words).
+Equations (12) and (13). Discrete-time Bernoulli adoption with rate `pi`. One paragraph (~150 words).
 
 - [ ] **Step 3: Draft 3.4.2 Certainty-equivalent switching**
 
-Equations (13)-(15). Logistic switching with intensity beta, switching score `a + alpha (CE_forecast - CE_null)`. One paragraph (~250 words).
+Equations (14) and (15). The certainty equivalent CE = mean - (a/2) var per rule, the score S_t = CE^(A) - CE^(0), and the logistic switch probability Lambda(alpha + beta S_t). One paragraph (~250 words).
 
 - [ ] **Step 4: Compile and check rendering**
 
@@ -847,7 +868,7 @@ git commit -m "report: 3.4 adoption mechanisms"
 
 **Source artifacts:**
 - Proposal v4 section 3.6.
-- `CLAUDE.md` lines 215-228.
+- `CLAUDE.md` intra-period timing section.
 
 - [ ] **Step 1: Read proposal section 3.6**
 
@@ -875,8 +896,8 @@ git commit -m "report: 3.5 intra-period timing"
 **Word budget:** ~400 words plus 2 equations.
 
 **Source artifacts:**
-- Proposal v4 section 3.6 (definition of `x_{t+1}`).
-- `CLAUDE.md` lines 31-34 (the "not the full regression residual" caveat).
+- Proposal v4 equation (7) and section 3.6 (definition of `x_{t+1}`).
+- `CLAUDE.md` (the "not the full regression residual" caveat in the overview).
 
 - [ ] **Step 1: Read both sources carefully**
 
@@ -899,7 +920,7 @@ git commit -m "report: 3.6 realised vs demand-adjusted decomposition"
 
 ---
 
-## METRICS — Section 4
+## METRICS: Section 4
 
 ### Stage 16: §4.1 Primary forecast-performance endpoints (realised + DA R^2)
 
@@ -915,7 +936,7 @@ git commit -m "report: 3.6 realised vs demand-adjusted decomposition"
 
 - [ ] **Step 2: Draft 4.1.1 Realised-return R^2**
 
-The standard OOS R^2 formula against `r_{t+1}`. Rolling over a window of `eval_window` steps. Include the formula.
+The standard OOS R^2 formula against `r_{t+1}`. Rolling over a window of `eval_window` steps. Include the formula. State the benchmark convention once: metrics.rolling_oos_r2 uses the trailing window's in-sample mean as the constant benchmark, not a real-time prevailing mean (negligible at near-zero-mean returns).
 
 - [ ] **Step 3: Draft 4.1.2 Demand-adjusted-return R^2**
 
@@ -946,7 +967,7 @@ git commit -m "report: 4.1 primary forecast-performance endpoints"
 
 - [ ] **Step 2: Draft prose**
 
-Define adopter net profit per period (gross PnL minus transaction cost on volume traded). State the null-relative criterion: `A*_{profit,rel}` is the smallest A at which adopter mean profit exceeds the null benchmark `null_mean_abs`. Briefly motivate why the null-relative view is preferred to the absolute view.
+Define adopter net profit per period (gross PnL minus transaction cost on volume traded). State the null-relative criterion: adopter net profit minus the null benchmark `null_profit_t - c * E|q^(0)|`, where E|q^(0)| = sqrt(2/pi) * sigma_q is stored as `null_mean_abs` in the phase 7 npz. State that the null benchmark's gross P&L has positive mean mu * sigma_q^2 / N from own price impact and that both legs of the comparison scale with the null's roughly 16x larger position; motivate why the proposal prefers the null-relative view and why phase 7 reports it with the size-asymmetry caveat.
 
 - [ ] **Step 3: Compile and check rendering**
 
@@ -1002,11 +1023,12 @@ git commit -m "report: 4.3 effective AR coefficient diagnostic"
 
 | Symbol | Target | Definition |
 |--------|--------|------------|
-| `A*_{R2,realised}` | realised-return R^2 | smallest A where realised R^2 falls to half its low-A baseline |
+| `A*_{R2,realised}` | realised-return R^2 | proposal definition: smallest A where realised R^2 crosses zero from above (typically not reached) |
+| `A*_{R2,realised,rel}` | realised-return R^2 | operational analogue: half its low-A baseline (fires only on weak-signal noise crossings) |
 | `A*_{R2,da,rel}` | demand-adjusted R^2 | smallest A where DA R^2 falls to half its low-A baseline |
 | `A*_{phi,rel}` | effective phi | smallest A where effective phi rises to 1.5x its baseline |
-| `A*_{profit,abs}` | adopter profit | smallest A where adopter mean profit crosses zero |
-| `A*_{profit,rel}` | adopter profit | smallest A where adopter mean profit exceeds null benchmark |
+| `A*_{profit,abs}` | adopter profit | smallest A where adopter mean net profit crosses zero (in this regime a from-below onset, not erosion) |
+| `A*_{profit,rel}` | adopter profit | smallest A where adopter net profit exceeds the null benchmark (null gross P&L minus its own cost) |
 | `A*_{vol}` | (optional) | smallest A where realised vol crosses a threshold |
 
 - [ ] **Step 3: Draft prose around the table**
@@ -1081,7 +1103,7 @@ git commit -m "report: 4.5 simulation protocol, seeds, parameter grid"
 
 ---
 
-## DISCUSSION — Section 7
+## DISCUSSION: Section 7
 
 ### Stage 21: §7.1 Interpretation of the dual-channel mechanism
 
@@ -1178,6 +1200,10 @@ Four-to-six bullets. Examples:
 - Discrete-time setup; continuous-time effects (latency, microstructure) are not modelled.
 - Homogeneous non-adopter pool (random null rule); heterogeneous trader ecology (trend followers, contrarians) is mentioned as an optional second extension but not implemented.
 - Transaction costs are linear and symmetric; market-impact-of-trade and inventory costs are not modelled.
+- Profit is marked at the post-impact quote and unwinds never re-enter the order flow, so all profit figures are paper profits under the model's accounting; the null benchmark books own-impact profit mu sigma_q^2 / N on a position roughly 16x the adopter cap, which dominates the null-relative endpoint at c = 0.
+- The market maker absorbs position levels rather than position changes (Beja-Goldman style rather than Farmer-Joshi order flow), which strengthens the persistence channel.
+- With the baseline risk_scale and q_cap the position cap binds almost every period, so adopters are effectively fixed-size sign traders.
+- The CE switching risk aversion (switching_a = 1) is set independently of the demand layer's implied risk aversion (~7 at the realised return variance).
 
 - [ ] **Step 2: Compile and check rendering**
 
@@ -1192,7 +1218,7 @@ git commit -m "report: 7.4 limitations"
 
 ---
 
-## FRAMING — Sections 2, 1, 8
+## FRAMING: Sections 2, 1, 8
 
 ### Stage 25: §2 Background (all four subsections)
 
@@ -1321,11 +1347,11 @@ git commit -m "report: 8 conclusion (all three subsections)"
 
 **Word budget:** ~1500 words across the three appendices plus the abstract polish.
 
-- [ ] **Step 1: Appendix A — Model equations and derivations**
+- [ ] **Step 1: Appendix A: Model equations and derivations**
 
 Re-display equations (1)-(15) from the proposal in one place, with brief connecting prose. This is for a reader who wants the full set on one page without flipping through §3-§4.
 
-- [ ] **Step 2: Appendix B — Additional figures**
+- [ ] **Step 2: Appendix B: Additional figures**
 
 Include the supplementary figures not used in §6, e.g.:
 - `phase_04_adoption_share.png` (adoption trajectory plots).
@@ -1337,13 +1363,13 @@ Include the supplementary figures not used in §6, e.g.:
 
 Each with a one-sentence caption.
 
-- [ ] **Step 3: Appendix C — Parameter tables and reproducibility details**
+- [ ] **Step 3: Appendix C: Parameter tables and reproducibility details**
 
 Full parameter table by phase (mirrors what each notebook's parameters cell contains). Repo URL placeholder if not yet known. Python version. Pure-numpy commitment. CI pointer.
 
 - [ ] **Step 4: Re-read the abstract against the now-complete body**
 
-Open `report.tex` lines 65-69. Verify every numeric claim in the abstract matches the body (the "0.09 to 0.19", "0.07 to 0.04", "0.32 to 0.45" numbers in particular). If any number in the abstract was recalled rather than sourced, fix it now.
+Open `report.tex` lines 65-69. Verify every numeric claim in the abstract matches the body (the "0.07 to 0.19", "0.08 to 0.04", "0.28 to 0.45" numbers anchored to the zero-adoption control in particular). If any number in the abstract was recalled rather than sourced, fix it now.
 
 - [ ] **Step 5: Finalise references.bib**
 
@@ -1390,11 +1416,11 @@ This section is a glossary of source artifacts so each stage can refer back to i
 - Scalars: `phi_input`, `rolling_window`, `seeds`
 
 #### `phase_03_ar_forecast.npz`
-- `summary` (3, 5) — 3 windows × 5 stats
+- `summary` (3, 5): 3 windows × 5 stats
 - `ar_windows` (3,), `ar_order`, `eval_window`, `phi_input`, `seed`
 
 #### `phase_04_stochastic_adoption.npz`
-- `summary` (3, 8) — 3 regimes × 8 stats
+- `summary` (3, 8): 3 regimes × 8 stats
 - `regime_pi` (3,), `regime_delta` (3,), `regime_names` (3,)
 - Scalars: `phi_input`, `mu`, `risk_scale`, `q_cap`, `forecast_window`, `eval_window`, `T`, `N`, `seed`
 
@@ -1445,9 +1471,9 @@ Phase 7: phase_07_a_star_profit_vs_cost, phase_07_net_profit_vs_adoption
 | Module | LoC | Responsibility | Proposal eqs |
 |--------|-----|----------------|--------------|
 | `__init__.py` | 7 | package init |   |
-| `market.py` | 23 | aggregate demand, price update, return law | (4), (5), (6) |
-| `traders.py` | 30 | null rule, demand mapping, cap | (1), (2), (3), (8) |
-| `adoption.py` | 47 | stochastic diffusion, CE switching | (11)-(15) |
-| `forecast.py` | 75 | rolling AR(p) fit and OOS forecast | (9), (10) |
-| `metrics.py` | 144 | MSFE, OOS R^2 (realised + DA), effective phi | §4 |
-| `simulate.py` | 237 | end-to-end run | §3.6 timing |
+| `market.py` | 30 | aggregate demand, price update, return law | (4), (5), (6) |
+| `traders.py` | 30 | null rule, demand mapping, cap | (1), (2), (3), (9) |
+| `adoption.py` | 47 | stochastic diffusion, CE switching | (12)-(15) |
+| `forecast.py` | 75 | rolling AR(p) fit and OOS forecast | (10), (11) |
+| `metrics.py` | 150 | MSFE, OOS R^2 (realised + DA), effective phi | §4 |
+| `simulate.py` | 249 | end-to-end run | §3.6 timing |

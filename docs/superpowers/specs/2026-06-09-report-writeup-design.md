@@ -1,4 +1,4 @@
-# Capstone report writeup — staged plan
+# Capstone report writeup: staged plan
 
 **Author:** Jan Jacek Wejchert
 **Date:** 2026-06-09
@@ -20,6 +20,7 @@ Turn the existing skeleton `docs/Report/report.tex` into an exceptional final re
 - **Authoritative sources:**
   - The proposal v4 PDF is the contract for symbols, endpoints, and definitions. If the report and proposal disagree, the proposal wins until explicitly revised.
   - The `results/data/phase_*.npz` files and notebook cells are the contract for numbers. No quantitative claim goes into the report without a traceable source.
+  - Equation numbering follows the compiled v4 PDF: decomposition (7), profit (8), null rule (9), AR (10) and (11), diffusion (12) and (13), CE (14), logistic switch (15). The repo was reconciled to this numbering on the fable branch. Three prose cross-references in the proposal's section 5 table were fixed in the tex only, so recompile the proposal PDF before Stage 10 lifts equations.
 
 ## Strategy
 
@@ -48,20 +49,26 @@ Word budget guideline for ~22 pages mid-range:
 |----------------|------:|
 | Abstract       |   200 |
 | 1 Introduction |   800 |
-| 2 Background   |  1500 |
-| 3 Model        |  2000 |
-| 4 Metrics      |  1500 |
+| 2 Background   |  1200 |
+| 3 Model        |  1700 |
+| 4 Metrics      |  1200 |
 | 5 Implementation | 800 |
-| 6 Results      |  3500 |
-| 7 Discussion   |  1500 |
+| 6 Results      |  3000 |
+| 7 Discussion   |  1300 |
 | 8 Conclusion   |   500 |
 | References + Appendices | variable |
+
+These budgets total ~10,200 words of body text, roughly 21 to 22 pages at
+12pt single spacing, leaving room for at most about 10 figures in the main
+text before the 30-page cap binds; every other figure goes to Appendix B.
+Check the compiled page count after each section group and trim Results,
+Model, and Metrics first if it tracks above 28 pages.
 
 ## Cross-check protocol per stage (definition of done)
 
 Every subsection must pass all four checks before it is committed:
 
-1. **Numbers traced.** Every quantitative claim points to a specific `results/data/phase_NN_*.npz` field or a specific notebook cell that produced it. Use an inline LaTeX comment with the source, e.g. `% src: phase_06_a_star_grid.npz['A_star_R2_da_rel']`. No recalled numbers.
+1. **Numbers traced.** Every quantitative claim points to a specific `results/data/phase_NN_*.npz` field or a specific notebook cell that produced it. Use an inline LaTeX comment with the source, e.g. `% src: phase_06_a_star_grid.npz['a_star_R2_da']`. No recalled numbers.
 2. **Definitions match proposal v4.** Any symbol, endpoint, or term (μ, φ, A*, demand-adjusted return, etc.) is checked against `docs/proposal/reflexive_forecast_proposal_v4.pdf`. If the report and proposal disagree, the disagreement is resolved before moving on.
 3. **Figures verified.** Any `\includegraphics{...}` references a file that actually exists in `results/figures/`, and the surrounding prose accurately describes the figure (open the PNG and check, do not rely on recall).
 4. **Style pass.** No em dashes; plain English; equations render correctly in compile.
@@ -73,7 +80,7 @@ Each stage ends with: `git commit -m "report: <subsection title>"`. One stage = 
 ```
 Stage 0:  Format setup (12pt Times, 1.0 spacing, BibTeX, test compile)
 
-RESULTS (6) — write first because numbers are concrete:
+RESULTS (6): write first because numbers are concrete:
 Stage 1:  6.1 Baseline market and benchmark validation (phases 1, 2)
 Stage 2:  6.2 AR forecast performance without adoption (phase 3)
 Stage 3:  6.3 Dual-channel result under stochastic adoption (phase 4)
