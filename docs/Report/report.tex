@@ -173,6 +173,28 @@ This subsection is the control that the rest of the results lean on. Later phase
 
 \subsection{AR forecast performance without adoption (phase 3)}
 
+Phase 3 attaches the rolling AR(1) forecasting rule of section 3.4 of the proposal to the null-market design of the previous subsection, in offline mode: the forecast is estimated and scored, but no trader acts on it. A single run uses $N=200$ traders, $T=8000$ periods, $\mu=0.05$, $\sigma=0.01$, $\sigma_q=1.0$, and seed 43, with the input autoregressive coefficient raised to $\varphi=0.25$ so the rule has a clearly detectable signal to recover. % src: notebooks/phase_03_ar_forecast.ipynb parameters cell (cell 1); phase_03_ar_forecast.npz['phi_input'], ['seed']
+Each period the rule fits an AR(1) by least squares on the most recent $w \in \{50, 100, 250\}$ returns and issues a strictly out-of-sample one-step forecast $\hat{r}^{(A)}_{t+1}$, scored post hoc against realised returns by out-of-sample $R^{2}$ against a constant-mean benchmark (section 4.1 of the proposal), tracked on a trailing 1000-period window, and by full-sample mean squared forecast error (MSFE). % src: phase_03_ar_forecast.npz['ar_windows'], ['ar_order'], ['eval_window']; src/reflexive_market/metrics.py rolling_oos_r2(), msfe()
+With zero adoption the realised return and the demand-adjusted return $x_{t+1} = r_{t+1} - \mu D_t$ differ only by unpredictable null-order impact, so this subsection reports realised-return performance only; the two targets separate once adopters start trading in phase 4. % src: notebooks/phase_03_ar_forecast.ipynb title cell (cell 0), note on realised vs demand-adjusted return
+
+The rule recovers the signal it was built for. The mean rolling out-of-sample $R^{2}$ is small, positive for every window, and rising with window length: $0.013$ for $w=50$, $0.033$ for $w=100$, and $0.047$ for $w=250$. % src: phase_03_ar_forecast.npz['summary'][:, 2]
+Figure~\ref{fig:phase03-rolling-oos-r2} shows the time profile: the traces co-move because they score one path, longer windows sit almost everywhere higher, and the share of periods with positive $R^{2}$ rises with $w$. The $w=250$ trace is positive at every evaluated period (minimum $0.020$), $w=100$ in $98.5$ percent of periods, while $w=50$ dips below zero in roughly $16$ percent. % src: rolling_oos_r2 traces recomputed from notebooks/phase_03_ar_forecast.ipynb parameters cell and seed 43 (reproduces npz summary exactly); w=50 sits below both longer windows at every common period, but w=100 exceeds w=250 in 68 of 6751 common periods (6781 to 6915, max gap 0.0047), hence "almost everywhere"; results/figures/phase_03_rolling_oos_r2.png
+These levels are consistent with the return law's ceiling: an oracle knowing $\varphi$ exactly would attain a population $R^{2}$ of $\varphi^{2}=0.0625$, which the longer windows approach from below as estimation noise shrinks. % src: phase_03_ar_forecast.npz['phi_input'] = 0.25; ceiling = phi^2 follows from the return law (eq. 6 of the proposal) with iid null-order demand
+The coefficient estimates tell the same story: the rolling $\hat{\varphi}$ fluctuates around the input value, with means $0.195$, $0.217$, and $0.229$ and standard deviations $0.145$, $0.103$, and $0.063$ for $w=50$, $100$, and $250$; the mild downward gap reflects the small-sample bias of least-squares AR(1) estimation together with single-path sampling noise, and closes as the window lengthens. % src: phase_03_ar_forecast.npz['summary'][:, 3] (means); stds recomputed from the notebook parameters cell and seed 43; results/figures/phase_03_ar_coefficients.png
+Full-sample MSFE is nearly flat across windows ($1.18\times10^{-4}$ to $1.15\times10^{-4}$) and the rolling MSFE traces show no trend, as expected when no trader acts on the forecast. % src: phase_03_ar_forecast.npz['summary'][:, 1]; results/figures/phase_03_rolling_msfe.png
+Sign accuracy, a diagnostic rather than an endpoint (section 4.2 of the proposal), is $0.56$ for the two shorter windows and $0.57$ for $w=250$. % src: phase_03_ar_forecast.npz['summary'][:, 4] (0.5592, 0.5592, 0.5732)
+
+This completes the pre-adoption baseline. The previous subsection showed that the market does not drift when no one trades on a forecast; this one shows that the rolling rule recovers the linear-persistence signal at a known level, a small, stable, positive out-of-sample $R^{2}$ due entirely to the $\varphi r_t$ term.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.78\textwidth]{../../results/figures/phase_03_rolling_oos_r2.png}
+\caption{Rolling out-of-sample $R^{2}$ of the one-step AR(1) forecast against realised returns, computed on a trailing 1000-period window, for estimation windows $w=50$, $100$, and $250$ applied to the same null-market path (input $\varphi=0.25$, seed 43). The dashed line marks zero. The traces co-move because they score one path; longer windows sit almost everywhere higher (the $w=100$ and $w=250$ traces briefly cross around periods 6800 to 6900), the $w=250$ trace stays positive at every evaluated period, and the $w=50$ trace intermittently dips below zero.} % src: results/figures/phase_03_rolling_oos_r2.png; phase_03_ar_forecast.npz['eval_window'], ['phi_input'], ['seed']; sign and crossing statements recomputed from the notebook parameters cell and seed 43 (w=100 > w=250 in 68 of 6751 common periods, 6781 to 6915)
+\label{fig:phase03-rolling-oos-r2}
+\end{figure}
+
+% appendix B candidate: phase_03_ar_coefficients.png
+
 \subsection{Dual-channel result under stochastic adoption (phase 4)}
 
 \subsection{Endogenous CE-based switching (phase 5)}
