@@ -463,15 +463,8 @@ the return standard deviation averages $0.0110$ with spread $0.00012$; % src: ph
 the lag-1 autocorrelation averages $0.103$ with spread $0.012$, around the input $\varphi=0.10$; % src: phase_02_benchmark.npz['rho_per_seed'] (mean, std) vs ['phi_input']
 and the excess kurtosis averages $-0.0065$ with spread $0.071$, indistinguishable from the Gaussian value of zero. % src: phase_02_benchmark.npz['kurt_per_seed'] (mean, std); excess (Fisher) kurtosis per src/reflexive_market/metrics.py kurtosis()
 The kurtosis reading and the symmetric single-seed histogram from phase 1 support treating null-rule returns as approximately Gaussian, as expected with Gaussian news and null orders and demand averaged across many traders. % src: phase_02_benchmark.npz['kurt_per_seed']; results/figures/phase_01_return_histogram.png
-The sharpest control statistic is the rolling effective AR coefficient (Figure~\ref{fig:phase02-rolling-phi}): estimated on a 1000-period sliding window and averaged across seeds, the trace sits near the input value and stays flat, total range $0.016$ over the 4001 periods with a complete window. % src: phase_02_benchmark.npz['mean_phi_trace'] (nanmax - nanmin = 0.0156); ['rolling_window'] = 1000
+The sharpest control statistic is the rolling effective AR coefficient (Figure~\ref{fig:phase02-rolling-phi}, Appendix~\ref{app:figures}): estimated on a 1000-period sliding window and averaged across seeds, the trace sits near the input value and stays flat, total range $0.016$ over the 4001 periods with a complete window. % src: phase_02_benchmark.npz['mean_phi_trace'] (nanmax - nanmin = 0.0156); ['rolling_window'] = 1000
 This control underpins everything that follows: attributing later movements in forecast $R^{2}$ and effective AR coefficient to adoption is meaningful only because the same market without adoption shows no comparable drift over the same horizon.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.70\textwidth]{../../results/figures/phase_02_rolling_phi.png}
-\caption{Rolling lag-1 autocorrelation of returns under the null rule, on a 1000-period sliding window for each of 100 seeds (faint lines); the black line is the cross-seed mean, the dashed line the input $\varphi=0.10$. The mean trace stays flat for the full run, total range $0.016$ over the 4001 periods with a complete window: no drift in the effective AR coefficient in the absence of adoption.} % src: phase_02_benchmark.npz['mean_phi_trace'], ['rolling_window'], ['seeds']
-\label{fig:phase02-rolling-phi}
-\end{figure}
 
 \subsection{AR forecast performance without adoption (phase 3)}\label{sec:phase3-results}
 
@@ -480,20 +473,13 @@ Each period the rule fits an AR(1) on the most recent $w \in \{50, 100, 250\}$ r
 With zero adoption the realised and demand-adjusted returns differ only by unpredictable null-order impact, so this subsection reports realised-return performance only; the targets separate once adopters start trading in phase 4. % src: notebooks/phase_03_ar_forecast.ipynb title cell (cell 0), note on realised vs demand-adjusted return
 
 The rule recovers the signal it was built for: the mean rolling out-of-sample $R^{2}$ is small, positive for every window, and rising with window length, $0.013$ for $w=50$, $0.033$ for $w=100$, and $0.047$ for $w=250$. % src: phase_03_ar_forecast.npz['summary'][:, 2]
-In the time profile (Figure~\ref{fig:phase03-rolling-oos-r2}) the traces co-move because they score one path, and longer windows sit almost everywhere higher: the $w=250$ trace is positive at every evaluated period (minimum $0.020$), $w=100$ in $98.5$ percent of periods, while $w=50$ dips below zero in roughly $16$ percent. % src: rolling_oos_r2 traces recomputed from notebooks/phase_03_ar_forecast.ipynb parameters cell and seed 43 (reproduces npz summary exactly); w=50 sits below both longer windows at every common period, but w=100 exceeds w=250 in 68 of 6751 common periods (6781 to 6915, max gap 0.0047), hence "almost everywhere"; results/figures/phase_03_rolling_oos_r2.png
+In the time profile (Figure~\ref{fig:phase03-rolling-oos-r2}, Appendix~\ref{app:figures}) the traces co-move because they score one path, and longer windows sit almost everywhere higher: the $w=250$ trace is positive at every evaluated period (minimum $0.020$), $w=100$ in $98.5$ percent of periods, while $w=50$ dips below zero in roughly $16$ percent. % src: rolling_oos_r2 traces recomputed from notebooks/phase_03_ar_forecast.ipynb parameters cell and seed 43 (reproduces npz summary exactly); w=50 sits below both longer windows at every common period, but w=100 exceeds w=250 in 68 of 6751 common periods (6781 to 6915, max gap 0.0047), hence "almost everywhere"; results/figures/phase_03_rolling_oos_r2.png
 These levels are consistent with the return law's ceiling: an oracle knowing $\varphi$ exactly would attain a population $R^{2}$ of $\varphi^{2}=0.0625$, which the longer windows approach from below as estimation noise shrinks. % src: phase_03_ar_forecast.npz['phi_input'] = 0.25; ceiling = phi^2 follows from the return law (eq. 6 of the proposal) with iid null-order demand
 The coefficient estimates tell the same story (Figure~\ref{fig:phase03-ar-coefficients}, Appendix~\ref{app:figures}): the rolling $\hat{\varphi}$ fluctuates around the input value, with means $0.195$, $0.217$, $0.229$ and standard deviations $0.145$, $0.103$, $0.063$ for $w=50$, $100$, $250$; the mild downward gap reflects small-sample least-squares AR(1) bias plus single-path sampling noise, and closes as the window lengthens. % src: phase_03_ar_forecast.npz['summary'][:, 3] (means); stds recomputed from the notebook parameters cell and seed 43; results/figures/phase_03_ar_coefficients.png
 Full-sample MSFE is nearly flat across windows ($1.18\times10^{-4}$ to $1.15\times10^{-4}$) and the rolling MSFE traces show no trend, as expected when no trader acts on the forecast. % src: phase_03_ar_forecast.npz['summary'][:, 1]; results/figures/phase_03_rolling_msfe.png
 Sign accuracy, a diagnostic rather than an endpoint, is $0.56$ for the two shorter windows and $0.57$ for $w=250$. % src: phase_03_ar_forecast.npz['summary'][:, 4] (0.5592, 0.5592, 0.5732)
 
 This completes the pre-adoption baseline: a market that does not drift without forecast trading, and a rule that recovers the linear-persistence signal at a known, stable level due entirely to the $\varphi r_t$ term.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.70\textwidth]{../../results/figures/phase_03_rolling_oos_r2.png}
-\caption{Rolling out-of-sample $R^{2}$ of the one-step AR(1) forecast against realised returns, on a trailing 1000-period window, for estimation windows $w=50$, $100$, and $250$ on the same null-market path (input $\varphi=0.25$, seed 43); the dashed line marks zero. The traces co-move because they score one path; longer windows sit almost everywhere higher ($w=100$ and $w=250$ briefly cross around periods 6800 to 6900), $w=250$ stays positive at every evaluated period, and $w=50$ intermittently dips below zero.} % src: results/figures/phase_03_rolling_oos_r2.png; phase_03_ar_forecast.npz['eval_window'], ['phi_input'], ['seed']; sign and crossing statements recomputed from the notebook parameters cell and seed 43 (w=100 > w=250 in 68 of 6751 common periods, 6781 to 6915)
-\label{fig:phase03-rolling-oos-r2}
-\end{figure}
 
 \subsection{Dual-channel result under stochastic adoption (phase 4)}\label{sec:phase4-results}
 
@@ -760,9 +746,23 @@ Under diffusion the adoption share moves at an expected per-period rate of $\pi(
 
 \section{Additional figures}\label{app:figures}
 
-This appendix collects the supporting figures referenced from sections~\ref{sec:phase3-results} to~\ref{sec:phase6-results}, grouped into baseline and forecast diagnostics, adoption dynamics, and sweep robustness.
+This appendix collects the supporting figures referenced from sections~\ref{sec:phases12-results} to~\ref{sec:phase6-results}, grouped into baseline and forecast diagnostics, adoption dynamics, and sweep robustness.
 
 \subsection{Baseline and forecast diagnostics}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{../../results/figures/phase_02_rolling_phi.png}
+\caption{Rolling lag-1 autocorrelation of returns under the null rule, on a 1000-period sliding window for each of 100 seeds (faint lines); the black line is the cross-seed mean, the dashed line the input $\varphi=0.10$. The mean trace stays flat for the full run, total range $0.016$ over the 4001 periods with a complete window: no drift in the effective AR coefficient in the absence of adoption.} % src: phase_02_benchmark.npz['mean_phi_trace'], ['rolling_window'], ['seeds']
+\label{fig:phase02-rolling-phi}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{../../results/figures/phase_03_rolling_oos_r2.png}
+\caption{Rolling out-of-sample $R^{2}$ of the one-step AR(1) forecast against realised returns, on a trailing 1000-period window, for estimation windows $w=50$, $100$, and $250$ on the same null-market path (input $\varphi=0.25$, seed 43); the dashed line marks zero. The traces co-move because they score one path; longer windows sit almost everywhere higher ($w=100$ and $w=250$ briefly cross around periods 6800 to 6900), $w=250$ stays positive at every evaluated period, and $w=50$ intermittently dips below zero.} % src: results/figures/phase_03_rolling_oos_r2.png; phase_03_ar_forecast.npz['eval_window'], ['phi_input'], ['seed']; sign and crossing statements recomputed from the notebook parameters cell and seed 43 (w=100 > w=250 in 68 of 6751 common periods, 6781 to 6915)
+\label{fig:phase03-rolling-oos-r2}
+\end{figure}
 
 \begin{figure}[!htbp]
 \centering
