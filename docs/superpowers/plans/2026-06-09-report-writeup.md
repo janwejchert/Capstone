@@ -1347,11 +1347,11 @@ git commit -m "report: 8 conclusion (all three subsections)"
 
 **Word budget:** ~1500 words across the three appendices plus the abstract polish.
 
-- [ ] **Step 1: Appendix A: Model equations and derivations**
+- [x] **Step 1: Appendix A: Model equations and derivations**
 
 Re-display equations (1)-(15) from the proposal in one place, with brief connecting prose. This is for a reader who wants the full set on one page without flipping through §3-§4.
 
-- [ ] **Step 2: Appendix B: Additional figures**
+- [x] **Step 2: Appendix B: Additional figures**
 
 Include the supplementary figures not used in §6, e.g.:
 - `phase_04_adoption_share.png` (adoption trajectory plots).
@@ -1363,15 +1363,15 @@ Include the supplementary figures not used in §6, e.g.:
 
 Each with a one-sentence caption.
 
-- [ ] **Step 3: Appendix C: Parameter tables and reproducibility details**
+- [x] **Step 3: Appendix C: Parameter tables and reproducibility details**
 
 Full parameter table by phase (mirrors what each notebook's parameters cell contains). Repo URL placeholder if not yet known. Python version. Pure-numpy commitment. CI pointer.
 
-- [ ] **Step 4: Re-read the abstract against the now-complete body**
+- [x] **Step 4: Re-read the abstract against the now-complete body**
 
 Open `report.tex` lines 65-69. Verify every numeric claim in the abstract matches the body (the "0.07 to 0.19", "0.08 to 0.04", "0.28 to 0.45" numbers anchored to the zero-adoption control in particular). If any number in the abstract was recalled rather than sourced, fix it now.
 
-- [ ] **Step 5: Finalise references.bib**
+- [x] **Step 5: Finalise references.bib**
 
 Scan the report for every `\cite{}` and confirm an entry exists. Run:
 
@@ -1381,7 +1381,7 @@ cd docs/Report && bibtex report 2>&1 | grep -i "warning\|error"
 
 Resolve any "warning: I didn't find a database entry for ..." messages by adding the missing entry.
 
-- [ ] **Step 6: Full read-through compile**
+- [x] **Step 6: Full read-through compile**
 
 Run the four-command pdflatex sequence one more time, then open `report.pdf`. Read every section in order. Note any:
 - Overfull/underfull boxes (in the .log).
@@ -1391,7 +1391,7 @@ Run the four-command pdflatex sequence one more time, then open `report.pdf`. Re
 
 Fix any issues found.
 
-- [ ] **Step 7: Final commit**
+- [x] **Step 7: Final commit**
 
 ```bash
 git add docs/Report/report.tex docs/Report/references.bib docs/Report/report.pdf
