@@ -84,14 +84,29 @@ The simulator identifies a dual-channel result. As adoption rises, the rolling o
 
 \subsection{Motivation}
 
+Consider a forecasting service that publishes a one-period-ahead return forecast for a single asset. At launch nobody trades on it, and its out-of-sample accuracy measures whatever genuine structure the rule has found. Then it acquires users: subscribers trade in the direction of the published signal, their coordinated orders move the price, and the returns against which the forecast is scored begin to carry its fingerprint. When the tracked performance metrics now shift, what exactly has changed: the forecast's skill, the market, or the meaning of the measurement? % src: framing per proposal v4 section 1 (deployed forecast with users whose trading feeds back into the evaluated returns); mechanism is mu D_t per \eqref{eq:return-law}
+
+Both readings are defensible. The improvement could be real, since coordinated trading after a positive forecast pushes the realised return in the forecast's direction, so the forecast points where the price actually goes. It could equally be hollow, the independent regularity the rule was estimated to capture eroding under the very adoption that flatters the score. This report builds the smallest market in which that question can be posed, and answered, exactly. % src: the two readings are the report's two evaluation channels, sec:phase4-results; "smallest market" per the single-asset minimal design of sec:model
+
 \subsection{Relation to previous work}
+
+Three research traditions meet in this question. The first is reflexivity and its machine-learning formalisation, performative prediction: \citet{soros1987} argued that market participants' views alter the outcomes those views are about, and \citet{perdomo2020} made the deployed model's effect on its own evaluation distribution a formal object of study. The second is heterogeneous-agent finance, which supplies the market: mean-variance traders who switch between competing rules on recent performance, after \citet{brockhommes1998}, trading against a market maker who moves the price linearly in net order flow, in the disequilibrium tradition of \citet{beja1980} and \citet{farmerjoshi2002}. The third is classical out-of-sample forecast evaluation in the tradition of \citet{diebold1995}, whose machinery presumes a target that the forecast under test does not move, exactly the premise adoption breaks. The report joins the three: a performative forecast inside a heterogeneous-agent market, scored with standard out-of-sample metrics, with the divergence between evaluation targets as the central result. Section~\ref{sec:background} develops each strand. % src: positioning per proposal v4 sections 2.1 and 2.2 (literature strands); the exogenous-target premise restates sec 2.3 of this report ("the target is exogenous of the forecast"); diebold1995 entry added to references.bib per stage instructions
 
 \subsection{Research question and contribution}
 
+The research question is: how does adoption of a shared autoregressive return forecast affect its realised-return predictive performance, its demand-adjusted predictive performance, and its economic value to adopters, in a tractable single-asset agent-based market? % src: proposal v4 section 2.3 ("Core research question: How does adoption of a return-forecasting rule change realised market predictability, the independent demand-adjusted signal, and economic value in a reflexive single-asset market?")
+The two performance readings score the same forecast on the same path against two targets: the realised return, price impact included, the only number a deployed forecaster can compute, and a demand-adjusted counterfactual with contemporaneous price impact stripped out. % src: proposal v4 section 3.6 (two evaluation channels); x_{t+1} = r_{t+1} - mu D_t per \eqref{eq:decomposition}, contemporaneous impact only, not the full regression residual
+
+The contribution is a small, fully reproducible simulator that demonstrates and quantifies a dual-channel answer. At the baseline configuration, adoption lifts the realised-return out-of-sample $R^{2}$ from 0.07 under a zero-adoption control to 0.19 at near-full adoption, while the demand-adjusted reading falls from 0.08 to 0.04 and measured return persistence rises from 0.28 to 0.45 (section~\ref{sec:phase4-results}). % src: phase_04_stochastic_adoption.npz['summary'][0, 2] = 0.0695 (control realised), [2, 3] = 0.1904 (fast regime, high-adoption window, mean A = 0.994 per [2, 1]); [0, 4] = 0.0821, [2, 5] = 0.0386 (demand-adjusted); [0, 6] = 0.2821, [2, 7] = 0.4470 (effective AR coefficient)
+A 3600-run sweep then maps both channels across price impact $\mu$, input persistence $\varphi$, estimation window $w$, and AR order $p$, locating the adoption shares at which the independent signal has lost half its low-adoption baseline (section~\ref{sec:phase6-results}). % src: phase_06_a_star_grid.npz['mu_grid'] (5) x ['phi_grid'] (6) x ['w_grid'] (3) x ['forecast_p_grid'] (4) x ['num_seeds'] (10) = 3600 runs; ['r2_threshold_factor'] = 0.5 (half-baseline convention)
+Mean adopter profit grows with adoption at every transaction-cost level tested, costs setting where the growth starts to pay rather than reversing it (section~\ref{sec:phase7-results}). % src: phase_07_transaction_costs.npz['summary'] (high-adoption column exceeds low-adoption column in every cost row of c_grid = 0 to 0.01)
+
 \subsection{Report roadmap}
 
+The remainder of the report proceeds as follows. Section~\ref{sec:background} develops the theoretical background and fixes notation. Section~\ref{sec:model} specifies the market, the trader layers, the forecasting rules, the adoption mechanisms, and the realised versus demand-adjusted decomposition. Section~\ref{sec:metrics} defines the evaluation endpoints and the experimental design, and section~\ref{sec:implementation} describes the software and its phased construction. Section~\ref{sec:results} reports the results phase by phase, from the baseline market to the transaction-cost extension. Section~\ref{sec:discussion} interprets the mechanism, states its boundary conditions, and lists limitations; section~\ref{sec:conclusion} concludes. % src: section order and content per the document's own headings as compiled
 
-\section{Background and theoretical framework}
+
+\section{Background and theoretical framework}\label{sec:background}
 
 \subsection{Reflexivity and performative prediction}
 
@@ -387,7 +402,7 @@ The phase 6 sweep crosses five price-impact values, six input AR coefficients, t
 The sweep's window set differs from the design set of section~\ref{sec:model-rules}: it drops the shortest window $w = 50$ and adds $w = 500$, bracketing the default $w = 250$ from both sides. % src: phase_06_a_star_grid.npz['w_grid'] = [100, 250, 500] vs notebooks/phase_03 ar_windows = [50, 100, 250] and proposal v4 section 3.4 (w in {50, 100, 250})
 Each run uses slow stochastic diffusion ($\pi = 3 \times 10^{-4}$), released only after a 1500-period low-adoption baseline window has completed, so the threshold searches of section~\ref{sec:metrics-a-star} start from $A = 0$ against a baseline measured at zero adoption. % src: phase_06_a_star_grid.npz['adoption_pi'] = 3e-4, ['baseline_span'] = 1500; notebooks/phase_06_experiments_threshold.ipynb cell 4 (adoption_start_t_w = baseline_hi_w; "the baseline R^2/phi are measured with A = 0 across their full span")
 
-\section{Implementation}
+\section{Implementation}\label{sec:implementation}
 
 \subsection{Software architecture}\label{sec:software-architecture}
 
@@ -642,7 +657,7 @@ The null-relative endpoint is therefore implemented exactly as designed but domi
 \end{figure}
 
 
-\section{Discussion}
+\section{Discussion}\label{sec:discussion}
 
 \subsection{Interpretation of the dual-channel mechanism}\label{sec:discussion-interpretation}
 
@@ -692,7 +707,7 @@ The findings carry two kinds of boundary: scope restrictions built into the mini
 \end{itemize}
 
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 
 \subsection{Summary of findings}
 
