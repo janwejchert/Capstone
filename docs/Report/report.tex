@@ -693,7 +693,7 @@ Outside that corner the amplification weakens: the tail realised $R^{2}$ remains
 The lowest-$\varphi$ rows bound the erosion claim from below: at $\varphi\leq0.10$ the demand-adjusted baseline is near zero, leaving no signal to lose: the $\varphi=0.05$ row never crosses and the $\varphi=0.10$ row fires only at low shares. % src: phase_06_a_star_grid.npz['baseline_R2_da_grid'][0] (phi = 0.05 and 0.10 row means -0.013 and -0.003); ['a_star_R2_da'][0] (phi = 0.05 row all NaN; phi = 0.10 crossings 0.004 to 0.146); notebooks/phase_07_evaluation_extensions.ipynb summary report cell (weak-signal boundary condition)
 The boundary does not extend to the economic endpoint: adopter mean profit grows with adoption at every cost level tested (section~\ref{sec:phase7-results}), so the erosion result concerns the independent signal, not profitability in this baseline. % src: phase_07_transaction_costs.npz['summary'] (column 2 exceeds column 1 in every row); notebooks/phase_07_evaluation_extensions.ipynb summary report cell (cost-free baseline shows no economic erosion)
 
-\subsection{Limitations}
+\subsection{Limitations}\label{sec:limitations}
 
 The findings carry two kinds of boundary: scope restrictions built into the minimal design, and implementation conventions that sections~\ref{sec:phase7-results}, \ref{sec:discussion-phi}, and \ref{sec:discussion-boundary} lean on directly.
 
@@ -711,9 +711,22 @@ The findings carry two kinds of boundary: scope restrictions built into the mini
 
 \subsection{Summary of findings}
 
+The headline finding is the dual-channel result: adoption of the shared rolling AR(1) forecast lifts its realised-return out-of-sample $R^{2}$ from 0.07 under a zero-adoption control to 0.19 at near-full adoption, while on the same path its demand-adjusted $R^{2}$ falls from 0.08 to 0.04 and measured persistence rises from 0.28 to 0.45. % src: phase_04_stochastic_adoption.npz['summary'][0, 2] = 0.0695, [2, 3] = 0.1904 (realised); [0, 4] = 0.0821, [2, 5] = 0.0386 (demand-adjusted); [0, 6] = 0.2821, [2, 7] = 0.4470 (effective AR coefficient); matches the abstract and sec:phase4-results
+One coordinated order flow drives both channels, and the pattern survives endogenous switching and a 3600-run sweep over price impact, input persistence, estimation window, and AR order. % src: sec:phase5-results (matched erosion under CE switching); phase_06_a_star_grid.npz['mu_grid'] (5) x ['phi_grid'] (6) x ['w_grid'] (3) x ['forecast_p_grid'] (4) x ['num_seeds'] (10) = 3600 runs per sec:phase6-results
+Economically, adoption amplifies rather than erodes adopter profit: the mean grows with adoption at every transaction-cost level tested, costs setting only the share at which the growth starts to pay (0.35 and 0.72 at $c=0.003$ and $0.004$). % src: phase_07_transaction_costs.npz['summary'] (high-adoption column exceeds low-adoption column in every cost row); ['a_star_profit_abs'] = (nan, nan, nan, 0.35, 0.717, nan, nan, nan), per sec:phase7-results
+The null-relative comparison is dominated by position-size asymmetry and carries no clean forecast-content reading. % src: sec:phase7-results (asymmetry between the null position E|q0| = 0.798 and the adopter cap 0.05); phase_07_transaction_costs.npz['null_mean_abs'] / ['q_cap'] = 15.96; null own-impact profit mu sigma_q^2 / N = 2.5e-4
+The realised-return channel itself never erodes systematically: its threshold fires in only 28 of 90 AR(1) cells, all weak-signal noise crossings at near-zero baselines. % src: phase_06_a_star_grid.npz['a_star_R2_realised'][0] (28 of 90 finite); noise-crossing reading per sec:discussion-boundary (median baseline 0.014 at the hit cells, 26 of 28 at phi <= 0.20)
+
 \subsection{Implications for forecasting under adoption}
 
+The practical lesson is about measurement. Realised-return $R^{2}$, the only score a deployed forecaster can compute, over-reports the forecast once it has users with price impact: it conflates the stable signal the rule was estimated to capture with the price impact of the rule's own adopters, and here it improves exactly while the independent content erodes. % src: restates sec:discussion-interpretation (realised reading conflates phi r_t persistence with the mu D_t channel); sec:phase4-results (realised rises while demand-adjusted falls on the same path)
+The demand-adjusted $R^{2}$ is the cleaner signal of whether the underlying forecasting hypothesis still holds, since it scores the forecast against a target with contemporaneous price impact removed; computing it requires the period's aggregate order flow and the impact coefficient, exactly what an external evaluator typically lacks. % src: x_{t+1} = r_{t+1} - mu D_t per \eqref{eq:decomposition} (counterfactual stripping contemporaneous impact only, not the full regression residual); inputs D_t and mu per sec:discussion-interpretation
+Where adoption is plausible, both readings should therefore be reported together: their gap measures the deployment-driven component of measured accuracy, the quantity the realised number silently absorbs. % src: dual reporting per sec:model-decomposition (both readings reported on the same path); gap-as-deployment-component framing per sec:discussion-interpretation
+
 \subsection{Directions for future work}
+
+Each direction for future work relaxes a limitation of section~\ref{sec:limitations}. Non-linear price impact, such as a square-root law, would test the mechanism against realistic impact concavity, and a heterogeneous ecology of trend followers and contrarians would set other strategies against the coordinated adopters. % src: sec:limitations items 1 and 3 (square-root impact untested; heterogeneous ecology an unimplemented extension per CLAUDE.md)
+Machine-learning forecasters and multi-asset extensions would ask whether richer rules and cross-asset demand reproduce, dampen, or redirect the same two channels. % src: sec:limitations items 1 and 2 (single-asset scope; ML and non-parametric forecasters excluded by design)
 
 
 \bibliography{references}
