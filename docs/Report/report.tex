@@ -309,8 +309,39 @@ The relative qualifier marks an operational analogue, not a redefinition. The pr
 The relative thresholds make erosion detectable in that regime and were fixed before the sweep was run: a fall to half the metric's own low-adoption baseline on the two $R^{2}$ targets, a rise to 1.5 times baseline on the effective coefficient, each defined only where that baseline is positive, and each carrying the rel subscript so it is never mistaken for a zero-crossing reading. % src: proposal v4 section 4.3 bullet 2 ("pre-registered relative threshold", reworded per the internal-only rule; "labelled A*_{R2,da,rel} to keep it distinct from the zero-crossing definition"); phase_06_a_star_grid.npz['r2_threshold_factor'] = 0.5, ['phi_threshold_factor'] = 1.5; notebooks/phase_06_experiments_threshold.ipynb cells 0 and 3 (a_star NaN when the baseline is not positive)
 The economic target runs the other way: transaction costs hand net profit a genuine zero to cross, so section~\ref{sec:phase7-results} reads both profit conventions against zero directly and no relative version is needed. % src: notebooks/phase_06_experiments_threshold.ipynb cell 0 ("Once transaction costs land in phase 7 the absolute zero-crossing definition becomes operational on the economic endpoint A*_{profit} and we report that one against zero, not as a relative threshold")
 
-\subsection{Simulation protocol, seed handling, and parameter grid}
+\subsection{Simulation protocol, seed handling, and parameter grid}\label{sec:metrics-protocol}
 
+Every experiment in section~\ref{sec:results} is a set of end-to-end simulator runs with all parameters fixed in code in the owning notebook. Table~\ref{tab:parameters} collects the headline parameters: the default column gives the configuration shared by the adoption phases (4 to 7, with the exceptions the caption lists), and the range column the values crossed by the phase 6 sweep or, for the adoption rate, by the phase 4 regime comparison. % src: parameters cells of notebooks/phase_01..07 (CLAUDE.md notebook conventions); "in code", not "in the parameters cell", because phase_04 cell 21 sets the MC band seeds (mc_base_seed=1000, num_seeds_mc=100) outside the parameters cell and after the first simulate.run call in cell 3
+
+\begin{table}[h]
+\centering
+\caption{Headline simulation parameters. Defaults are the values shared by the adoption phases (4 to 7). The pre-adoption control phases differ in three places: phases 1 and 2 use $T = 5000$ and input $\varphi = 0.10$, phase 2 uses $N = 128$, and phase 3 fits windows $w \in \{50, 100, 250\}$ offline. Phase 4's saturation diagnostic extends fast-diffusion runs to $T = 30000$, and phase 5's stochastic comparator runs the fast rate $\pi = 10^{-3}$. The two shock scales are held fixed throughout, news at $\sigma = 0.01$ and null orders at $\sigma_q = 1.0$.} % src: notebooks/phase_01 (N=200, T=5000, phi=0.10), phase_02 (N=128, T=5000, phi=0.10), phase_03 (ar_windows=[50,100,250]), phase_04 (T_long=30000), phase_05 (stochastic_pi=1e-3; the other regime is CE switching with no pi) parameters cells; sigma_news = 0.01 and sigma_q = 1.0 in every notebooks/phase_01..07 parameters cell
+\label{tab:parameters}
+\begin{tabular}{@{}l c l l@{}}
+\toprule
+Parameter & Symbol & Default & Range tested \\
+\midrule
+Trader count & $N$ & 200 & held at default \\ % src: N=200 in notebooks/phase_01, 03-07 parameters cells; phase_06_a_star_grid.npz['N'] = 200
+Periods & $T$ & 8000 & held at default \\ % src: T=8000 in notebooks/phase_03..07 parameters cells; phase_06_a_star_grid.npz['T'] = 8000
+Price impact & $\mu$ & 0.05 & $\{0.025, 0.05, 0.075, 0.10, 0.15\}$ \\ % src: mu=0.05 in notebooks/phase_01..05, 07 parameters cells; phase_06_a_star_grid.npz['mu_grid']
+AR coefficient (input) & $\varphi$ & 0.25 & $\{0.05, 0.10, 0.15, 0.20, 0.25, 0.30\}$ \\ % src: phi=0.25 in notebooks/phase_03..05, 07 parameters cells; phase_06_a_star_grid.npz['phi_grid']
+Forecast window & $w$ & 250 & $\{100, 250, 500\}$ \\ % src: forecast_window=250 in notebooks/phase_04, 05, 07 parameters cells; phase_06_a_star_grid.npz['w_grid']
+Forecast order & $p$ & 1 & $\{1, 2, 5, 10\}$ \\ % src: forecast_p=1 in notebooks/phase_04, 05, 07 parameters cells; phase_06_a_star_grid.npz['forecast_p_grid']
+Adoption rate (stochastic) & $\pi$ & $3 \times 10^{-4}$ & $\{0, 3 \times 10^{-4}, 10^{-3}\}$ \\ % src: phase_04 regimes pi in {0, 3e-4, 1e-3}; phase_05 stochastic_pi=1e-3; adoption_pi=3e-4 in notebooks/phase_06, 07 parameters cells and phase_06_a_star_grid.npz['adoption_pi']
+Risk scale & $a\sigma^{2}$ & 0.001 & held at default \\ % src: risk_scale=0.001 in notebooks/phase_04..07 parameters cells; phase_06_a_star_grid.npz['risk_scale']
+Position cap & $\bar{q}$ & 0.05 & held at default \\ % src: q_cap=0.05 in notebooks/phase_04..07 parameters cells; phase_06_a_star_grid.npz['q_cap']
+\bottomrule
+\end{tabular}
+\end{table}
+
+Seed handling has three levels. Single-path runs fix one master seed: 42 for phase 1, 43 for phase 3, 71 for phases 4 and 5. % src: notebooks/phase_01 (seed=42), phase_03 (seed=43), phase_04 and phase_05 (seed=71) parameters cells
+Regimes meant to be compared share that seed: phases 4 and 5 re-instantiate the generator from seed 71 for each adoption regime, and the dedicated adoption generator of section~\ref{sec:model-adoption} keeps the market shock stream identical across them, so any cross-regime difference is attributable to adopter behaviour (paired shocks). % src: notebooks/phase_04 parameters cell ("Seed shared by all regimes so demand and news shocks are paired across them") and run cell (rng = np.random.default_rng(seed) per regime); phase_05 parameters cell (same wording for both regimes); src/reflexive_market/simulate.py adoption_rng spawn comment ("across-regime comparisons stay paired on the same shocks")
+Monte Carlo exercises derive per-run seeds deterministically from a notebook-level base seed: 100 seeds from base 0 in phase 2, 100 from 1000 and 50 from 5000 for phase 4's band and saturation figures, 10 per grid cell from 2000 in phase 6, and 50 from 4000 in phase 7. % src: notebooks/phase_02 (base_seed=0, num_seeds=100), phase_04 cell 21 (mc_base_seed=1000, num_seeds_mc=100) and parameters cell (mc_saturation_base_seed=5000, n_seeds_mc_saturation=50), phase_06 (base_seed=2000, num_seeds_phase6=10), phase_07 (base_seed=4000, num_seeds_phase7=50)
+The pairing extends into the sweeps. Phase 6's per-run seed is offset by the window index and the $(\varphi, \mu)$ cell but deliberately not by the AR order, so all four orders $p$ run on identical shock streams; phase 7 applies its eight cost levels to the same 50 simulated paths, costs entering the profit accounting only. % src: notebooks/phase_06_experiments_threshold.ipynb cell 4 (seed_s = base_seed + 100000*k + 1000*(i*n_mu + j) + s; "deliberately omits the AR-order index ip"); notebooks/phase_07_evaluation_extensions.ipynb cells 4-5 (50 run_seed calls, c_grid applied to the pooled paths after the fact)
+
+The phase 6 sweep crosses five price-impact values, six input AR coefficients, three windows, and four AR orders: 360 cells at 10 seeds per cell, 3600 simulator runs. % src: notebooks/phase_06_experiments_threshold.ipynb parameters cell ("4 x 3 x 6 x 5 x 10 = 3600 runs") and run-cell print (no cells skipped, since every w exceeds every p); phase_06_a_star_grid.npz['mu_grid'] (5), ['phi_grid'] (6), ['w_grid'] (3), ['forecast_p_grid'] (4), ['num_seeds'] = 10
+The sweep's window set differs from the design set of section~\ref{sec:model-rules}: it drops the shortest window $w = 50$ and adds $w = 500$, bracketing the default $w = 250$ from both sides. % src: phase_06_a_star_grid.npz['w_grid'] = [100, 250, 500] vs notebooks/phase_03 ar_windows = [50, 100, 250] and proposal v4 section 3.4 (w in {50, 100, 250})
+Each run uses slow stochastic diffusion ($\pi = 3 \times 10^{-4}$), released only after a 1500-period low-adoption baseline window has completed, so the threshold searches of section~\ref{sec:metrics-a-star} start from $A = 0$ against a baseline measured at zero adoption. % src: phase_06_a_star_grid.npz['adoption_pi'] = 3e-4, ['baseline_span'] = 1500; notebooks/phase_06_experiments_threshold.ipynb cell 4 (adoption_start_t_w = baseline_hi_w; "the baseline R^2/phi are measured with A = 0 across their full span")
 
 \section{Implementation}
 
@@ -373,7 +404,7 @@ These conventions are enforced, not aspirational. The repository ships a 43-test
 A single GitHub Actions workflow runs this suite on every push and pull request: it installs the dependencies and the package on Python 3.11 and runs \texttt{pytest -q}, so every push is checked against the full suite. % src: .github/workflows/ci.yml (on: [push, pull_request]; python-version "3.11"; pip install -r requirements.txt; pip install -e .; pytest -q)
 
 
-\section{Results}
+\section{Results}\label{sec:results}
 
 \subsection{Baseline market and benchmark validation (phases 1 and 2)}\label{sec:phases12-results}
 
