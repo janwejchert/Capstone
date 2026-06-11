@@ -1111,20 +1111,20 @@ git commit -m "report: 4.5 simulation protocol, seeds, parameter grid"
 
 **Word budget:** ~500 words. No new figures; reference figures from §6.3 and §6.5.
 
-- [ ] **Step 1: Re-read §6.3 and the proposal's section 4.5 (if it discusses interpretation)**
+- [x] **Step 1: Re-read §6.3 and the proposal's section 4.5 (if it discusses interpretation)**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Three paragraphs:
   1. Re-state the dual-channel finding in interpretive language (not as a result). Adoption is self-fulfilling for the realised-return target but degrading for the demand-adjusted target.
   2. Why this matters for deployed forecasters: realised R^2 over-reports the "true" forecasting signal under adoption because it conflates the signal-the-forecast-was-trained-on with the price-impact channel created by the forecast's own users.
   3. Why this matters for theory: classical performative-prediction results often assume the forecaster can decompose performance into stable and adoption-driven parts. The dual-channel result quantifies that decomposition in a market with price impact.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1139,17 +1139,17 @@ git commit -m "report: 7.1 interpretation of the dual-channel mechanism"
 
 **Word budget:** ~350 words.
 
-- [ ] **Step 1: Re-read §6.3 and §4.3**
+- [x] **Step 1: Re-read §6.3 and §4.3**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Trace the mechanism in plain English: the AR forecast at time t uses `r_t` as a predictor. Adopters take positions proportional to that forecast, so the aggregate adopter demand at time t is proportional to `r_t`. Price impact `mu D_t` then pushes `r_{t+1}` in the direction of `r_t`, which is exactly an increase in the lag-1 autocorrelation, i.e. effective phi. The relationship is mechanical.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1164,19 +1164,19 @@ git commit -m "report: 7.2 why effective AR coefficient rises with adoption"
 
 **Word budget:** ~400 words.
 
-- [ ] **Step 1: Re-read §6.5 paragraph 4 (the realised non-result)**
+- [x] **Step 1: Re-read §6.5 paragraph 4 (the realised non-result)**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Two paragraphs:
   1. The realised-R^2 channel does not systematically erode under adoption in the regimes tested. Across the (mu, phi) sweep, `A*_{R2,realised}` is reached in only ~26% of cells and the hits cluster at very low A in the weak-signal corner of the grid. These are noise crossings: when baseline realised R^2 is already near zero, the half-baseline threshold sits at zero and rolling noise can satisfy it spuriously.
   2. The boundary conditions: the demand-adjusted erosion claim holds across the bulk of the grid; the realised-channel amplification claim holds in the high-mu, high-phi corner where the dual-channel pattern is most visible; outside that corner the realised channel is essentially flat or noisy.
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1191,7 +1191,7 @@ git commit -m "report: 7.3 boundary conditions and realised-channel non-result"
 
 **Word budget:** ~250 words.
 
-- [ ] **Step 1: Draft a short bulleted list of limitations**
+- [x] **Step 1: Draft a short bulleted list of limitations**
 
 Four-to-six bullets. Examples:
 - Single-asset market only; cross-asset and portfolio effects are out of scope.
@@ -1205,11 +1205,11 @@ Four-to-six bullets. Examples:
 - With the baseline risk_scale and q_cap the position cap binds almost every period, so adopters are effectively fixed-size sign traders.
 - The CE switching risk aversion (switching_a = 1) is set independently of the demand layer's implied risk aversion (~7 at the realised return variance).
 
-- [ ] **Step 2: Compile and check rendering**
+- [x] **Step 2: Compile and check rendering**
 
-- [ ] **Step 3: Cross-check protocol** (all four checks)
+- [x] **Step 3: Cross-check protocol** (all four checks)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add docs/Report/report.tex
