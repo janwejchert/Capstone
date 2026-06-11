@@ -990,17 +990,17 @@ git commit -m "report: 4.2 primary economic endpoint"
 
 **Source artifacts:** Proposal v4 section 4.2.
 
-- [ ] **Step 1: Read proposal section 4.2**
+- [x] **Step 1: Read proposal section 4.2**
 
-- [ ] **Step 2: Draft prose**
+- [x] **Step 2: Draft prose**
 
 Effective phi is a rolling AR(1) coefficient on realised returns, fit independently of the forecast. Under adoption it should rise above the input `phi` because adopter demand pushes realised returns in the forecast direction (the same mechanism behind the realised-R^2 climb in §6.3).
 
-- [ ] **Step 3: Compile and check rendering**
+- [x] **Step 3: Compile and check rendering**
 
-- [ ] **Step 4: Cross-check protocol** (all four checks)
+- [x] **Step 4: Cross-check protocol** (all four checks)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1017,9 +1017,9 @@ git commit -m "report: 4.3 effective AR coefficient diagnostic"
 
 **Source artifacts:** Proposal v4 section 4.3.
 
-- [ ] **Step 1: Read proposal section 4.3**
+- [x] **Step 1: Read proposal section 4.3**
 
-- [ ] **Step 2: Build the A* definition table**
+- [x] **Step 2: Build the A* definition table**
 
 | Symbol | Target | Definition |
 |--------|--------|------------|
@@ -1031,15 +1031,15 @@ git commit -m "report: 4.3 effective AR coefficient diagnostic"
 | `A*_{profit,rel}` | adopter profit | smallest A where adopter net profit exceeds the null benchmark (null gross P&L minus its own cost) |
 | `A*_{vol}` | (optional) | smallest A where realised vol crosses a threshold |
 
-- [ ] **Step 3: Draft prose around the table**
+- [x] **Step 3: Draft prose around the table**
 
 Two paragraphs: motivation for "target-specific" thresholds (different targets, different stories); a note on the "relative" qualifier (pre-registered when the absolute zero-crossing never occurs in the cost-free baseline).
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1058,7 +1058,7 @@ git commit -m "report: 4.4 target-specific critical adoption shares"
 - Notebook parameter cells across all 7 phases.
 - `results/data/phase_06_a_star_grid.npz` for grid sizes (`mu_grid`, `phi_grid`, `w_grid`, `forecast_p_grid`).
 
-- [ ] **Step 1: Collect default parameter values from each notebook**
+- [x] **Step 1: Collect default parameter values from each notebook**
 
 ```bash
 for nb in notebooks/phase_*.ipynb; do
@@ -1072,7 +1072,7 @@ for cell in data['cells'][:5]:
 done
 ```
 
-- [ ] **Step 2: Draft a parameter table**
+- [x] **Step 2: Draft a parameter table**
 
 | Parameter | Symbol | Default | Range tested |
 |-----------|--------|---------|--------------|
@@ -1086,15 +1086,15 @@ done
 | Risk scale | a | [value] | [single] |
 | Demand cap | q_cap | [value] | [single] |
 
-- [ ] **Step 3: Draft prose around the table**
+- [x] **Step 3: Draft prose around the table**
 
 One paragraph on seed handling (one master seed per phase, derivative seeds per Monte Carlo run, paired shocks across regimes where applicable). One paragraph on the parameter grid for the sweep.
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
