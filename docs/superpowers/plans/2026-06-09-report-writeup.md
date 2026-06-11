@@ -1226,11 +1226,11 @@ git commit -m "report: 7.4 limitations"
 
 **Word budget:** ~1500 words total across four subsections.
 
-- [ ] **Step 1: Draft §2.1 Reflexivity and performative prediction (~400 words)**
+- [x] **Step 1: Draft §2.1 Reflexivity and performative prediction (~400 words)**
 
 Cite Soros' reflexivity concept; cite the performative-prediction literature (Perdomo et al. 2020 if available, or the equivalent foundational paper). Frame: when forecasts move the market they describe, evaluating them with off-shelf metrics no longer measures only forecast skill.
 
-- [ ] **Step 2: Add Soros and Perdomo et al. BibTeX entries**
+- [x] **Step 2: Add Soros and Perdomo et al. BibTeX entries**
 
 ```bibtex
 @book{soros1987,
@@ -1248,23 +1248,23 @@ Cite Soros' reflexivity concept; cite the performative-prediction literature (Pe
 }
 ```
 
-- [ ] **Step 3: Draft §2.2 Heterogeneous-agent finance and price formation (~400 words)**
+- [x] **Step 3: Draft §2.2 Heterogeneous-agent finance and price formation (~400 words)**
 
 Cite Brock-Hommes (already in bib), Beja-Goldman (already in bib), Farmer-Joshi (already in bib). One paragraph on mean-variance demand with CARA, one on market-maker price impact.
 
-- [ ] **Step 4: Draft §2.3 Forecast evaluation under self-fulfilment (~350 words)**
+- [x] **Step 4: Draft §2.3 Forecast evaluation under self-fulfilment (~350 words)**
 
 The OOS R^2 / MSFE tradition assumes the target is exogenous of the forecast. State the issue: under adoption the target inherits the forecast, so the standard metric mixes channels. Position the report's contribution as: explicit decomposition into realised and demand-adjusted targets on the same path.
 
-- [ ] **Step 5: Draft §2.4 Key concepts and notation (~350 words)**
+- [x] **Step 5: Draft §2.4 Key concepts and notation (~350 words)**
 
 A small notation table: `r_t`, `D_t`, `mu`, `phi`, `pi`, `A`, `A*`, `x_{t+1}`, `w`, `p`. Plus a one-paragraph glossary of "adoption share", "realised return", "demand-adjusted return", "effective AR coefficient".
 
-- [ ] **Step 6: Compile and check rendering**
+- [x] **Step 6: Compile and check rendering**
 
-- [ ] **Step 7: Cross-check protocol** (all four checks)
+- [x] **Step 7: Cross-check protocol** (all four checks)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add docs/Report/report.tex docs/Report/references.bib
@@ -1279,27 +1279,27 @@ git commit -m "report: 2 background (all four subsections)"
 
 **Word budget:** ~800 words total across four subsections.
 
-- [ ] **Step 1: Draft §1.1 Motivation (~200 words)**
+- [x] **Step 1: Draft §1.1 Motivation (~200 words)**
 
 Lead with the practical scenario: a forecasting service is deployed; users start trading on its signal; performance metrics change. Pose the question: is the change a measurement artefact or a real shift in the underlying signal?
 
-- [ ] **Step 2: Draft §1.2 Relation to previous work (~250 words)**
+- [x] **Step 2: Draft §1.2 Relation to previous work (~250 words)**
 
 Position against three traditions: (a) reflexivity / performative prediction (Soros, Perdomo et al.), (b) heterogeneous-agent finance (Brock-Hommes, Beja-Goldman, Farmer-Joshi), (c) classical forecast evaluation (Diebold-Mariano-style OOS testing).
 
-- [ ] **Step 3: Draft §1.3 Research question and contribution (~250 words)**
+- [x] **Step 3: Draft §1.3 Research question and contribution (~250 words)**
 
 State the question: how does adoption of a shared autoregressive forecast affect realised vs demand-adjusted predictive performance and economic value, in a tractable single-asset agent-based market? State the contribution: a clean simulator demonstrating the dual-channel result and quantifying it across (mu, phi, w, p).
 
-- [ ] **Step 4: Draft §1.4 Report roadmap (~100 words)**
+- [x] **Step 4: Draft §1.4 Report roadmap (~100 words)**
 
 One paragraph signposting sections 2-8.
 
-- [ ] **Step 5: Compile and check rendering**
+- [x] **Step 5: Compile and check rendering**
 
-- [ ] **Step 6: Cross-check protocol** (all four checks)
+- [x] **Step 6: Cross-check protocol** (all four checks)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add docs/Report/report.tex
@@ -1314,23 +1314,23 @@ git commit -m "report: 1 introduction (all four subsections)"
 
 **Word budget:** ~500 words total.
 
-- [ ] **Step 1: Draft §8.1 Summary of findings (~200 words)**
+- [x] **Step 1: Draft §8.1 Summary of findings (~200 words)**
 
 Two sentences on the dual-channel result. Two sentences on the economic-endpoint finding. One sentence on the realised-channel non-result.
 
-- [ ] **Step 2: Draft §8.2 Implications for forecasting under adoption (~200 words)**
+- [x] **Step 2: Draft §8.2 Implications for forecasting under adoption (~200 words)**
 
 State the practical takeaway: realised R^2 over-reports under adoption; demand-adjusted R^2 is the cleaner signal for measuring whether the underlying forecasting hypothesis still holds; both should be reported when adoption is plausible.
 
-- [ ] **Step 3: Draft §8.3 Directions for future work (~100 words)**
+- [x] **Step 3: Draft §8.3 Directions for future work (~100 words)**
 
 Two-to-three sentences. Examples: non-linear price impact, heterogeneous trader ecology, ML forecasters, multi-asset extensions.
 
-- [ ] **Step 4: Compile and check rendering**
+- [x] **Step 4: Compile and check rendering**
 
-- [ ] **Step 5: Cross-check protocol** (all four checks)
+- [x] **Step 5: Cross-check protocol** (all four checks)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add docs/Report/report.tex
