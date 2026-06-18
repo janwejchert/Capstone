@@ -7,18 +7,20 @@ Everything below exists to make that proposal implementable in clean stages.
 ## What we are building
 
 A single-asset agent-based market that studies how adoption of a shared
-autoregressive forecast affects three distinct quantities: realised-return
-predictive performance (the metric a deployed forecaster sees), independent
-demand-adjusted signal (counterfactual stripping out contemporaneous price
-impact), and net trading value relative to a null benchmark. The proposal
-anticipates and the implemented simulator confirms a **dual-channel result**:
-adoption *raises* realised-return R^2 (self-fulfilling channel) while *lowering*
-demand-adjusted R^2 (demand-adjusted-erosion channel) on the same path, and
-mean adopter profit grows with adoption in the cost-free baseline. The
-null-relative economic endpoint is confounded by position-size asymmetry
-(the null rule trades ~sigma_q while adopters are capped at q_cap, so the
-null books larger own-impact paper profit at c = 0 and a larger cost bill
-at c > 0); phase 7 reports it with that caveat.
+autoregressive forecast affects two distinct quantities: realised-return
+predictive performance (the metric a deployed forecaster sees) and the
+independent demand-adjusted signal (a counterfactual stripping out
+contemporaneous price impact). The proposal anticipates and the implemented
+simulator confirms a **dual-channel result**: adoption *raises* realised-return
+R^2 (self-fulfilling channel) while *lowering* demand-adjusted R^2
+(demand-adjusted-erosion channel) on the same path. A third quantity, net
+trading value relative to a null benchmark (the economic endpoint), was an
+intended extension: the transaction-cost and profit analysis was attempted but
+not fully conducted and is left for future work. It was hampered by a
+position-size asymmetry (the null rule trades ~sigma_q while adopters are capped
+at q_cap, so the null books larger own-impact paper profit at c = 0 and a larger
+cost bill at c > 0) that a faithful economic reading must first neutralise; the
+phase 7 notebook holds the preliminary attempt.
 
 The market combines two well-known building blocks from the heterogeneous-agent
 literature. Trader demand is mean-variance with constant absolute risk aversion,
@@ -28,8 +30,8 @@ and Joshi (2002). The compact summary statistics are the target-specific
 critical adoption shares from section 4.3 of the proposal:
 `A*_{R2,realised}` (mostly not reached; the finite hits are weak-signal noise
 crossings rather than systematic erosion), `A*_{R2,da}` (demand-adjusted erosion of the independent signal),
-`A*_{profit}` (economic endpoint), and the optional `A*_{vol}` (volatility
-threshold). In the cost-free baseline `A*_{R2,da}` never reaches an absolute
+and the optional `A*_{vol}` (volatility threshold). The economic threshold
+`A*_{profit}` belongs to the deferred transaction-cost extension (future work). In the cost-free baseline `A*_{R2,da}` never reaches an absolute
 zero crossing, so phase 6 reports a pre-registered relative analogue
 `A*_{R2,da,rel}` (half the low-adoption baseline) plus the analogous
 `A*_{phi,rel}` on the effective AR coefficient diagnostic. Note that the
@@ -145,22 +147,24 @@ itself is roughly flat in mu because the relative threshold scales with the
 baseline), and the by-p robustness grids demonstrate the mechanism is not
 specific to AR(1).
 
-### Phase 7: evaluation and one extension
-Summarises primary findings under the dual-channel framing, reports the
-diagnostics in section 4.2 of the proposal, and adds the transaction-cost
-extension from section 3.7. Holds AR order at p = 1 to remain on the proposal's
-baseline rule. Reports two views of `A*_{profit}`: an absolute view (smallest
-A at which adopter net profit crosses zero; in this regime a from-below
-profitability onset, the reverse of the proposal's from-above erosion
-reading) and the null-relative view that is the proposal's primary economic
-endpoint (read it with the null self-impact and position-size caveats stated
-in the notebook). A second optional extension is
-heterogeneous trader ecology (trend followers and contrarians replacing the
-random null), if time allows.
+### Phase 7: evaluation and attempted extension
+Summarises primary findings under the dual-channel framing and reports the
+diagnostics in section 4.2 of the proposal. The transaction-cost extension from
+section 3.7 (proportional cost `c`, adopter net trading value against the null
+benchmark, and the economic threshold `A*_{profit}`, holding AR order at p = 1)
+was attempted here but not fully conducted: the null-relative comparison is
+confounded by the position-size asymmetry between the uncapped null rule
+(~sigma_q) and the capped adopter rule (q_cap), which a faithful economic
+reading must first neutralise. The cost and profit analysis is therefore left
+for future work rather than reported as a settled result, and the report keeps
+it in its future-work section only. A second optional extension, heterogeneous
+trader ecology (trend followers and contrarians replacing the random null), is
+likewise left for future work.
 
-Notebook: `notebooks/phase_07_evaluation_extensions.ipynb`
+Notebook: `notebooks/phase_07_evaluation_extensions.ipynb` (preliminary; the
+economic endpoint is deferred to future work)
 Done when: the report cell at the top of the notebook clearly states which
-findings are core, which are robustness, and what the boundary conditions of
+findings are core and which are deferred, and what the boundary conditions of
 the dual-channel mechanism are.
 
 ## Notebook conventions
