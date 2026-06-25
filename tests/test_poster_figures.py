@@ -17,6 +17,15 @@ def test_summary_row_reproduces_npz_fast_and_control():
     np.testing.assert_allclose(row2, summ[2], atol=1e-6)
 
 
+def test_saturation_plateau_levels():
+    # cheap check on the plateau using a few seeds and the post-ramp tail
+    import numpy as np
+    out, P = figures.run_regime(1e-3, seed=figures.SAT_BASE_SEED, T=figures.T_LONG)
+    tail = slice(10000, figures.T_LONG)
+    assert 0.13 < float(np.nanmean(out["r2_realised"][tail])) < 0.21
+    assert -0.01 < float(np.nanmean(out["r2_da"][tail])) < 0.06
+
+
 def test_dual_channel_svg_written(tmp_path, monkeypatch):
     figures.set_style()
     # speed: tiny MC by monkeypatching the seed count

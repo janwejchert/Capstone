@@ -181,6 +181,57 @@ def make_dual_channel(recompute=False):
     plt.close(fig)
 
 
+N_SEEDS_SAT = 50
+SAT_BASE_SEED = 5000
+T_LONG = 30000
+
+
+def compute_saturation(recompute=False):
+    cache = os.path.join(CACHE, "phase4_saturation.npz")
+    if os.path.exists(cache) and not recompute:
+        d = np.load(cache)
+        return d["t"], d["mr"], d["sr"], d["mx"], d["sx"], d["mA"]
+    rr = np.full((N_SEEDS_SAT, T_LONG), np.nan)
+    xx = np.full((N_SEEDS_SAT, T_LONG), np.nan)
+    AA = np.full((N_SEEDS_SAT, T_LONG), np.nan)
+    for s in range(N_SEEDS_SAT):
+        out, P = run_regime(1e-3, seed=SAT_BASE_SEED + s, T=T_LONG)
+        rr[s] = out["r2_realised"]
+        xx[s] = out["r2_da"]
+        AA[s] = out["adoption_share"]
+    t = np.arange(T_LONG)
+    mr, sr = np.nanmean(rr, axis=0), np.nanstd(rr, axis=0)
+    mx, sx = np.nanmean(xx, axis=0), np.nanstd(xx, axis=0)
+    mA = np.nanmean(AA, axis=0)
+    os.makedirs(CACHE, exist_ok=True)
+    np.savez(cache, t=t, mr=mr, sr=sr, mx=mx, sx=sx, mA=mA)
+    return t, mr, sr, mx, sx, mA
+
+
+def make_saturation(recompute=False):
+    t, mr, sr, mx, sx, mA = compute_saturation(recompute)
+    kr = np.isfinite(mr)
+    kx = np.isfinite(mx)
+    fig, ax = plt.subplots(figsize=(9.5, 5.2))
+    ax.plot(t[kr], mr[kr], color=BLUE, linewidth=2.6, label="realised $R^2$")
+    ax.fill_between(t[kr], mr[kr] - sr[kr], mr[kr] + sr[kr], color=BLUE, alpha=0.15)
+    ax.plot(t[kx], mx[kx], color=RED, linewidth=2.6, label="demand-adjusted $R^2$")
+    ax.fill_between(t[kx], mx[kx] - sx[kx], mx[kx] + sx[kx], color=RED, alpha=0.15)
+    ax.axhline(0.0, color=MUTE, linewidth=1.0)
+    ax.set_xlabel("Time period")
+    ax.set_ylabel("Rolling out-of-sample $R^2$")
+    ax.legend(loc="center right")
+    ax2 = ax.twinx()
+    ax2.plot(t, mA, color=MUTE, linewidth=1.4, linestyle="--", alpha=0.8)
+    ax2.set_ylabel("Adoption share", color=MUTE)
+    ax2.set_ylim(-0.02, 1.02)
+    ax2.tick_params(axis="y", colors=MUTE)
+    ax2.grid(False)
+    fig.tight_layout()
+    fig.savefig(os.path.join(ASSETS, "fig_saturation.svg"))
+    plt.close(fig)
+
+
 def write_values():
     """Headline numbers for the template, read from the saved npz so the poster
     text matches the report exactly."""
@@ -207,8 +258,9 @@ def main():
     args = ap.parse_args()
     set_style()
     make_dual_channel(args.recompute)
+    make_saturation(args.recompute)
     write_values()
-    print("wrote fig_dual_channel.svg and figure_values.json")
+    print("wrote fig_dual_channel.svg, fig_saturation.svg and figure_values.json")
 
 
 if __name__ == "__main__":
