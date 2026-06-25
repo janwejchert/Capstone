@@ -234,6 +234,49 @@ def make_saturation(recompute=False):
     plt.close(fig)
 
 
+def _heatmap(ax, values, hit, mu_grid, phi_grid, title):
+    im = ax.imshow(values, origin="lower", cmap="viridis_r", vmin=0.0, vmax=1.0, aspect="auto")
+    ax.set_xticks(range(len(mu_grid)))
+    ax.set_xticklabels([f"{m:g}" for m in mu_grid])
+    ax.set_yticks(range(len(phi_grid)))
+    ax.set_yticklabels([f"{p:.2f}" for p in phi_grid])
+    ax.set_xlabel("$\\mu$ (price impact)")
+    ax.set_ylabel("$\\varphi$ (input persistence)")
+    ax.set_title(title)
+    ax.grid(False)
+    for i in range(len(phi_grid)):
+        for j in range(len(mu_grid)):
+            v = values[i, j]
+            if not np.isfinite(v):
+                text, color = f"hit {hit[i, j]:.1f}", "black"
+            else:
+                text, color = f"{v:.2f}", ("white" if v < 0.5 else "black")
+            ax.text(j, i, text, ha="center", va="center", color=color, fontsize=15)
+    return im
+
+
+def make_threshold_heatmaps():
+    d = np.load(os.path.join(DATA, "phase_06_a_star_grid.npz"))
+    mu_grid, phi_grid = d["mu_grid"], d["phi_grid"]
+    kw = 1  # w = 250
+    specs = [
+        ("a_star_R2_da", "hit_rate_R2_da", "fig_threshold_r2.svg",
+         "$A^{*}_{R^2,\\mathrm{da}}$  (signal halved)"),
+        ("a_star_phi", "hit_rate_phi", "fig_threshold_phi.svg",
+         "$A^{*}_{\\varphi}$  (persistence x1.5)"),
+    ]
+    for vkey, hkey, fname, title in specs:
+        vals = d[vkey][0, kw]   # AR(1) is p index 0
+        hit = d[hkey][0, kw]
+        fig, ax = plt.subplots(figsize=(6.4, 6.2))
+        im = _heatmap(ax, vals, hit, mu_grid, phi_grid, title)
+        cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        cb.set_label("critical adoption share $A^{*}$")
+        fig.tight_layout()
+        fig.savefig(os.path.join(ASSETS, fname))
+        plt.close(fig)
+
+
 def write_values():
     """Headline numbers for the template, read from the saved npz so the poster
     text matches the report exactly."""
@@ -246,6 +289,17 @@ def write_values():
         "phi_low": round(float(summ[0, 6]), 2),
         "phi_high": round(float(summ[2, 7]), 2),
     }
+    g = np.load(os.path.join(DATA, "phase_06_a_star_grid.npz"))
+    da0, phi0, real0 = g["a_star_R2_da"][0], g["a_star_phi"][0], g["a_star_R2_realised"][0]
+    vals.update({
+        "n_da_hit": int(np.isfinite(da0).sum()), "n_da_cells": int(da0.size),
+        "a_da_mean": round(float(np.nanmean(da0)), 2),
+        "n_phi_hit": int(np.isfinite(phi0).sum()),
+        "a_phi_mean": round(float(np.nanmean(phi0)), 2),
+        "n_real_hit": int(np.isfinite(real0).sum()),
+        "n_runs": int(g["mu_grid"].size * g["phi_grid"].size * g["w_grid"].size
+                      * g["forecast_p_grid"].size * int(g["num_seeds"])),
+    })
     out = os.path.join(ASSETS, "figure_values.json")
     existing = {}
     if os.path.exists(out):
@@ -261,8 +315,9 @@ def main():
     set_style()
     make_dual_channel(args.recompute)
     make_saturation(args.recompute)
+    make_threshold_heatmaps()
     write_values()
-    print("wrote fig_dual_channel.svg, fig_saturation.svg and figure_values.json")
+    print("wrote fig_dual_channel.svg, fig_saturation.svg, fig_threshold_r2.svg, fig_threshold_phi.svg and figure_values.json")
 
 
 if __name__ == "__main__":

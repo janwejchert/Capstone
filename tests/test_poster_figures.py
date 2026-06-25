@@ -37,3 +37,11 @@ def test_dual_channel_svg_written(tmp_path, monkeypatch):
     assert os.path.getsize(p) > 5000
     head = open(p).read(400).lower()
     assert "<svg" in head or "<?xml" in head
+
+
+def test_threshold_counts_match_npz():
+    import numpy as np
+    g = np.load(os.path.join(HERE, "results", "data", "phase_06_a_star_grid.npz"))
+    assert int(np.isfinite(g["a_star_R2_da"][0]).sum()) == 67
+    assert int(np.isfinite(g["a_star_phi"][0]).sum()) == 82
+    assert int(np.isfinite(g["a_star_R2_realised"][0]).sum()) == 28

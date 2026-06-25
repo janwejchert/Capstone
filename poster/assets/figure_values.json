@@ -4,5 +4,12 @@
   "r2_da_low": 0.08,
   "r2_da_high": 0.04,
   "phi_low": 0.28,
-  "phi_high": 0.45
+  "phi_high": 0.45,
+  "n_da_hit": 67,
+  "n_da_cells": 90,
+  "a_da_mean": 0.29,
+  "n_phi_hit": 82,
+  "a_phi_mean": 0.38,
+  "n_real_hit": 28,
+  "n_runs": 3600
 }
