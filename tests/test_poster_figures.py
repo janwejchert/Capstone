@@ -19,7 +19,6 @@ def test_summary_row_reproduces_npz_fast_and_control():
 
 def test_saturation_plateau_levels():
     # cheap check on the plateau using a few seeds and the post-ramp tail
-    import numpy as np
     out, P = figures.run_regime(1e-3, seed=figures.SAT_BASE_SEED, T=figures.T_LONG)
     tail = slice(10000, figures.T_LONG)
     assert 0.13 < float(np.nanmean(out["r2_realised"][tail])) < 0.21

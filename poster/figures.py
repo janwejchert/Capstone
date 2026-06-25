@@ -210,6 +210,8 @@ def compute_saturation(recompute=False):
 
 def make_saturation(recompute=False):
     t, mr, sr, mx, sx, mA = compute_saturation(recompute)
+    STEP = 10
+    t, mr, sr, mx, sx, mA = t[::STEP], mr[::STEP], sr[::STEP], mx[::STEP], sx[::STEP], mA[::STEP]
     kr = np.isfinite(mr)
     kx = np.isfinite(mx)
     fig, ax = plt.subplots(figsize=(9.5, 5.2))
