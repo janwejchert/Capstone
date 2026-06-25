@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<link rel="stylesheet" href="poster.css">
+</head>
+<body>
+<div class="poster">
+
+  <header class="title-band">
+    <div class="title-text">
+      <h1 class="title">Performative Prediction in a Single-Asset Market</h1>
+      <p class="subtitle">Self-fulfilment and signal erosion under forecast adoption</p>
+      <p class="byline">Jan Jacek Wejchert &nbsp;|&nbsp; Supervisor: Nacho Molina Clemente</p>
+      <p class="byline">IE School of Science and Technology &nbsp;|&nbsp; MSc in Business Analytics and Data Science &nbsp;|&nbsp; July 2026</p>
+    </div>
+    {{logo}}
+  </header>
+  <hr class="rule">
+
+  <section class="headline">
+    <h2>One forecast, two verdicts, as adoption rises</h2>
+    <div class="kpi">
+      <div class="stat stat-blue">{{val:r2_real_low}} &rarr; {{val:r2_real_high}}<span class="lbl">realised-return R&sup2; (rises)</span></div>
+      <div class="stat stat-red">{{val:r2_da_low}} &rarr; {{val:r2_da_high}}<span class="lbl">demand-adjusted R&sup2; (falls)</span></div>
+      <div class="stat stat-gold">{{val:phi_low}} &rarr; {{val:phi_high}}<span class="lbl">effective persistence &phi; (rises)</span></div>
+    </div>
+  </section>
+
+  <section class="mechanism">
+    <div class="schematic fig">{{fig:schematic}}</div>
+    <div class="decomp-wrap">
+      <div class="eq decomposition">{{eq:decomposition}}</div>
+      <div class="decomp-labels">
+        <span class="box-blue">&mu; D<sub>t</sub>: self-fulfilment</span>
+        <span class="box-red">x<sub>t+1</sub>: independent signal</span>
+      </div>
+      <p class="caption">One coordinated order flow, scored two ways. The forecast moves the price it is judged against; stripping that move out leaves the signal that was truly there.</p>
+    </div>
+  </section>
+
+  <main class="cols">
+
+    <div class="col section">
+      <h2>The question</h2>
+      <p>A published forecast acquires users. Once adopters trade on it, their coordinated demand enters the very returns the forecast is scored against. So does adoption make a forecast look better, worse, or both at once? We separate the score a deployed forecaster can measure from the signal that is independently present.</p>
+
+      <h2>The model</h2>
+      <p>A minimal single-asset market. Traders hold mean-variance demand with constant absolute risk aversion (Brock and Hommes 1998); a risk-neutral market maker absorbs net order flow and moves the quote (Beja and Goldman 1980; Farmer and Joshi 2002).</p>
+      <div class="eq-block">
+        <div class="eq">{{eq:return_law}}</div>
+        <div class="eq">{{eq:price_update}}</div>
+        <div class="eq">{{eq:demand}}</div>
+      </div>
+      <p class="caption">Capped mean-variance demand sets each adopter order from the shared forecast; aggregate demand D<sub>t</sub> clears through the maker, who carries the inventory.</p>
+
+      <h2>Intra-period timing</h2>
+      <ol class="timing">
+        <li>Agents observe returns through t and form forecasts.</li>
+        <li>Adopters and non-adopters submit orders.</li>
+        <li>The maker absorbs demand and moves the quote.</li>
+        <li>The news shock and the persistence term realise.</li>
+      </ol>
+    </div>
+
+    <div class="col section">
+      <h2>Two evaluation targets</h2>
+      <p>The same forecast is scored against two targets. The realised return r<sub>t+1</sub> is what a deployed forecaster sees. The demand-adjusted return x<sub>t+1</sub> = r<sub>t+1</sub> &minus; &mu; D<sub>t</sub> is a counterfactual that removes contemporaneous price impact: the independent signal. Effective persistence &phi; links the two channels.</p>
+      <div class="fig">{{fig:dual_channel}}</div>
+      <p class="caption">Rolling out-of-sample R&sup2; against adoption share, 100 seeds, &plusmn;1 SD bands. Realised (blue) rises by self-fulfilment; demand-adjusted (red) erodes on the same path.</p>
+
+      <h2>A steady state, not a transient</h2>
+      <div class="fig">{{fig:saturation}}</div>
+      <p class="caption">Holding high adoption to T = 30000 over 50 seeds, the readings hold separated plateaus (realised near 0.17, demand-adjusted near 0.02). The gap is structural, not an artefact of the adoption ramp.</p>
+    </div>
+
+    <div class="col section">
+      <h2>Where the signal erodes</h2>
+      <div class="fig">{{fig:threshold_r2}}</div>
+      <div class="fig">{{fig:threshold_phi}}</div>
+      <p class="caption">A {{val:n_runs}}-run sweep over (&mu;, &phi;), window, AR order p in {1, 2, 5, 10}, 10 seeds. The demand-adjusted threshold A*<sub>R&sup2;,da,rel</sub> is reached in {{val:n_da_hit}} of 90 AR(1) cells; the persistence threshold A*<sub>&phi;,rel</sub> in {{val:n_phi_hit}} of 90. The realised channel reaches its threshold in only {{val:n_real_hit}} of 90, all weak-signal noise crossings: the designed non-result. The pattern holds across p.</p>
+
+      <h2>Conclusion</h2>
+      <p>Realised-return R&sup2;, the only score a deployed forecaster can compute, over-reports skill once the forecast has users with price impact. Report both readings together; their gap measures the deployment-driven component of measured accuracy.</p>
+
+      <h2>Future work</h2>
+      <p>The economic endpoint (proportional costs, net trading value against a null benchmark, the profit threshold) is deferred: a faithful reading must first neutralise the position-size asymmetry between the capped adopter and uncapped null rules. A heterogeneous trader ecology is likewise left for future work.</p>
+
+      <div class="refs">
+        <p>Soros 1987 &middot; Perdomo et al. 2020 &middot; Brock &amp; Hommes 1998</p>
+        <p>Beja &amp; Goldman 1980 &middot; Farmer &amp; Joshi 2002 &middot; Diebold &amp; Mariano 1995</p>
+      </div>
+    </div>
+
+  </main>
+
+  <hr class="rule">
+  <footer class="take-home">
+    <p class="lead"><strong>Take-home.</strong> Realised R&sup2; over-reports skill once a forecast has users with price impact. Report both readings; their gap is the deployment-driven component of measured accuracy.</p>
+    <p class="foot-meta">Reproducible single-asset agent-based simulator &nbsp;|&nbsp; IE University Capstone 2026 &nbsp;|&nbsp; jan.wejchert@student.ie.edu</p>
+  </footer>
+
+</div>
+</body>
+</html>
