@@ -268,7 +268,7 @@ def make_threshold_heatmaps():
     for vkey, hkey, fname, title in specs:
         vals = d[vkey][0, kw]   # AR(1) is p index 0
         hit = d[hkey][0, kw]
-        fig, ax = plt.subplots(figsize=(6.4, 6.2))
+        fig, ax = plt.subplots(figsize=(6.6, 4.3))
         im = _heatmap(ax, vals, hit, mu_grid, phi_grid, title)
         cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
         cb.set_label("critical adoption share $A^{*}$")
