@@ -48,6 +48,7 @@ def test_write_figure_geometry_populates_json(tmp_path, monkeypatch):
     vals = json.loads(out.read_text())
     for k in ["price_path_d", "result_real_d", "result_da_d",
               "result_high_real", "result_high_da",
+              "result_low_real", "result_low_da",
               "plateau_real", "plateau_da", "steady_real_y", "steady_da_y"]:
         assert k in vals, k
     assert vals["price_path_d"].startswith("M")

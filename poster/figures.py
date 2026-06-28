@@ -8,6 +8,7 @@ Run as a script: python figures.py [--recompute is accepted and ignored].
 import os
 import json
 import argparse
+import warnings
 
 import sys
 
@@ -80,9 +81,11 @@ def compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG, span=1500):
     adopt = np.full((num_seeds, T), np.nan)
     for s in range(num_seeds):
         r2r[s], r2d[s], adopt[s] = _run_fast(SAT_BASE_SEED + s, T)
-    mean_r2r = np.nanmean(r2r, axis=0)
-    mean_r2d = np.nanmean(r2d, axis=0)
-    mean_A = np.nanmean(adopt, axis=0)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        mean_r2r = np.nanmean(r2r, axis=0)
+        mean_r2d = np.nanmean(r2d, axis=0)
+        mean_A = np.nanmean(adopt, axis=0)
 
     finite = np.isfinite(mean_r2r) & np.isfinite(mean_r2d) & np.isfinite(mean_A)
     fin_idx = np.flatnonzero(finite)
