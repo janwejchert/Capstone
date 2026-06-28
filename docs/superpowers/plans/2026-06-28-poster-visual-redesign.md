@@ -79,20 +79,9 @@ def test_make_polyline_maps_and_flips_y():
 Run: `python3 -m pytest tests/test_poster_figures.py::test_make_polyline_maps_and_flips_y -q`
 Expected: FAIL with `AttributeError: module 'figures' has no attribute 'make_polyline'`.
 
-- [ ] **Step 3: Add the src path + imports + `make_polyline` to `figures.py`**
+- [ ] **Step 3: Add `make_polyline` to `figures.py`**
 
-At the top of `poster/figures.py`, after the existing `import numpy as np`, add the src path and simulator imports (needed by later tasks too):
-
-```python
-import sys
-
-sys.path.insert(0, os.path.join(HERE, "..", "src"))
-
-from reflexive_market import simulate  # noqa: E402
-from reflexive_market.metrics import rolling_oos_r2  # noqa: E402
-```
-
-(`HERE` already exists in the module.) Then add the helper:
+`make_polyline` needs only numpy, which `figures.py` already imports (the simulator imports come in Task 2 where they are first used, to avoid an unused-import). Add the helper:
 
 ```python
 def make_polyline(xs, ys, x0, x1, y0, y1, w, h, decimals=2):
@@ -175,7 +164,18 @@ Expected: FAIL with `AttributeError: module 'figures' has no attribute 'compute_
 
 - [ ] **Step 3: Implement the regeneration in `figures.py`**
 
-Add the phase-4 constants near the top (after the existing `DATA` definition):
+First add the src path and simulator/metrics imports. At the top of `poster/figures.py`, after the existing `import numpy as np`, add:
+
+```python
+import sys
+
+sys.path.insert(0, os.path.join(HERE, "..", "src"))
+
+from reflexive_market import simulate  # noqa: E402
+from reflexive_market.metrics import rolling_oos_r2  # noqa: E402
+```
+
+(`HERE` already exists in the module.) Then add the phase-4 constants near the top (after the existing `DATA` definition):
 
 ```python
 # Phase-4 fast-diffusion parameters (notebooks/phase_04_stochastic_adoption.ipynb).
