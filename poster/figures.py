@@ -9,11 +9,37 @@ import os
 import json
 import argparse
 
+import sys
+
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+sys.path.insert(0, os.path.join(HERE, "..", "src"))
+
+from reflexive_market import simulate  # noqa: E402
+from reflexive_market.metrics import rolling_oos_r2  # noqa: E402
 ASSETS = os.path.join(HERE, "assets")
 DATA = os.path.join(HERE, "..", "results", "data")
+
+# Phase-4 fast-diffusion parameters (notebooks/phase_04_stochastic_adoption.ipynb).
+P4_N = 200
+P4_MU = 0.05
+P4_PHI = 0.25
+P4_SIGMA_NEWS = 0.01
+P4_SIGMA_Q = 1.0
+P4_FORECAST_WINDOW = 250
+P4_FORECAST_P = 1
+P4_RISK_SCALE = 0.001
+P4_Q_CAP = 0.05
+P4_EVAL_WINDOW = 1000
+P4_ADOPTION_START_T = P4_FORECAST_WINDOW + P4_EVAL_WINDOW  # 1250
+FAST_PI = 1e-3
+FAST_DELTA = 0.0
+T_LONG = 30000
+SAT_BASE_SEED = 5000
+NUM_SEEDS_MC = 50
+RESULT_NPZ = os.path.join(DATA, "poster_result_curve.npz")
 
 
 def make_polyline(xs, ys, x0, x1, y0, y1, w, h, decimals=2):
@@ -29,6 +55,74 @@ def make_polyline(xs, ys, x0, x1, y0, y1, w, h, decimals=2):
     pts = [f"{round(float(a), decimals)},{round(float(b), decimals)}"
            for a, b in zip(px, py)]
     return "M" + " L".join(pts)
+
+
+def _run_fast(seed, T):
+    rng = np.random.default_rng(seed)
+    out = simulate.run(
+        T=T, N=P4_N, mu=P4_MU, phi=P4_PHI,
+        sigma_news=P4_SIGMA_NEWS, sigma_q=P4_SIGMA_Q, rng=rng,
+        forecast_window=P4_FORECAST_WINDOW, forecast_p=P4_FORECAST_P,
+        risk_scale=P4_RISK_SCALE, q_cap=P4_Q_CAP,
+        adoption_pi=FAST_PI, adoption_delta=FAST_DELTA,
+        adoption_start_t=P4_ADOPTION_START_T,
+    )
+    da = out["returns"] - P4_MU * out["demand"]
+    r2_real = rolling_oos_r2(out["returns"], out["forecasts"], P4_EVAL_WINDOW)
+    r2_da = rolling_oos_r2(da, out["forecasts"], P4_EVAL_WINDOW)
+    return r2_real, r2_da, out["adoption_share"]
+
+
+def compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG, span=1500):
+    r2r = np.full((num_seeds, T), np.nan)
+    r2d = np.full((num_seeds, T), np.nan)
+    adopt = np.full((num_seeds, T), np.nan)
+    for s in range(num_seeds):
+        r2r[s], r2d[s], adopt[s] = _run_fast(SAT_BASE_SEED + s, T)
+    mean_r2r = np.nanmean(r2r, axis=0)
+    mean_r2d = np.nanmean(r2d, axis=0)
+    mean_A = np.nanmean(adopt, axis=0)
+
+    finite = np.isfinite(mean_r2r) & np.isfinite(mean_r2d) & np.isfinite(mean_A)
+    fin_idx = np.flatnonzero(finite)
+    lo = fin_idx[:span]
+    hi = fin_idx[-span:]
+    low_real, high_real = float(mean_r2r[lo].mean()), float(mean_r2r[hi].mean())
+    low_da, high_da = float(mean_r2d[lo].mean()), float(mean_r2d[hi].mean())
+    low_A, high_A = float(mean_A[lo].mean()), float(mean_A[hi].mean())
+
+    # Bin the finite samples by adoption share into a clean vs-adoption curve.
+    nb = 50
+    edges = np.linspace(0.0, 1.0, nb + 1)
+    centres = 0.5 * (edges[:-1] + edges[1:])
+    a_vals, yr, yd = mean_A[finite], mean_r2r[finite], mean_r2d[finite]
+    which = np.clip(np.digitize(a_vals, edges) - 1, 0, nb - 1)
+    ca, cr, cd = [], [], []
+    for k in range(nb):
+        m = which == k
+        if m.any():
+            ca.append(float(centres[k]))
+            cr.append(float(yr[m].mean()))
+            cd.append(float(yd[m].mean()))
+
+    return {
+        "adopt_curve": np.array(ca), "r2_real_vs_a": np.array(cr),
+        "r2_da_vs_a": np.array(cd),
+        "mean_r2_real_t": mean_r2r, "mean_r2_da_t": mean_r2d, "mean_A_t": mean_A,
+        "low_real": low_real, "high_real": high_real,
+        "low_da": low_da, "high_da": high_da, "low_A": low_A, "high_A": high_A,
+        "plateau_real": high_real, "plateau_da": high_da,
+        "num_seeds": int(num_seeds), "T": int(T),
+    }
+
+
+def load_or_compute_result_curve(recompute=False):
+    if not recompute and os.path.exists(RESULT_NPZ):
+        d = np.load(RESULT_NPZ)
+        return {k: d[k] for k in d.files}
+    data = compute_result_curve()
+    np.savez(RESULT_NPZ, **{k: np.asarray(v) for k, v in data.items()})
+    return data
 
 
 def write_values():

@@ -22,6 +22,7 @@ Thumbs.db
 results/data/*.npz
 !results/data/.gitkeep
 !results/data/phase_*.npz
+!results/data/poster_result_curve.npz
 
 # LaTeX aux (track .tex, .bib, .pdf only)
 *.aux
@@ -33,3 +34,6 @@ results/data/*.npz
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+
+# brainstorming visual companion mockups
+.superpowers/
