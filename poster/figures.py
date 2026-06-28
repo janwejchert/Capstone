@@ -126,6 +126,50 @@ def load_or_compute_result_curve(recompute=False):
     return data
 
 
+# Result-curve plot rect (matches the template SVG).
+RC_W, RC_H = 270, 120
+RC_YMAX = 0.2
+# Price-path plot rect.
+PP_W, PP_H = 304, 104
+# Steady-state plot rect (absolute viewBox coords).
+SS_TOP, SS_H, SS_YMAX = 24, 150, 0.2
+
+
+def write_figure_geometry(data):
+    prices = np.load(os.path.join(DATA, "phase_01_baseline.npz"))["prices"]
+    step = max(1, prices.size // 300)
+    idx = np.arange(0, prices.size, step)
+    pmin, pmax = float(prices.min()), float(prices.max())
+    pad = (pmax - pmin) * 0.05
+    price_d = make_polyline(idx, prices[idx], 0, prices.size - 1,
+                            pmin - pad, pmax + pad, PP_W, PP_H)
+
+    real_d = make_polyline(data["adopt_curve"], data["r2_real_vs_a"],
+                           0, 1, 0, RC_YMAX, RC_W, RC_H)
+    da_d = make_polyline(data["adopt_curve"], data["r2_da_vs_a"],
+                         0, 1, 0, RC_YMAX, RC_W, RC_H)
+
+    plat_real = float(data["plateau_real"])
+    plat_da = float(data["plateau_da"])
+    geom = {
+        "price_path_d": price_d,
+        "result_real_d": real_d,
+        "result_da_d": da_d,
+        "result_high_real": f"{float(data['high_real']):.2f}",
+        "result_high_da": f"{float(data['high_da']):.2f}",
+        "result_low_real": f"{float(data['low_real']):.2f}",
+        "result_low_da": f"{float(data['low_da']):.2f}",
+        "plateau_real": f"{plat_real:.2f}",
+        "plateau_da": f"{plat_da:.2f}",
+        "steady_real_y": round(SS_TOP + (1 - plat_real / SS_YMAX) * SS_H, 1),
+        "steady_da_y": round(SS_TOP + (1 - plat_da / SS_YMAX) * SS_H, 1),
+    }
+    out = os.path.join(ASSETS, "figure_values.json")
+    existing = json.load(open(out)) if os.path.exists(out) else {}
+    existing.update(geom)
+    json.dump(existing, open(out, "w"), indent=2)
+
+
 def write_values():
     summ = np.load(os.path.join(DATA, "phase_04_stochastic_adoption.npz"))["summary"]
     vals = {
@@ -158,8 +202,10 @@ def write_values():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--recompute", action="store_true")
-    ap.parse_args()
+    args = ap.parse_args()
     write_values()
+    data = load_or_compute_result_curve(recompute=args.recompute)
+    write_figure_geometry(data)
     print("wrote figure_values.json")
 
 

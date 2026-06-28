@@ -36,3 +36,22 @@ def test_load_or_compute_result_curve_roundtrips(tmp_path, monkeypatch):
     assert npz.exists()
     d2 = figures.load_or_compute_result_curve(recompute=False)
     np.testing.assert_allclose(d1["adopt_curve"], d2["adopt_curve"])
+
+
+def test_write_figure_geometry_populates_json(tmp_path, monkeypatch):
+    import json
+    out = tmp_path / "figure_values.json"
+    out.write_text("{}")
+    monkeypatch.setattr(figures, "ASSETS", str(tmp_path))
+    data = figures.compute_result_curve(num_seeds=3, T=6000, span=400)
+    figures.write_figure_geometry(data)
+    vals = json.loads(out.read_text())
+    for k in ["price_path_d", "result_real_d", "result_da_d",
+              "result_high_real", "result_high_da",
+              "plateau_real", "plateau_da", "steady_real_y", "steady_da_y"]:
+        assert k in vals, k
+    assert vals["price_path_d"].startswith("M")
+    assert vals["result_real_d"].startswith("M")
+    # plateau labels formatted to two decimals, geometry within the steady viewBox
+    assert vals["plateau_real"].count(".") == 1
+    assert 24.0 <= float(vals["steady_real_y"]) <= 174.0
