@@ -14,9 +14,10 @@ def test_template_has_required_content():
               "As adoption rises"]:
         assert s in html, s
     for tok in ["{{eq:decomposition}}", "{{eq:return_law}}",
-                "{{val:r2_real_high}}", "{{val:price_path_d}}",
-                "{{val:result_real_d}}", "{{val:result_da_d}}",
-                "{{val:plateau_real}}", "{{logo}}"]:
+                "{{val:r2_real_high}}", "{{val:r2_da_high}}",
+                "{{val:price_path_d}}", "{{val:result_real_d}}",
+                "{{val:result_da_d}}", "{{val:steady_real_y}}",
+                "{{val:steady_da_y}}", "{{logo}}"]:
         assert tok in html, tok
     assert "—" not in html  # no em dash
 

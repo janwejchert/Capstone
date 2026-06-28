@@ -87,11 +87,11 @@
           <path d="{{val:result_da_d}}" fill="none" stroke="#C62828" stroke-width="2.1"/>
           <path d="{{val:result_real_d}}" fill="none" stroke="#1B6FC4" stroke-width="2.1"/>
         </g>
-        <text x="424" y="34" text-anchor="end" font-size="9" font-weight="700" fill="#1B6FC4">realised R&sup2; rises to {{val:result_high_real}}</text>
-        <text x="424" y="122" text-anchor="end" font-size="9" font-weight="700" fill="#C62828">demand-adjusted R&sup2; falls to {{val:result_high_da}}</text>
+        <text x="424" y="34" text-anchor="end" font-size="9" font-weight="700" fill="#1B6FC4">realised R&sup2; rises to {{val:r2_real_high}}</text>
+        <text x="424" y="122" text-anchor="end" font-size="9" font-weight="700" fill="#C62828">demand-adjusted R&sup2; falls to {{val:r2_da_high}}</text>
       </svg>
     </div>
-    <p class="cap">rolling out-of-sample R&sup2; against each target, extended saturated regime (T = 30,000). The two readings of the same forecast pull apart as the crowd grows.</p>
+    <p class="cap">rolling out-of-sample R&sup2; against each target, fast-adoption run (T = 8,000). The two readings of the same forecast pull apart as the crowd grows.</p>
   </section>
 
   <main class="cols">
@@ -130,18 +130,18 @@
         <h2>A steady state, not a transient</h2>
         <div class="fig steady">
           <svg viewBox="0 0 320 200" font-family="Inter, sans-serif">
-            <text x="6" y="14" fill="#1F4E79" font-size="11" font-weight="700">Run 30,000 steps: both readings stay put</text>
+            <text x="6" y="14" fill="#1F4E79" font-size="11" font-weight="700">Run 8,000 steps: both readings stay put</text>
             <line x1="44" y1="24" x2="44" y2="174" stroke="#5B6670" stroke-width="1.2"/>
             <line x1="44" y1="174" x2="304" y2="174" stroke="#5B6670" stroke-width="1.2"/>
             <text x="38" y="28" text-anchor="end" fill="#5B6670" font-size="8">0.2</text>
             <text x="38" y="176" text-anchor="end" fill="#5B6670" font-size="8">0</text>
             <line x1="44" y1="{{val:steady_real_y}}" x2="304" y2="{{val:steady_real_y}}" stroke="#1B6FC4" stroke-width="3"/>
-            <text x="300" y="{{val:steady_real_y}}" dy="-5" text-anchor="end" fill="#1B6FC4" font-size="10" font-weight="700">realised &#8776; {{val:plateau_real}}</text>
+            <text x="300" y="{{val:steady_real_y}}" dy="-5" text-anchor="end" fill="#1B6FC4" font-size="10" font-weight="700">realised &#8776; {{val:r2_real_high}}</text>
             <line x1="44" y1="{{val:steady_da_y}}" x2="304" y2="{{val:steady_da_y}}" stroke="#C62828" stroke-width="3"/>
-            <text x="300" y="{{val:steady_da_y}}" dy="-5" text-anchor="end" fill="#C62828" font-size="10" font-weight="700">demand-adjusted &#8776; {{val:plateau_da}}</text>
+            <text x="300" y="{{val:steady_da_y}}" dy="-5" text-anchor="end" fill="#C62828" font-size="10" font-weight="700">demand-adjusted &#8776; {{val:r2_da_high}}</text>
             <line x1="120" y1="{{val:steady_real_y}}" x2="120" y2="{{val:steady_da_y}}" stroke="#1F4E79" stroke-width="1.3"/>
             <text x="128" y="110" fill="#1F4E79" font-size="10" font-weight="700">gap stays open</text>
-            <text x="44" y="192" fill="#5B6670" font-size="8">time period &#8594; 30,000 &#183; 50 seeds &#183; not a start-up transient</text>
+            <text x="44" y="192" fill="#5B6670" font-size="8">time period &#8594; 8,000 steps &#183; one reproducible seed &#183; not a start-up transient</text>
           </svg>
         </div>
       </section>

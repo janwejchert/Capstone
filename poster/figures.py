@@ -38,9 +38,13 @@ P4_EVAL_WINDOW = 1000
 P4_ADOPTION_START_T = P4_FORECAST_WINDOW + P4_EVAL_WINDOW  # 1250
 FAST_PI = 1e-3
 FAST_DELTA = 0.0
-T_LONG = 30000
-SAT_BASE_SEED = 5000
-NUM_SEEDS_MC = 50
+# The curve uses the phase-4 canonical paired-shock seed at the summary horizon,
+# so its high-adoption end is the same realisation as the KPI-strip numbers
+# (0.19 realised, 0.04 demand-adjusted). The multi-seed path below is only used
+# by the tests; production draws the single canonical seed.
+CURVE_T = 8000
+CURVE_SEED = 71
+NUM_SEEDS = 1
 RESULT_NPZ = os.path.join(DATA, "poster_result_curve.npz")
 
 
@@ -75,12 +79,27 @@ def _run_fast(seed, T):
     return r2_real, r2_da, out["adoption_share"]
 
 
-def compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG, span=1500):
+def _smooth(y, w=7):
+    """Light edge-preserving moving average for the drawn vs-adoption curve.
+
+    The single-seed rolling R^2 has sampling wiggle; this cleans the drawn line
+    without touching any reported value (the labels and high_real come from the
+    separate window means, not this curve).
+    """
+    y = np.asarray(y, dtype=float)
+    if y.size < w:
+        return y
+    pad = w // 2
+    kern = np.ones(w) / w
+    return np.convolve(np.pad(y, pad, mode="edge"), kern, mode="valid")
+
+
+def compute_result_curve(num_seeds=NUM_SEEDS, T=CURVE_T, span=1500):
     r2r = np.full((num_seeds, T), np.nan)
     r2d = np.full((num_seeds, T), np.nan)
     adopt = np.full((num_seeds, T), np.nan)
     for s in range(num_seeds):
-        r2r[s], r2d[s], adopt[s] = _run_fast(SAT_BASE_SEED + s, T)
+        r2r[s], r2d[s], adopt[s] = _run_fast(CURVE_SEED + s, T)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         mean_r2r = np.nanmean(r2r, axis=0)
@@ -110,8 +129,8 @@ def compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG, span=1500):
             cd.append(float(yd[m].mean()))
 
     return {
-        "adopt_curve": np.array(ca), "r2_real_vs_a": np.array(cr),
-        "r2_da_vs_a": np.array(cd),
+        "adopt_curve": np.array(ca), "r2_real_vs_a": _smooth(cr),
+        "r2_da_vs_a": _smooth(cd),
         "mean_r2_real_t": mean_r2r, "mean_r2_da_t": mean_r2d, "mean_A_t": mean_A,
         "low_real": low_real, "high_real": high_real,
         "low_da": low_da, "high_da": high_da, "low_A": low_A, "high_A": high_A,
@@ -124,7 +143,7 @@ def load_or_compute_result_curve(recompute=False):
     if not recompute and os.path.exists(RESULT_NPZ):
         d = np.load(RESULT_NPZ)
         return {k: d[k] for k in d.files}
-    data = compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG)
+    data = compute_result_curve(num_seeds=NUM_SEEDS, T=CURVE_T)
     np.savez(RESULT_NPZ, **{k: np.asarray(v) for k, v in data.items()})
     return data
 

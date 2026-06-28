@@ -30,8 +30,8 @@ def test_compute_result_curve_shows_dual_channel():
 def test_load_or_compute_result_curve_roundtrips(tmp_path, monkeypatch):
     npz = tmp_path / "curve.npz"
     monkeypatch.setattr(figures, "RESULT_NPZ", str(npz))
-    monkeypatch.setattr(figures, "NUM_SEEDS_MC", 3)
-    monkeypatch.setattr(figures, "T_LONG", 5000)
+    monkeypatch.setattr(figures, "NUM_SEEDS", 3)
+    monkeypatch.setattr(figures, "CURVE_T", 5000)
     d1 = figures.load_or_compute_result_curve(recompute=True)
     assert npz.exists()
     d2 = figures.load_or_compute_result_curve(recompute=False)
