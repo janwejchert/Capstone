@@ -1,9 +1,14 @@
-"""Write the headline numbers for the poster template from saved results.
+"""Generate the poster's numbers and data-driven figure geometry.
 
-The poster figures are hand-authored schematic SVG inlined in
-poster.template.html. This script only refreshes assets/figure_values.json so
-every number on the poster matches results/data (and therefore the report).
-Run as a script: python figures.py [--recompute is accepted and ignored].
+The poster figures are inline SVG in poster.template.html. This script writes
+assets/figure_values.json with: the headline numbers from results/data (so they
+match the report), an SVG polyline for the phase-1 price path, and the
+dual-channel result-curve polylines plus steady-state line positions, which it
+regenerates from the simulator (the phase-4 canonical seed at the summary
+horizon) and caches in results/data/poster_result_curve.npz.
+
+Run as a script: python figures.py [--recompute]. With --recompute the result
+curve is re-simulated; otherwise the cached npz is reused.
 """
 import os
 import json
@@ -128,9 +133,17 @@ def compute_result_curve(num_seeds=NUM_SEEDS, T=CURVE_T, span=1500):
             cr.append(float(yr[m].mean()))
             cd.append(float(yd[m].mean()))
 
+    # Anchor the full-adoption endpoint to the reported high-adoption window
+    # means so the drawn line reaches the same values its label and the KPI
+    # strip state (the bin average over the whole saturated tail sits a touch
+    # lower because it folds in the ramp into saturation).
+    adopt_arr, cr_s, cd_s = np.array(ca), _smooth(cr), _smooth(cd)
+    if adopt_arr.size:
+        adopt_arr[-1], cr_s[-1], cd_s[-1] = high_A, high_real, high_da
+
     return {
-        "adopt_curve": np.array(ca), "r2_real_vs_a": _smooth(cr),
-        "r2_da_vs_a": _smooth(cd),
+        "adopt_curve": adopt_arr, "r2_real_vs_a": cr_s,
+        "r2_da_vs_a": cd_s,
         "mean_r2_real_t": mean_r2r, "mean_r2_da_t": mean_r2d, "mean_A_t": mean_A,
         "low_real": low_real, "high_real": high_real,
         "low_da": low_da, "high_da": high_da, "low_A": low_A, "high_A": high_A,
