@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "src"))
 
 from reflexive_market import simulate  # noqa: E402
 from reflexive_market.metrics import rolling_oos_r2  # noqa: E402
+
 ASSETS = os.path.join(HERE, "assets")
 DATA = os.path.join(HERE, "..", "results", "data")
 
@@ -120,7 +121,7 @@ def load_or_compute_result_curve(recompute=False):
     if not recompute and os.path.exists(RESULT_NPZ):
         d = np.load(RESULT_NPZ)
         return {k: d[k] for k in d.files}
-    data = compute_result_curve()
+    data = compute_result_curve(num_seeds=NUM_SEEDS_MC, T=T_LONG)
     np.savez(RESULT_NPZ, **{k: np.asarray(v) for k, v in data.items()})
     return data
 
