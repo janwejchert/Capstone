@@ -129,8 +129,9 @@ def load_or_compute_result_curve(recompute=False):
     return data
 
 
-# Result-curve plot rect (matches the template SVG).
-RC_W, RC_H = 270, 120
+# Result-curve plot rect (matches the template SVG). Wide, flat aspect so the
+# full-width headline figure stays short enough for the body columns to fit.
+RC_W, RC_H = 384, 116
 RC_YMAX = 0.2
 # Price-path plot rect.
 PP_W, PP_H = 304, 104
