@@ -22,26 +22,16 @@ function renderEquations() {
   return out;
 }
 
-function inlineSvg(name) {
-  return fs.readFileSync(A(`assets/${name}.svg`), "utf8");
-}
-
 function assemble() {
   let html = fs.readFileSync(A("poster.template.html"), "utf8");
   const vals = JSON.parse(fs.readFileSync(A("assets/figure_values.json"), "utf8"));
   const eqs = renderEquations();
-  const figs = {
-    dual_channel: inlineSvg("fig_dual_channel"),
-    saturation: inlineSvg("fig_saturation"),
-    threshold_r2: inlineSvg("fig_threshold_r2"),
-    threshold_phi: inlineSvg("fig_threshold_phi"),
-    schematic: inlineSvg("schematic"),
-  };
   const logo = `<img class="logo" src="assets/ielogo.jpeg" alt="IE">`;
   html = html.replace(/\{\{logo\}\}/g, logo);
-  html = html.replace(/\{\{val:([a-z0-9_]+)\}\}/g, (_, k) => String(vals[k] ?? `?${k}?`));
   html = html.replace(/\{\{eq:([a-z_]+)\}\}/g, (_, k) => eqs[k] ?? `?eq:${k}?`);
-  html = html.replace(/\{\{fig:([a-z0-9_]+)\}\}/g, (_, k) => figs[k] ?? `?fig:${k}?`);
+  // Value substitution runs last so {{val:...}} placeholders inside the inline
+  // schematic SVGs (not just the template body) also resolve.
+  html = html.replace(/\{\{val:([a-z0-9_]+)\}\}/g, (_, k) => String(vals[k] ?? `?${k}?`));
   fs.writeFileSync(A("poster.html"), html);
   return html;
 }

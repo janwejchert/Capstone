@@ -8,97 +8,146 @@
 <body>
 <div class="poster">
 
-  <header class="title-band">
+  <header class="title-bar">
     <div class="title-text">
       <h1 class="title">Performative Prediction in a Single-Asset Market</h1>
       <p class="subtitle">Self-fulfilment and signal erosion under forecast adoption</p>
       <p class="byline">Jan Jacek Wejchert &nbsp;|&nbsp; Supervisor: Nacho Molina Clemente</p>
       <p class="byline">IE School of Science and Technology &nbsp;|&nbsp; MSc in Business Analytics and Data Science &nbsp;|&nbsp; July 2026</p>
     </div>
-    {{logo}}
+    <div class="logo-chip">{{logo}}</div>
   </header>
-  <hr class="rule">
 
-  <section class="headline">
-    <h2>One forecast, two verdicts, as adoption rises</h2>
-    <div class="kpi">
-      <div class="stat stat-blue">{{val:r2_real_low}} &rarr; {{val:r2_real_high}}<span class="lbl">realised-return R&sup2; (rises)</span></div>
-      <div class="stat stat-red">{{val:r2_da_low}} &rarr; {{val:r2_da_high}}<span class="lbl">demand-adjusted R&sup2; (falls)</span></div>
-      <div class="stat stat-gold">{{val:phi_low}} &rarr; {{val:phi_high}}<span class="lbl">effective persistence &phi; (rises)</span></div>
-    </div>
+  <section class="kpi-strip">
+    <div class="kpi kpi-blue"><span class="n">{{val:r2_real_low}} &rarr; {{val:r2_real_high}}</span><span class="l">realised-return R&sup2; (rises)</span></div>
+    <div class="kpi kpi-red"><span class="n">{{val:r2_da_low}} &rarr; {{val:r2_da_high}}</span><span class="l">demand-adjusted R&sup2; (falls)</span></div>
+    <div class="kpi kpi-gold"><span class="n">{{val:phi_low}} &rarr; {{val:phi_high}}</span><span class="l">effective persistence &phi; (rises)</span></div>
   </section>
 
-  <section class="mechanism">
-    <div class="schematic fig">{{fig:schematic}}</div>
-    <div class="decomp-wrap">
+  <section class="hero">
+    <div class="hero-left">
+      <h2 class="hero-h">One forecast, two channels</h2>
       <div class="eq decomposition">{{eq:decomposition}}</div>
       <div class="decomp-labels">
-        <span class="box-blue">&mu; D<sub>t</sub>: self-fulfilment</span>
+        <span class="box-blue">&mu;D<sub>t</sub>: self-fulfilment</span>
         <span class="box-red">x<sub>t+1</sub>: independent signal</span>
       </div>
-      <p class="caption">One coordinated order flow, scored two ways. The forecast moves the price it is judged against; stripping that move out leaves the signal that was truly there.</p>
+      <div class="fig feedback">
+        <svg viewBox="0 0 240 58" font-family="Inter, sans-serif">
+          <rect x="2" y="6" width="60" height="24" rx="3" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <text x="32" y="22" font-size="9" text-anchor="middle" fill="#1F4E79">forecast</text>
+          <rect x="90" y="6" width="60" height="24" rx="3" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <text x="120" y="22" font-size="9" text-anchor="middle" fill="#1F4E79">demand</text>
+          <rect x="178" y="6" width="60" height="24" rx="3" fill="#fff" stroke="#1F4E79" stroke-width="1.4"/>
+          <text x="208" y="22" font-size="9" text-anchor="middle" fill="#1F4E79">price move</text>
+          <line x1="62" y1="18" x2="86" y2="18" stroke="#1F4E79" stroke-width="1.6"/>
+          <polygon points="86,15 90,18 86,21" fill="#1F4E79"/>
+          <line x1="150" y1="18" x2="174" y2="18" stroke="#1F4E79" stroke-width="1.6"/>
+          <polygon points="174,15 178,18 174,21" fill="#1F4E79"/>
+          <path d="M208,30 q0,20 -106,20 q-100,0 -100,-20" fill="none" stroke="#5B6670" stroke-width="1.3" stroke-dasharray="3 3"/>
+          <polygon points="5,33 2,30 8,30" fill="#5B6670"/>
+          <text x="60" y="56" font-size="8" fill="#5B6670">adopters' demand feeds back into price</text>
+        </svg>
+      </div>
+    </div>
+    <div class="hero-right">
+      <h2 class="hero-h">As adoption rises, one forecast gets two verdicts</h2>
+      <div class="fig hero-bars">
+        <svg viewBox="0 0 300 152" font-family="Inter, sans-serif">
+          <line x1="20" y1="132" x2="285" y2="132" stroke="#5B6670" stroke-width="1.5"/>
+          <rect x="44" y="104" width="28" height="28" fill="#9DC3EA"/>
+          <rect x="80" y="50" width="28" height="82" fill="#1B6FC4"/>
+          <text x="44" y="98" font-size="10.5" fill="#1B6FC4">{{val:r2_real_low}}</text>
+          <text x="80" y="44" font-size="10.5" font-weight="700" fill="#1B6FC4">{{val:r2_real_high}}</text>
+          <text x="70" y="30" font-size="16" font-weight="700" fill="#1B6FC4">&#9650;</text>
+          <text x="40" y="148" font-size="9.5" font-weight="700" fill="#1B6FC4">Realised R&#178; (rises)</text>
+          <rect x="182" y="92" width="28" height="40" fill="#E59A9A"/>
+          <rect x="218" y="116" width="28" height="16" fill="#C62828"/>
+          <text x="182" y="86" font-size="10.5" fill="#C62828">{{val:r2_da_low}}</text>
+          <text x="218" y="110" font-size="10.5" font-weight="700" fill="#C62828">{{val:r2_da_high}}</text>
+          <text x="208" y="30" font-size="16" font-weight="700" fill="#C62828">&#9660;</text>
+          <text x="176" y="148" font-size="9.5" font-weight="700" fill="#C62828">Demand-adj R&#178; (falls)</text>
+          <text x="62" y="123" font-size="7.5" fill="#5B6670">low</text>
+          <text x="88" y="123" font-size="7.5" fill="#5B6670">high</text>
+        </svg>
+      </div>
     </div>
   </section>
 
   <main class="cols">
 
-    <div class="col section">
-      <h2>The question</h2>
-      <p>A published forecast acquires users. Once adopters trade on it, their coordinated demand enters the very returns the forecast is scored against. So does adoption make a forecast look better, worse, or both at once? We separate the score a deployed forecaster can measure from the signal that is independently present.</p>
-
-      <h2>The model</h2>
-      <p>A minimal single-asset market. Traders hold mean-variance demand with constant absolute risk aversion (Brock and Hommes 1998); a risk-neutral market maker absorbs net order flow and moves the quote (Beja and Goldman 1980; Farmer and Joshi 2002).</p>
-      <div class="eq-block">
-        <div class="eq">{{eq:return_law}}</div>
-        <div class="eq">{{eq:price_update}}</div>
-        <div class="eq">{{eq:demand}}</div>
-      </div>
-      <p class="caption">Capped mean-variance demand sets each adopter order from the shared forecast; aggregate demand D<sub>t</sub> clears through the maker, who carries the inventory.</p>
-
-      <h2>Intra-period timing</h2>
-      <ol class="timing">
-        <li>Agents observe returns through t and form forecasts.</li>
-        <li>Adopters and non-adopters submit orders.</li>
-        <li>The maker absorbs demand and moves the quote.</li>
-        <li>The news shock and the persistence term realise.</li>
-      </ol>
+    <div class="col">
+      <section>
+        <h2>The question</h2>
+        <p>Publish one forecast of tomorrow's return, and traders begin acting on it. Their coordinated buying and selling pushes the very price the forecast will later be graded against. So does the forecast become genuinely better, or does it just bend the market into agreeing with it?</p>
+      </section>
+      <section>
+        <h2>The model</h2>
+        <p>Strip a market to its essentials: traders who buy more when they expect a higher return and hold back when risk is high, and a market maker who moves the quote to absorb their net demand (Brock and Hommes 1998; Beja and Goldman 1980; Farmer and Joshi 2002). It is the smallest market in which a shared forecast can move the prices it is later judged against.</p>
+        <p class="eq-intro">Three lines define the whole market: how returns form, how the price moves, and how each trader sizes a bet.</p>
+        <div class="eqrow"><div class="eq">{{eq:return_law}}</div><p class="gloss">next return = momentum from last return, plus the crowd's price push, plus news</p></div>
+        <div class="eqrow"><div class="eq">{{eq:price_update}}</div><p class="gloss">the market maker nudges the quote by that same crowd push plus news</p></div>
+        <div class="eqrow"><div class="eq">{{eq:demand}}</div><p class="gloss">bet size = forecast return divided by risk aversion times variance</p></div>
+      </section>
+      <p class="cap">Every figure flows from one random seed: the whole simulator is reproducible.</p>
     </div>
 
-    <div class="col section">
-      <h2>Two evaluation targets</h2>
-      <p>The same forecast is scored against two targets. The realised return r<sub>t+1</sub> is what a deployed forecaster sees. The demand-adjusted return x<sub>t+1</sub> = r<sub>t+1</sub> &minus; &mu; D<sub>t</sub> is a counterfactual that removes contemporaneous price impact: the independent signal. Effective persistence &phi; links the two channels.</p>
-      <div class="fig">{{fig:dual_channel}}</div>
-      <p class="caption">Rolling out-of-sample R&sup2; against adoption share, 100 seeds, &plusmn;1 SD bands. Realised (blue) rises by self-fulfilment; demand-adjusted (red) erodes on the same path.</p>
-
-      <h2>A steady state, not a transient</h2>
-      <div class="fig">{{fig:saturation}}</div>
-      <p class="caption">Holding high adoption to T = 30000 over 50 seeds, the readings hold separated plateaus (realised near 0.17, demand-adjusted near 0.02). The gap is structural, not an artefact of the adoption ramp.</p>
+    <div class="col">
+      <section>
+        <h2>Intra-period timing</h2>
+        <ol class="timing">
+          <li>observe returns through t, form forecasts</li>
+          <li>adopters and non-adopters submit orders</li>
+          <li>maker absorbs demand, moves the quote</li>
+          <li>news shock and persistence term realise</li>
+        </ol>
+      </section>
+      <section>
+        <h2>Two evaluation targets</h2>
+        <p>We score the same forecast two ways on the exact same price path. The realised-return score asks the deployment question: did the price actually move as predicted? The demand-adjusted score first strips out the adopters' own price impact (the &mu;D<sub>t</sub> term), asking the honest question: was the signal genuinely there before the crowd pushed? One is what a live forecaster measures, the other is the real underlying skill.</p>
+      </section>
+      <section>
+        <h2>A steady state, not a transient</h2>
+        <div class="fig steady">
+          <svg viewBox="0 0 280 170" font-family="Inter, sans-serif">
+            <text x="4" y="14" fill="#1F4E79" font-size="10.5" font-weight="700">Run 30,000 steps: both readings stay put</text>
+            <line x1="38" y1="30" x2="38" y2="134" stroke="#5B6670" stroke-width="1.2"/>
+            <line x1="38" y1="134" x2="270" y2="134" stroke="#5B6670" stroke-width="1.2"/>
+            <text x="14" y="38" fill="#5B6670" font-size="8">0.2</text>
+            <text x="22" y="136" fill="#5B6670" font-size="8">0</text>
+            <rect x="46" y="50" width="220" height="9" fill="#1B6FC4" opacity="0.12"/>
+            <line x1="46" y1="54.5" x2="266" y2="54.5" stroke="#1B6FC4" stroke-width="3"/>
+            <text x="128" y="48" fill="#1B6FC4" font-size="9.5" font-weight="700">realised &#8776; 0.17</text>
+            <rect x="46" y="116" width="220" height="9" fill="#C62828" opacity="0.12"/>
+            <line x1="46" y1="120.5" x2="266" y2="120.5" stroke="#C62828" stroke-width="3"/>
+            <text x="120" y="114" fill="#C62828" font-size="9.5" font-weight="700">demand-adjusted &#8776; 0.02</text>
+            <line x1="92" y1="54.5" x2="92" y2="120.5" stroke="#1F4E79" stroke-width="1.3"/>
+            <path d="M88,59 L92,54.5 L96,59 M88,116 L92,120.5 L96,116" fill="none" stroke="#1F4E79" stroke-width="1.3"/>
+            <text x="100" y="91" fill="#1F4E79" font-size="9.5" font-weight="700">gap stays open</text>
+            <text x="38" y="152" fill="#5B6670" font-size="8">time period &#8594; 30,000 &#183; 50 seeds &#183; not a start-up transient</text>
+          </svg>
+        </div>
+      </section>
+      <p class="cap">Realised rises by self-fulfilment; demand-adjusted erodes on the very same path.</p>
     </div>
 
-    <div class="col section">
-      <h2>Where the signal erodes</h2>
-      <div class="fig">{{fig:threshold_r2}}</div>
-      <div class="fig">{{fig:threshold_phi}}</div>
-      <p class="caption">A {{val:n_runs}}-run sweep over (&mu;, &phi;), window, AR order p in {1, 2, 5, 10}, 10 seeds. The demand-adjusted threshold A*<sub>R&sup2;,da,rel</sub> is reached in {{val:n_da_hit}} of 90 AR(1) cells; the persistence threshold A*<sub>&phi;,rel</sub> in {{val:n_phi_hit}} of 90. The realised channel reaches its threshold in only {{val:n_real_hit}} of 90, all weak-signal noise crossings: the designed non-result. The pattern holds across p.</p>
-
-      <h2>Conclusion</h2>
-      <p>Realised-return R&sup2;, the only score a deployed forecaster can compute, over-reports skill once the forecast has users with price impact. Report both readings together; their gap measures the deployment-driven component of measured accuracy.</p>
-
-      <h2>Future work</h2>
-      <p>The economic endpoint (proportional costs, net trading value against a null benchmark, the profit threshold) is deferred: a faithful reading must first neutralise the position-size asymmetry between the capped adopter and uncapped null rules. A heterogeneous trader ecology is likewise left for future work.</p>
-
-      <div class="refs">
-        <p>Soros 1987 &middot; Perdomo et al. 2020 &middot; Brock &amp; Hommes 1998</p>
-        <p>Beja &amp; Goldman 1980 &middot; Farmer &amp; Joshi 2002 &middot; Diebold &amp; Mariano 1995</p>
-      </div>
+    <div class="col">
+      <section>
+        <h2>The dual-channel result</h2>
+        <p>Here is the twist. As more traders adopt the forecast, its realised-return score climbs from {{val:r2_real_low}} to {{val:r2_real_high}}, looking sharper and sharper. But that rise is mostly self-fulfilment: the crowd's coordinated trades drag the price toward the prediction, so the forecast is partly grading its own homework. Strip that push out and the demand-adjusted score falls the other way, from {{val:r2_da_low}} to {{val:r2_da_high}}, meaning the genuine, independent signal is actually eroding. The same trades stiffen the market's memory too (effective persistence rises from {{val:phi_low}} to {{val:phi_high}}), feeding the self-fulfilling loop even harder.</p>
+      </section>
+      <section>
+        <h2>Conclusion</h2>
+        <p>Realised accuracy over-reports skill the moment a forecast has users who move the market. The gap between the two readings is not noise: it is the slice of measured accuracy manufactured by the forecast's own deployment. Report both readings, or mistake self-fulfilment for foresight.</p>
+      </section>
+      <p class="refs">Soros 1987 &middot; Perdomo et al. 2020 &middot; Brock &amp; Hommes 1998 &middot; Beja &amp; Goldman 1980 &middot; Farmer &amp; Joshi 2002 &middot; Diebold &amp; Mariano 1995</p>
     </div>
 
   </main>
 
-  <hr class="rule">
-  <footer class="take-home">
-    <p class="lead"><strong>Take-home.</strong> Realised R&sup2; over-reports skill once a forecast has users with price impact. Report both readings; their gap is the deployment-driven component of measured accuracy.</p>
-    <p class="foot-meta">Reproducible single-asset agent-based simulator &nbsp;|&nbsp; IE University Capstone 2026 &nbsp;|&nbsp; jan.wejchert@student.ie.edu</p>
+  <footer class="foot">
+    <span>Reproducible single-asset agent-based simulator</span>
+    <span>IE University Capstone 2026 &nbsp;|&nbsp; jan.wejchert@student.ie.edu</span>
   </footer>
 
 </div>
