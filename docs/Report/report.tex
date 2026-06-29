@@ -57,9 +57,22 @@
 
 {\Large Jan Jacek Wejchert\par}
 \vspace{0.3em}
+{\large Supervisor: Nacho Molina Clemente\par}
+\vspace{0.3em}
+{\large MSc in Business Analytics and Data Science\par}
+\vspace{0.2em}
+{\normalsize IE School of Science and Technology\par}
+\vspace{0.3em}
 {\large June 2026\par}
 
 \vfill
+
+\begin{minipage}{0.85\textwidth}
+\footnotesize\setstretch{1.05}\justifying
+\noindent\textbf{Declaration on the use of AI.} Generative AI tools, including large language models, were used in the course of this project to assist with software implementation, debugging, figure generation, and language editing. The research questions, model design, experimental design, analysis, interpretation of results, and conclusions are the author's own. The author has reviewed all AI-assisted output and takes full responsibility for the content of this report.
+\end{minipage}
+
+\vspace{0.5cm}
 \end{titlepage}
 \setcounter{page}{2}
 
@@ -844,6 +857,6 @@ Every random draw flows through an explicitly passed \texttt{numpy.random.Genera
 Each phase saves its figures as \texttt{results/figures/phase\_NN\_<name>.png} and its numeric summaries as \texttt{results/data/phase\_NN\_<name>.npz}; the npz files hold the arrays behind the report's tables and headline numbers, and the remaining quoted statistics are deterministic recomputations from the notebooks' fixed seeds, flagged as such where they appear. % src: CLAUDE.md reproducibility conventions; ls results/data results/figures (7 npz files, 38 figures, all named phase_NN_<name>); the npz files store summaries only (e.g. phase_03_ar_forecast.npz a 3x5 summary, phase_05_performance_adoption.npz a 2x6 summary plus scalars), so the phase 3 coefficient stds, phase 4 plateau means, and phase 5 timing/score stats are deterministic reruns per their own src comments in sec:phase3-results, sec:phase4-results, sec:phase5-results
 
 \paragraph{Repository.}
-The full source code (package \texttt{reflexive\_market}, version 0.1.0), the seven phase notebooks, the test suite, and the saved figure and data artifacts all live in the project repository, laid out as described in appendix~\ref{app:implementation}. % src: pyproject.toml ([project] name and version; no repository URL is published in the package metadata, so none is given here)
+The full source code (package \texttt{reflexive\_market}, version 0.1.0), the seven phase notebooks, the test suite, and the saved figure and data artifacts all live in the project repository at \url{https://github.com/janwejchert/Capstone/tree/main}, laid out as described in appendix~\ref{app:implementation}. % src: repository URL provided by the author
 
 \end{document}
