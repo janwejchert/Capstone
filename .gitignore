@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results: track small phase summaries, ignore everything else
+results/data/*.npz
+!results/data/.gitkeep
+!results/data/phase_*.npz
+
+# LaTeX aux (track .tex, .bib, .pdf only)
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# brainstorming visual companion mockups
+.superpowers/
